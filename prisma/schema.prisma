@@ -41,7 +41,7 @@ model Card {
   description    String // 카드 설명
   totalCount     Int // 카드 총 수 -> 최초의 발행한 카드의 수
   remainingCount Int // 현재 남아있는 카드 개수
-  imageURL       String // 카드 이미지 URL
+  imageURL       String? // 카드 이미지 URL
   createAt       DateTime   @default(now()) // 카드 생성 시점
   updateAt       DateTime   @updatedAt // 카드 수정 시점
   user           User       @relation(fields: [userId], references: [id], onDelete: Restrict) // 카드 소유자 (유저 ID, 외래 키)
@@ -88,13 +88,14 @@ model Purchase {
 }
 
 model Exchange {
-  id       Int      @id @default(autoincrement()) // 카드ID, 기본 키
-  createAt DateTime @default(now()) // 카드 생성 시점
-  updateAt DateTime @updatedAt // 카드 수정 시점
-  user     User     @relation(fields: [userId], references: [id])
-  userId   Int
-  card     Card     @relation("CardExchanges", fields: [cardId], references: [id]) //교환을 신청하는 카드 
-  cardId   Int //교환을 신청하는 카드 ID 
-  Shop     Shop     @relation(fields: [shopId], references: [id]) //예시 ) 구매자가 구매후 판매샵의 남아있는 카드수를 카운트 하기 위한 관계
-  shopId   Int //교환의 희망하는 판매상품 
+  id        Int      @id @default(autoincrement()) // 카드ID, 기본 키
+  createAt  DateTime @default(now()) // 카드 생성 시점
+  updateAt  DateTime @updatedAt // 카드 수정 시점
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  card      Card     @relation("CardExchanges", fields: [cardId], references: [id]) //교환을 신청하는 카드 
+  cardId    Int //교환을 신청하는 카드 ID 
+  Shop      Shop     @relation(fields: [shopId], references: [id]) //예시 ) 구매자가 구매후 판매샵의 남아있는 카드수를 카운트 하기 위한 관계
+  shopId    Int //교환의 희망하는 판매상품 
+  isApprove Boolean  @default(true)
 }
