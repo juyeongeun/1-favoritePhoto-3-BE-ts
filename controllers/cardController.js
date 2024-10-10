@@ -59,5 +59,24 @@ router.get("/", async (req, res, next) => {
   }
 });
 
+// 카드 상세 조회
+router.get("/:id", async (req, res, next) => {
+  const { id } = req.params; // URL 파라미터에서 카드 ID 추출
+
+  try {
+    const card = await cardService.getCardById(Number(id)); // 카드 ID로 카드 조회
+
+    if (!card) {
+      return res
+        .status(404)
+        .send({ success: false, message: "카드를 찾을 수 없습니다." });
+    }
+
+    res.status(200).send({ success: true, data: card });
+  } catch (error) {
+    next(error); // 에러를 next로 전달
+  }
+});
+
 // 라우터 내보내기
 export default router;
