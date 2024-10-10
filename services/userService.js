@@ -1,4 +1,5 @@
-import userRepository from "../repositorys/userRepository";
+import userRepository from "../repositorys/userRepository.js";
+import bcrypt from "bcrypt";
 
 const getUserByEmail = async (email) => {
   const user = await userRepository.getByEmail(email);
@@ -41,7 +42,7 @@ const create = async (data) => {
     throw error;
   }
 
-  const hashedPassword = hashingPassword(data.password);
+  const hashedPassword = await hashingPassword(data.password);
   const createUser = await userRepository.create({
     ...data,
     password: hashedPassword,
