@@ -13,4 +13,29 @@ router.post("/", async (req, res, next) => {
   }
 });
 
+// 전체 알림 조회
+router.get("/:userId", async (req, res, next) => {
+  try {
+    const notifications = await notificationService.getAllNotifications(
+      req.params.userId
+    );
+    res.status(200).send({ success: true, notifications });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// 특정 알림 조회(교환 관련 or 구매 관련 등)
+router.get("/type/:userId/:type", async (req, res, next) => {
+  try {
+    const notifications = await notificationService.getNotificationsByType(
+      req.params.userId,
+      req.params.type // 조회할 알림의 타입
+    );
+    res.status(200).send({ success: true, notifications });
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default router;
