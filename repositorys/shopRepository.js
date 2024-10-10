@@ -119,6 +119,7 @@ export const deleteShopCard = async (shopId) => {
 };
 
 // 카드 구매 처리 (트랜잭션 사용)
+// 알림 로직 수정해야함
 export const purchaseShopCard = async (data) => {
   const { shopId, count, buyerId } = data;
 
@@ -173,6 +174,7 @@ export const purchaseShopCard = async (data) => {
         imageURL: shopCard.card.imageURL,
         grade: shopCard.card.grade,
         genre: shopCard.card.genre,
+        purchasePrice: shopCard.card.price,
       },
     });
 
