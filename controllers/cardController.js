@@ -38,6 +38,26 @@ router.post("/", async (req, res, next) => {
     next(error); // 에러를 next로 전달
   }
 });
+// 카드 전체 조회(검색 기능 포함)
+router.get("/", async (req, res, next) => {
+  try {
+    const { search } = req.query; // 쿼리 파라미터에서 검색어 추출
+    const userId = req.body.userId; // 사용자 ID를 요청에서 가져옴
+
+    const cards = await cardService.getUserCards(userId); // 사용자 카드 조회 (서비스에서 사용자 카드만 가져오는 함수 필요)
+
+    // (일단 이름으로만 검색- 추후 수정) 검색어가 있을 경우 카드 이름으로만 필터링
+    const filteredCards = search
+      ? cards.filter(
+          (card) => card.name.toLowerCase().includes(search.toLowerCase()) // 카드 이름 검색
+        )
+      : cards;
+
+    res.status(200).send({ success: true, data: filteredCards });
+  } catch (error) {
+    next(error); // 에러를 next로 전달
+  }
+});
 
 // 라우터 내보내기
 export default router;
