@@ -38,4 +38,29 @@ router.get("/type/:userId/:type", async (req, res, next) => {
   }
 });
 
+// 알림 업데이트 (읽음 상태 변경 등)
+router.put("/:id", async (req, res, next) => {
+  try {
+    const updatedNotification = await notificationService.updateNotification(
+      req.params.id,
+      req.body
+    );
+    res.status(200).send({ success: true, updatedNotification });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// 알림 삭제
+router.delete("/:id", async (req, res, next) => {
+  try {
+    await notificationService.deleteNotification(req.params.id);
+    res
+      .status(200)
+      .send({ success: true, message: "알림이 성공적으로 삭제되었습니다." });
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default router;
