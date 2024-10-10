@@ -38,11 +38,12 @@ router.post("/", async (req, res, next) => {
     next(error); // 에러를 next로 전달
   }
 });
+
 // 카드 전체 조회(검색 기능 포함)
 router.get("/", async (req, res, next) => {
   try {
     const { search } = req.query; // 쿼리 파라미터에서 검색어 추출
-    const userId = req.body.userId; // 사용자 ID를 요청에서 가져옴
+    const userId = req.user.id; // 로그인된 사용자 ID
 
     const cards = await cardService.getUserCards(userId); // 사용자 카드 조회 (서비스에서 사용자 카드만 가져오는 함수 필요)
 
@@ -81,25 +82,10 @@ router.get("/:id", async (req, res, next) => {
 // 카드 삭제
 router.delete("/:id", async (req, res, next) => {
   const { id } = req.params; // URL 파라미터에서 카드 ID 추출
-  const userId = req.body.userId; // 사용자 ID를 요청에서 가져옴
+  const userId = req.user.id; // 로그인된 사용자 ID
 
   try {
-    const card = await cardService.getCardById(Number(id)); // 카드 ID로 카드 조회
-
-    if (!card) {
-      return res
-        .status(404)
-        .send({ success: false, message: "포토카드를 찾을 수 없습니다." });
-    }
-
-    // 작성자 확인
-    if (card.userId !== userId) {
-      return res
-        .status(403)
-        .send({ success: false, message: "삭제 권한이 없습니다." });
-    }
-
-    await cardService.deleteCard(Number(id)); // 카드 삭제
+    await cardService.deleteCard(Number(id), userId);
     res
       .status(200)
       .send({ success: true, message: "카드가 성공적으로 삭제되었습니다." });
