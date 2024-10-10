@@ -37,8 +37,8 @@ const userValidation = (req, res, next) => {
 
   if (
     typeof nickname !== "string" ||
-    !nickname.length < 1 ||
-    !nickname.length > 10
+    nickname.length < 1 ||
+    nickname.length > 10
   ) {
     return res.status(400).send({
       message: "닉네임은 1자 이상 10자 미만 입니다.",

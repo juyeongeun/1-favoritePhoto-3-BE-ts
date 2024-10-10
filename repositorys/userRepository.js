@@ -1,7 +1,7 @@
 import prismaClient from "../utils/prismaClient.js";
 
 const getByEmail = (email) => {
-  return prismaClient.user.findUniqueOrThrow({
+  return prismaClient.user.findUnique({
     where: {
       email,
     },
@@ -9,7 +9,7 @@ const getByEmail = (email) => {
 };
 
 const getById = (id) => {
-  return prismaClient.user.findUniqueOrThrow({
+  return prismaClient.user.findUnique({
     where: {
       id,
     },
