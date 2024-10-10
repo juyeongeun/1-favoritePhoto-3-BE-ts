@@ -1,4 +1,5 @@
 import userRepository from "../repositorys/userRepository";
+import bcrypt from "bcrypt";
 
 const getUserByEmail = async (email) => {
   const user = await userRepository.getByEmail(email);

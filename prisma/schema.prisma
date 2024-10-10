@@ -73,8 +73,8 @@ model Shop {
   cardId         Int
   favorited      User[]   @relation("favorite") // 관심카드를 위한 다대다 관계 -> 정규 요구사항 아님
   price          Int
-  totalCount     Int // 카드 총 수 -> 최초의 발행한 카드의 수
-  remainingCount Int // 현재 남아있는 카드 개수
+  totalCount     Int // 최초의 판매 등록 수
+  remainingCount Int // 팔고 남은거 
 }
 
 model Purchase {
@@ -96,5 +96,5 @@ model Exchange {
   card           Card     @relation("CardExchanges", fields: [cardId], references: [id]) //교환을 신청하는 카드 
   cardId         Int //교환을 신청하는 카드 ID 
   exchangeCard   Card     @relation("ExchangeTarget", fields: [exchangeCardId], references: [id]) //교환 제안을 받은 카드
-  exchangeCardId Int //교환을 제안하는 카드 ID 
+  exchangeCardId Int //교환 대상이 되는 카드 ID 
 }
