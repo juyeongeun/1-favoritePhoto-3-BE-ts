@@ -35,7 +35,7 @@ model User {
 model Card {
   id             Int        @id @default(autoincrement()) // 카드ID, 기본 키
   name           String // 카드 이름
-  price          Int // 카드 가격
+  purchasePrice  Int? // 카드를 구매한 가격
   grade          String // 카드 등급
   genre          String // 카드 장르
   description    String // 카드 설명
