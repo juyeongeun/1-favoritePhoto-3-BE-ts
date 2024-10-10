@@ -1,11 +1,14 @@
 import express from "express";
-import userService from "../services/userService";
+import userService from "../services/userService.js";
+import userValidation from "../middlewares/users/userValidation.js";
+import { asyncHandle } from "../utils/error/asyncHandle.js";
 
 const router = express.Router();
 
 router.post(
   "/signup",
-  asyncHandle(async (res, res, next) => {
+  userValidation,
+  asyncHandle(async (req, res, next) => {
     try {
       const { email, password, nickname } = req.body;
 
@@ -21,3 +24,5 @@ router.post(
     }
   })
 );
+
+export default router;

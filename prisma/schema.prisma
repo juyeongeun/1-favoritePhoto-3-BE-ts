@@ -35,21 +35,20 @@ model User {
 model Card {
   id             Int        @id @default(autoincrement()) // 카드ID, 기본 키
   name           String // 카드 이름
-  price          Int // 카드 가격
+  purchasePrice  Int? // 카드를 구매한 가격
   grade          String // 카드 등급
   genre          String // 카드 장르
   description    String // 카드 설명
   totalCount     Int // 카드 총 수 -> 최초의 발행한 카드의 수
   remainingCount Int // 현재 남아있는 카드 개수
-  imageURL       String // 카드 이미지 URL
+  imageURL       String? // 카드 이미지 URL
   createAt       DateTime   @default(now()) // 카드 생성 시점
   updateAt       DateTime   @updatedAt // 카드 수정 시점
   user           User       @relation(fields: [userId], references: [id], onDelete: Restrict) // 카드 소유자 (유저 ID, 외래 키)
   userId         Int // 카드 소유자 (유저 ID, 외래 키)
   shop           Shop[]
   purchase       Purchase[]
-  exchange       Exchange[] @relation("CardExchanges")
-  exchangeTarget Exchange[] @relation("ExchangeTarget")
+  exchange       Exchange[] @relation("CardExchanges") //교환 신청자의 카드
 }
 
 model Notification {
@@ -64,17 +63,18 @@ model Notification {
 }
 
 model Shop {
-  id             Int      @id @default(autoincrement()) // 카드ID, 기본 키
-  createAt       DateTime @default(now()) // 카드 생성 시점
-  updateAt       DateTime @updatedAt // 카드 수정 시점
-  user           User     @relation(fields: [userId], references: [id])
+  id             Int        @id @default(autoincrement()) // 카드ID, 기본 키
+  createAt       DateTime   @default(now()) // 카드 생성 시점
+  updateAt       DateTime   @updatedAt // 카드 수정 시점
+  user           User       @relation(fields: [userId], references: [id])
   userId         Int
-  card           Card     @relation(fields: [cardId], references: [id])
+  card           Card       @relation(fields: [cardId], references: [id])
   cardId         Int
-  favorited      User[]   @relation("favorite") // 관심카드를 위한 다대다 관계 -> 정규 요구사항 아님
+  favorited      User[]     @relation("favorite") // 관심카드를 위한 다대다 관계 -> 정규 요구사항 아님
   price          Int
-  totalCount     Int // 카드 총 수 -> 최초의 발행한 카드의 수
-  remainingCount Int // 현재 남아있는 카드 개수
+  totalCount     Int // 최초의 판매 등록 수
+  remainingCount Int // 팔고 남은거 
+  exchange       Exchange[]
 }
 
 model Purchase {
@@ -88,13 +88,14 @@ model Purchase {
 }
 
 model Exchange {
-  id             Int      @id @default(autoincrement()) // 카드ID, 기본 키
-  createAt       DateTime @default(now()) // 카드 생성 시점
-  updateAt       DateTime @updatedAt // 카드 수정 시점
-  user           User     @relation(fields: [userId], references: [id])
-  userId         Int
-  card           Card     @relation("CardExchanges", fields: [cardId], references: [id]) //교환을 신청하는 카드 
-  cardId         Int //교환을 신청하는 카드 ID 
-  exchangeCard   Card     @relation("ExchangeTarget", fields: [exchangeCardId], references: [id]) //교환 제안을 받은 카드
-  exchangeCardId Int //교환을 제안하는 카드 ID 
+  id        Int      @id @default(autoincrement()) // 카드ID, 기본 키
+  createAt  DateTime @default(now()) // 카드 생성 시점
+  updateAt  DateTime @updatedAt // 카드 수정 시점
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  card      Card     @relation("CardExchanges", fields: [cardId], references: [id]) //교환을 신청하는 카드 
+  cardId    Int //교환을 신청하는 카드 ID 
+  Shop      Shop     @relation(fields: [shopId], references: [id]) //예시 ) 구매자가 구매후 판매샵의 남아있는 카드수를 카운트 하기 위한 관계
+  shopId    Int //교환의 희망하는 판매상품 
+  isApprove Boolean  @default(true)
 }
