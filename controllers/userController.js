@@ -90,12 +90,52 @@ router.post(
   asyncHandle(async (req, res, next) => {
     try {
       const { email } = req.body;
-      //카드 서비스함수 호출 필요
       const user = await userService.getUserByEmail(email);
       if (user) {
-        res.status(200).send({ message: "사용중인 이메일입니다." });
+        res.status(400).send({
+          isApprove: false,
+          data: {
+            message: "사용중인 이메일입니다.",
+            email,
+          },
+        });
       } else {
-        res.status(404).send();
+        res.status(200).send({
+          isApprove: true,
+          data: {
+            message: "사용가능한 이메일입니다.",
+            email,
+          },
+        });
+      }
+    } catch (error) {
+      next(error);
+    }
+  })
+);
+
+router.post(
+  "/check-nickname",
+  asyncHandle(async (req, res, next) => {
+    try {
+      const { nickname } = req.body;
+      const user = await userService.getUserByEmail(nickname);
+      if (user) {
+        res.status(400).send({
+          isApprove: false,
+          data: {
+            message: "사용중인 닉네임입니다.",
+            email,
+          },
+        });
+      } else {
+        res.status(200).send({
+          isApprove: true,
+          data: {
+            message: "사용가능한 닉네임입니다.",
+            email,
+          },
+        });
       }
     } catch (error) {
       next(error);

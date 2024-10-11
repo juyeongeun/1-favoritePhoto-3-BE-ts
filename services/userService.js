@@ -30,6 +30,12 @@ const getUserByEmail = async (email) => {
   return filterSensitiveUserData(user);
 };
 
+const getUserByNickname = async (nickname) => {
+  const user = await userRepository.getByNickname(nickname);
+
+  return filterSensitiveUserData(user);
+};
+
 const getUserById = async (userId) => {
   const user = await userRepository.getById(userId);
 
@@ -126,6 +132,8 @@ export default {
   getUser,
   getUserByEmail,
   getUserById,
+  getUserByNickname,
+  refreshToken,
   create,
   updateUser,
   deleteUser,
