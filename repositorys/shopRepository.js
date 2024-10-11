@@ -85,8 +85,18 @@ const getShopCardById = async (cardId) => {
           price: true,
           totalCount: true,
           remainingCount: true,
+          imageURL: true, // 이미지 URL 추가
           genre: true, // 장르 추가
           grade: true, // 등급 추가
+          exchange: {
+            // 교환 희망 정보 추가(추후 수정)
+            select: {
+              id: true, // 교환 ID
+              grade: true, // 교환 등급
+              genre: true, // 교환 장르
+              exchangeDescription: true, // 교환 설명
+            },
+          },
         },
       },
       user: { select: { nickname: true } }, // 판매자 정보에서 닉네임만 포함

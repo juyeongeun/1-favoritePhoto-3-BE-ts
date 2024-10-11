@@ -35,7 +35,7 @@ const getShopCards = async (filters) => {
 
   const cardsWithSoldOutFlag = cards.map((card) => ({
     ...card,
-    isSoldOut: card.remainingCount === 0,
+    isSoldOut: card.remainingCount === 0, // 품절 여부
   }));
 
   return { cards: cardsWithSoldOutFlag, totalCount };
