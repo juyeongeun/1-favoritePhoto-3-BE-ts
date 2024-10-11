@@ -55,3 +55,15 @@ export const getCardById = async (id) => {
 export const deleteCard = async (id) => {
   return await prismaClient.card.delete({ where: { id } });
 };
+
+export const updateCard = async (data) => {
+  console.log(data.id, data.userId, data.remainingCount);
+  return await prismaClient.card.update({
+    where: {
+      AND: [{ id: data.id }, { userId: data.userId }],
+    },
+    data: {
+      remainingCount: data.remainingCount,
+    },
+  });
+};

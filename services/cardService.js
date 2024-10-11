@@ -53,3 +53,11 @@ export const deleteCard = async (id, userId) => {
     throw new Error("카드 삭제 중 오류 발생");
   }
 };
+
+export const updateCard = async (data) => {
+  try {
+    return await cardRepository.updateCard(data);
+  } catch (error) {
+    throw new Error("카드 수정 중 오류 발생");
+  }
+};

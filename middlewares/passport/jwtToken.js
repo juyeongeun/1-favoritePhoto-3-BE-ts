@@ -1,5 +1,5 @@
 import { Strategy as JwtStrategy } from "passport-jwt";
-import userService from "../../service/userService.js";
+import userService from "../../services/userService.js";
 
 const accessExtractor = function (req) {
   var token = null;
