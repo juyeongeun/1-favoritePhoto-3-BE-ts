@@ -1,7 +1,7 @@
 import prismaClient from "../utils/prismaClient.js";
 
 // 상점 카드 정보 체크
-export const getCheckCardById = async (userId, cardId) => {
+const getCheckCardById = async (userId, cardId) => {
   return await prismaClient.shopCard.findUnique({
     where: {
       userId_cardId: { userId, cardId }, // 복합 고유 키 사용
@@ -10,12 +10,12 @@ export const getCheckCardById = async (userId, cardId) => {
 };
 
 // 상점 카드 생성
-export const createShopCard = async (data) => {
+const createShopCard = async (data) => {
   return await prismaClient.shopCard.create({ data });
 };
 
 // 상점에 등록된 카드 목록 조회
-export const getShopCards = async (filters) => {
+const getShopCards = async (filters) => {
   const { page, pageSize, orderBy, keyword, grade, genre, isSoldOut } = filters;
 
   const where = {
@@ -56,7 +56,7 @@ export const getShopCards = async (filters) => {
 };
 
 // 상점에 등록된 카드 총 개수 조회
-export const getShopCardCount = async (data) => {
+const getShopCardCount = async (data) => {
   const { keyword, grade, genre } = data;
 
   const where = {
@@ -74,7 +74,7 @@ export const getShopCardCount = async (data) => {
 };
 
 // 상점 카드 상세 정보 조회
-export const getShopCardById = async (cardId) => {
+const getShopCardById = async (cardId) => {
   return await prismaClient.shopCard.findUnique({
     where: { id: cardId },
     include: {
@@ -95,7 +95,7 @@ export const getShopCardById = async (cardId) => {
 };
 
 // 판매자 정보 가져오기
-export const getUserById = async (userId) => {
+const getUserById = async (userId) => {
   return await prismaClient.user.findUnique({
     where: { id: userId },
     select: { nickname: true }, // 닉네임만 선택적으로 가져오기
@@ -103,7 +103,7 @@ export const getUserById = async (userId) => {
 };
 
 // 상점 카드 정보 업데이트
-export const updateShopCard = async (data) => {
+const updateShopCard = async (data) => {
   return await prismaClient.shopCard.update({
     where: { id: data.shopId },
     data: { price: data.price, totalCount: data.totalCount },
@@ -111,7 +111,7 @@ export const updateShopCard = async (data) => {
 };
 
 // 상점 카드 삭제 및 관련 정보 업데이트 (트랜잭션 사용)
-export const deleteShopCard = async (shopId) => {
+const deleteShopCard = async (shopId) => {
   return await prismaClient.$transaction(async (prisma) => {
     const shopCard = await prisma.shopCard.findUnique({
       where: { id: shopId },
@@ -142,7 +142,7 @@ export const deleteShopCard = async (shopId) => {
 
 // 카드 구매 처리 (트랜잭션 사용)
 // 알림 로직 수정해야함
-export const purchaseShopCard = async (data) => {
+const purchaseShopCard = async (data) => {
   const { shopId, count, buyerId } = data;
 
   return await prismaClient.$transaction(async (prisma) => {
@@ -206,4 +206,16 @@ export const purchaseShopCard = async (data) => {
 
     return { message: "Card purchased successfully." };
   });
+};
+
+export {
+  getCheckCardById,
+  createShopCard,
+  getShopCards,
+  getShopCardCount,
+  getShopCardById,
+  getUserById,
+  updateShopCard,
+  deleteShopCard,
+  purchaseShopCard,
 };

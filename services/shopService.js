@@ -1,7 +1,25 @@
 import * as shopRepository from "../repositorys/shopRepository.js";
 
+const filters = {
+  page: parseInt(page, 10),
+  pageSize: parseInt(pageSize, 10),
+  orderBy,
+  keyword,
+  grade,
+  genre,
+  isSoldOut:
+    isSoldOut === "true" ? true : isSoldOut === "false" ? false : undefined,
+};
+
+// 카드 목록 조회시, 품절 카드 필터링
+if (filters.isSoldOut !== undefined) {
+  cards = cards.filter(
+    (card) => (card.remainingCount === 0) === filters.isSoldOut
+  );
+}
+
 /* 상점에 포토카드 판매 등록 */
-export const createShopCard = async (data) => {
+const createShopCard = async (data) => {
   // 카드 판매 시, 재고 확인
   if (data.totalCount <= 0) {
     const error = new Error("Total count must be greater than zero");
@@ -29,7 +47,7 @@ export const createShopCard = async (data) => {
 };
 
 /* 상점에 등록한 포토 카드 전체 리스트 조회 */
-export const getShopCards = async (filters) => {
+const getShopCards = async (filters) => {
   const cards = await shopRepository.getShopCards(filters);
   const totalCount = await shopRepository.getShopCardCount(filters);
 
@@ -42,7 +60,7 @@ export const getShopCards = async (filters) => {
 };
 
 /* 상점에 등록한 포토 카드 상세 조회 */
-export const getShopCardByShopId = async (cardId) => {
+const getShopCardByShopId = async (cardId) => {
   const card = await shopRepository.getShopCardById(cardId);
 
   // 등록된 카드 없는 경우
@@ -62,15 +80,15 @@ export const getShopCardByShopId = async (cardId) => {
   };
 };
 
-export const updateShopCard = async (data) => {
+const updateShopCard = async (data) => {
   return await shopRepository.updateShopCard(data);
 };
 
-export const deleteShopCard = async (shopId) => {
+const deleteShopCard = async (shopId) => {
   return await shopRepository.deleteShopCard(shopId);
 };
 
-export const purchaseShopCard = async (data) => {
+const purchaseShopCard = async (data) => {
   const { shopId, count } = data;
 
   // 카드 정보 조회
@@ -95,6 +113,16 @@ export const purchaseShopCard = async (data) => {
 };
 
 // 카드 판매 히스토리 조회
-export const getPurchaseHistoryByCardId = async (cardId) => {
+const getPurchaseHistoryByCardId = async (cardId) => {
   return await shopRepository.getPurchaseHistory(cardId);
+};
+
+export {
+  createShopCard,
+  getShopCards,
+  getShopCardByShopId,
+  updateShopCard,
+  deleteShopCard,
+  purchaseShopCard,
+  getPurchaseHistoryByCardId,
 };
