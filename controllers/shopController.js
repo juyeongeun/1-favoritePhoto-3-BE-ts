@@ -27,7 +27,7 @@ router.post(
 
 // 상점에 등록된 카드 목록 조회 라우트
 router.get(
-  "/",
+  "/cards/:shopId",
   asyncHandle(async (req, res, next) => {
     const {
       page = 1,
@@ -55,13 +55,13 @@ router.get(
   })
 );
 
-// 카드 상세 보기
+// 포토 카드 상세 조회
 router.get(
-  "/:shopId",
+  "/cards/:shopId/:cardId",
   asyncHandle(async (req, res, next) => {
-    const { shopId } = req.params;
-    const cards = await shopService.getShopCardByShopId(parseInt(shopId, 10));
-    return res.status(200).json(cards);
+    const { cardId } = req.params;
+    const cardDetails = await shopService.getShopCardById(parseInt(cardId, 10));
+    return res.status(200).json(cardDetails);
   })
 );
 
