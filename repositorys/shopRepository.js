@@ -11,11 +11,20 @@ const getCheckCardById = async (userId, cardId) => {
 
 // 상점 카드 생성
 const createShopCard = async (data) => {
-  return await prismaClient.shopCard.create({ data });
+  return await prismaClient.shopCard.create({
+    data: {
+      ...data,
+      exchangeGrade: data.exchangeGrade, // 교환 희망 등급
+      exchangeGenre: data.exchangeGenre, // 교환 희망 장르
+      exchangeDescription: data.exchangeDescription, // 교환 희망 설명
+    },
+  });
 };
 
 // 상점에 등록된 카드 목록 조회
 const getShopCards = async (filters) => {
+  console.log("Filters:", filters); // filters 확인
+
   const { page, pageSize, orderBy, keyword, grade, genre, isSoldOut } = filters;
 
   const where = {
@@ -32,12 +41,16 @@ const getShopCards = async (filters) => {
     }),
   };
 
+  console.log("Where clause:", where); // where 조건 확인
+
   const order = {
     ...(orderBy === "recent" && { createAt: "desc" }),
     ...(orderBy === "old" && { createAt: "asc" }),
     ...(orderBy === "lowPrice" && { price: "asc" }),
     ...(orderBy === "highPrice" && { price: "desc" }),
   };
+
+  console.log("Order clause:", order); // order 조건 확인
 
   const cards = await prismaClient.shopCard.findMany({
     where,
@@ -88,18 +101,17 @@ const getShopCardById = async (cardId) => {
           imageURL: true, // 이미지 URL 추가
           genre: true, // 장르 추가
           grade: true, // 등급 추가
-          exchange: {
-            // 교환 희망 정보 추가(추후 수정)
-            select: {
-              id: true, // 교환 ID
-              grade: true, // 교환 등급
-              genre: true, // 교환 장르
-              exchangeDescription: true, // 교환 설명
-            },
-          },
         },
       },
       user: { select: { nickname: true } }, // 판매자 정보에서 닉네임만 포함
+      exchange: {
+        select: {
+          id: true, // 교환 ID
+          exchangeDescription: true, // 교환 설명
+          exchangeGrade: true, // 희망하는 카드 등급
+          exchangeGenre: true, // 희망하는 카드 장르
+        },
+      },
     },
   });
 };
