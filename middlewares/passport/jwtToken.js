@@ -1,6 +1,10 @@
 import { Strategy as JwtStrategy } from "passport-jwt";
+<<<<<<< HEAD
+import userService from "../../services/userService.js"; // 경로 수정
+=======
 import userService from "../../services/userService.js";
 import { JWT_SECRET } from "../../env.js";
+>>>>>>> 349580d9472995837b7f1a0df14fe098331d956f
 
 const accessExtractor = function (req) {
   var token = null;
