@@ -10,7 +10,7 @@ const createToken = (user, type) => {
 
 const getUser = async ({ email, password }) => {
   const user = await userRepository.getByEmail(email);
-
+  console.log(user);
   if (!user) {
     const error = new Error("Mot found");
     error.status = 404;
@@ -18,6 +18,7 @@ const getUser = async ({ email, password }) => {
       message: "등록된 사용자가 없습니다.",
       email,
     };
+    throw error;
   }
 
   await verifyPassword(password, user.password);
@@ -50,6 +51,7 @@ const getUserById = async (userId) => {
       message: "등록된 사용자가 없습니다.",
       userId,
     };
+    throw error;
   }
 
   return filterSensitiveUserData(user);
@@ -63,16 +65,15 @@ const refreshToken = async (userId, refreshToken) => {
     error.status = 404;
     error.data = {
       message: "등록된 사용자가 없습니다.",
-      userId,
     };
+    throw error;
   }
 
   if (refreshToken !== user.refreshToken) {
-    const error = new Error("Unprocessable Entity");
-    error.status = 422;
+    const error = new Error("Unauthorized");
+    error.status = 401;
     error.data = {
       message: "리프레쉬 토큰이 유효하지 않습니다.",
-      refreshToken,
     };
     throw error;
   }
@@ -80,13 +81,26 @@ const refreshToken = async (userId, refreshToken) => {
 };
 
 const create = async (data) => {
-  const user = await userRepository.getByEmail(data.email);
-
-  if (user) {
+  const userByEmail = await userRepository.getByEmail(data.email);
+  if (userByEmail) {
     //이미 사용중인 이메일인 경우 아래의 에러를 반환한다.
-    const error = new Error("Unauthorized");
+    const error = new Error("Unprocessable Entity");
     error.status = 422;
-    error.data = { email: user.email };
+    error.data = {
+      message: "사용중인 이메일입니다.",
+      email: userByEmail.email,
+    };
+    throw error;
+  }
+  const userByNickname = await userRepository.getByNickname(data.nickname);
+  if (userByNickname) {
+    //이미 사용중인 이메일인 경우 아래의 에러를 반환한다.
+    const error = new Error("Unprocessable Entity");
+    error.status = 422;
+    error.data = {
+      message: "사용중인 닉네임입니다.",
+      nickname: userByEmail.nickname,
+    };
     throw error;
   }
 
@@ -125,8 +139,11 @@ const filterSensitiveUserData = (user) => {
 const verifyPassword = async (inputPassword, savedPassword) => {
   const isValid = await bcrypt.compare(inputPassword, savedPassword); // 변경
   if (!isValid) {
-    const error = new Error("비밀번호가 일치 하지 않습니다.");
-    error.code = 401;
+    const error = new Error("Unauthorized");
+    error.status = 401;
+    error.data = {
+      message: "비밀번호가 일치 하지 않습니다.",
+    };
     throw error;
   }
 };
