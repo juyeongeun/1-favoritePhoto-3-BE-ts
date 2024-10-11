@@ -21,17 +21,6 @@ const whereConditions = (userId, keyword) => {
   return where;
 };
 
-const createNotificationFromExchange = async (shopId, cardId) => {
-  try {
-  } catch (error) {
-    error.status = 500;
-    error.data = {
-      message: "알림 생성에 실패 했습니다.",
-    };
-    throw error;
-  }
-};
-
 const createExchange = async (data) => {
   //판매의 남아있는 카드 수량을 검사하는 로직 필요
   try {
