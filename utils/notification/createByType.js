@@ -11,8 +11,11 @@ const switchingType = (type, exchange) => {
         type: "교환승인",
         content: `${shop.user.nickname}님과의 [${shop.card.grade} | ${shop.card.name}]의 포토 카드 교환이 성사되었습니다.`,
       };
-    case 3: //교환거절
-      return "등록하신 상품의 교환 신청이 있습니다.";
+    case 3: //교환거절 구매자에게
+      return {
+        type: "교환거절",
+        content: `${shop.user.nickname}님과의 [${shop.card.grade} | ${shop.card.name}]의 포토 카드 교환이 거절되었습니다.`,
+      };
     case 4:
       return "등록하신 상품의 교환 신청이 있습니다.";
     case 5:
@@ -22,10 +25,12 @@ const switchingType = (type, exchange) => {
 
 const createNotificationFromType = async (userId, type, exchange) => {
   try {
+    const { content } = switchingType(type, exchange);
     const notification = await notificationRepository.createNotification({
       userId,
-      content: "등록하신 상품의 교환 신청이 있습니다",
+      content,
     });
+    return notification;
   } catch (error) {
     error.status = 500;
     error.data = {
