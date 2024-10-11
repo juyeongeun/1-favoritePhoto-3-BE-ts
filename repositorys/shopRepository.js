@@ -218,7 +218,7 @@ const purchaseShopCard = async (data) => {
   });
 };
 
-export default {
+export {
   getCheckCardById,
   createShopCard,
   getShopCards,

@@ -75,7 +75,9 @@ model Shop {
   totalCount          Int // 최초의 판매 등록 수
   remainingCount      Int // 팔고 남은거 
   exchange            Exchange[]
-  exchangeDescription String?
+  exchangeDescription String? //교환희망 설명
+  exchangeGrade       String // 교환희망 카드 등급
+  exchangeGenre       String // 교환희망 카드 장르
 }
 
 model Purchase {

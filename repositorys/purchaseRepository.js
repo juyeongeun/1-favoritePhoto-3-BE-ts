@@ -1,7 +1,7 @@
 import prismaClient from "../utils/prismaClient.js";
 
 // 사용자 구매내역 조회
-export const getUserPurchase = async (userId, filters) => {
+const getUserPurchase = async (userId, filters) => {
   const { page, pageSize, orderBy, keyword, grade, genre, isSoldOut } = filters;
 
   const where = {
@@ -37,7 +37,7 @@ export const getUserPurchase = async (userId, filters) => {
 };
 
 // 사용자의 구매 내역 총 개수 조회
-export const getUserPurchaseCount = async (userId, filters) => {
+const getUserPurchaseCount = async (userId, filters) => {
   const { keyword, grade, genre, isSoldOut } = filters;
 
   const where = {
@@ -55,3 +55,5 @@ export const getUserPurchaseCount = async (userId, filters) => {
   const totalCount = await prismaClient.purchase.count({ where });
   return totalCount;
 };
+
+export { getUserPurchase, getUserPurchaseCount };
