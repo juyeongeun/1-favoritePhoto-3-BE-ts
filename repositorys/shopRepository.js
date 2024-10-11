@@ -74,9 +74,31 @@ export const getShopCardCount = async (data) => {
 };
 
 // 상점 카드 상세 정보 조회
-export const getShopCardByShopId = async (shopId) => {
+export const getShopCardById = async (cardId) => {
   return await prismaClient.shopCard.findUnique({
-    where: { id: shopId },
+    where: { id: cardId },
+    include: {
+      card: {
+        select: {
+          name: true,
+          description: true,
+          price: true,
+          totalCount: true,
+          remainingCount: true,
+          genre: true, // 장르 추가
+          grade: true, // 등급 추가
+        },
+      },
+      user: { select: { nickname: true } }, // 판매자 정보에서 닉네임만 포함
+    },
+  });
+};
+
+// 판매자 정보 가져오기
+export const getUserById = async (userId) => {
+  return await prismaClient.user.findUnique({
+    where: { id: userId },
+    select: { nickname: true }, // 닉네임만 선택적으로 가져오기
   });
 };
 
