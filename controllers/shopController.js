@@ -11,16 +11,30 @@ const router = express.Router();
 // 카드 판매 등록하기
 router.post(
   "/",
-  shopValidation,
-  asyncHandle(async (req, res, next) => {
+  shopValidation, // 요청 본문의 유효성을 검사하는 미들웨어
+  asyncHandle(async (req, res) => {
+    // 요청 본문에서 카드 ID, 가격, 총 판매 수량, 교환 희망 정보를 추출
     const userId = req.user.id;
-    const { cardId, price, totalCount } = req.body;
+    const {
+      cardId,
+      price,
+      totalCount,
+      exchangeGrade,
+      exchangeGenre,
+      exchangeDescription,
+    } = req.body;
+
+    // 카드 정보를 상점에 등록
     const newCard = await shopService.createShopCard({
       userId,
       cardId,
       price,
       totalCount,
+      exchangeGrade, // 사용자로부터 교환 희망 정보 수신
+      exchangeGenre,
+      exchangeDescription,
     });
+    // 카드 등록 성공 시, 새로 등록된 카드 정보를 클라이언트에 반환
     return res.status(201).json(newCard);
   })
 );
