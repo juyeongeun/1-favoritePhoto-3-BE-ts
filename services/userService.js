@@ -26,13 +26,17 @@ const getUser = async ({ email, password }) => {
 
 const getUserByEmail = async (email) => {
   const user = await userRepository.getByEmail(email);
-
+  if (!user) {
+    return null;
+  }
   return filterSensitiveUserData(user);
 };
 
 const getUserByNickname = async (nickname) => {
   const user = await userRepository.getByNickname(nickname);
-
+  if (!user) {
+    return null;
+  }
   return filterSensitiveUserData(user);
 };
 

@@ -119,13 +119,13 @@ router.post(
   asyncHandle(async (req, res, next) => {
     try {
       const { nickname } = req.body;
-      const user = await userService.getUserByEmail(nickname);
+      const user = await userService.getUserByNickname(nickname);
       if (user) {
         res.status(400).send({
           isApprove: false,
           data: {
             message: "사용중인 닉네임입니다.",
-            email,
+            nickname,
           },
         });
       } else {
@@ -133,7 +133,7 @@ router.post(
           isApprove: true,
           data: {
             message: "사용가능한 닉네임입니다.",
-            email,
+            nickname,
           },
         });
       }
@@ -157,16 +157,21 @@ router.get(
   asyncHandle(async (req, res, next) => {
     try {
       const { id: userId } = req.user;
-      const refreshToken = req.cookies["refresh-token"];
+      let refreshToken = null;
+      if (req.cookies) {
+        refreshToken = req.cookies["refresh-token"];
+      } else {
+        refreshToken = req.headers.refreshtoken;
+      }
       const validationToken = await userService.refreshToken(
         userId,
         refreshToken
       );
       if (validationToken) {
-        const accessToken = userService.createToken(user);
-        const newRefreshToken = userService.createToken(user, "refresh");
-        const nextUser = await userService.updateUser(user.id, {
-          newRefreshToken,
+        const accessToken = userService.createToken(req.user);
+        const newRefreshToken = userService.createToken(req.user, "refresh");
+        const nextUser = await userService.updateUser(req.user.id, {
+          refreshToken: newRefreshToken,
         });
 
         res.cookie(
