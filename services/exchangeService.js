@@ -21,12 +21,29 @@ const whereConditions = (userId, keyword) => {
   return where;
 };
 
+const createNotificationFromExchange = async (shopId, cardId) => {
+  try {
+  } catch (error) {
+    error.status = 500;
+    error.data = {
+      message: "알림 생성에 실패 했습니다.",
+    };
+    throw error;
+  }
+};
+
 const createExchange = async (data) => {
   //판매의 남아있는 카드 수량을 검사하는 로직 필요
-
-  const exchange = await exchangeRepository.create(data);
-
-  return exchange;
+  try {
+    const exchange = await exchangeRepository.create(data);
+    return exchange;
+  } catch (error) {
+    error.status = 500;
+    error.data = {
+      message: "교환신청에 실패 했습니다.",
+    };
+    throw error;
+  }
 };
 
 //요구사항에 없음 일단 제작
