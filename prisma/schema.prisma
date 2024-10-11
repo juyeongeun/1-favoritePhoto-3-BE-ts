@@ -63,18 +63,19 @@ model Notification {
 }
 
 model Shop {
-  id             Int        @id @default(autoincrement()) // 카드ID, 기본 키
-  createAt       DateTime   @default(now()) // 카드 생성 시점
-  updateAt       DateTime   @updatedAt // 카드 수정 시점
-  user           User       @relation(fields: [userId], references: [id])
-  userId         Int
-  card           Card       @relation(fields: [cardId], references: [id])
-  cardId         Int
-  favorited      User[]     @relation("favorite") // 관심카드를 위한 다대다 관계 -> 정규 요구사항 아님
-  price          Int
-  totalCount     Int // 최초의 판매 등록 수
-  remainingCount Int // 팔고 남은거 
-  exchange       Exchange[]
+  id                  Int        @id @default(autoincrement()) // 카드ID, 기본 키
+  createAt            DateTime   @default(now()) // 카드 생성 시점
+  updateAt            DateTime   @updatedAt // 카드 수정 시점
+  user                User       @relation(fields: [userId], references: [id])
+  userId              Int
+  card                Card       @relation(fields: [cardId], references: [id])
+  cardId              Int
+  favorited           User[]     @relation("favorite") // 관심카드를 위한 다대다 관계 -> 정규 요구사항 아님
+  price               Int
+  totalCount          Int // 최초의 판매 등록 수
+  remainingCount      Int // 팔고 남은거 
+  exchange            Exchange[]
+  exchangeDescription String?
 }
 
 model Purchase {
