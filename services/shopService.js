@@ -1,23 +1,5 @@
 import * as shopRepository from "../repositorys/shopRepository.js";
 
-const filters = {
-  page: parseInt(page, 10),
-  pageSize: parseInt(pageSize, 10),
-  orderBy,
-  keyword,
-  grade,
-  genre,
-  isSoldOut:
-    isSoldOut === "true" ? true : isSoldOut === "false" ? false : undefined,
-};
-
-// 카드 목록 조회시, 품절 카드 필터링
-if (filters.isSoldOut !== undefined) {
-  cards = cards.filter(
-    (card) => (card.remainingCount === 0) === filters.isSoldOut
-  );
-}
-
 /* 상점에 포토카드 판매 등록 */
 export const createShopCard = async (data) => {
   // 카드 판매 시, 재고 확인
@@ -48,12 +30,30 @@ export const createShopCard = async (data) => {
 
 /* 상점에 등록한 포토 카드 전체 리스트 조회 */
 export const getShopCards = async (filters) => {
-  const cards = await shopRepository.getShopCards(filters);
-  const totalCount = await shopRepository.getShopCardCount(filters);
+  const {
+    page = 1,
+    pageSize = 9,
+    orderBy = "recent",
+    keyword = "",
+    grade = "",
+    genre = "",
+  } = filters;
+
+  const parsedFilters = {
+    page: parseInt(page, 10),
+    pageSize: parseInt(pageSize, 10),
+    orderBy,
+    keyword,
+    grade,
+    genre,
+  };
+
+  const cards = await shopRepository.getShopCards(parsedFilters);
+  const totalCount = await shopRepository.getShopCardCount(parsedFilters);
 
   const cardsWithSoldOutFlag = cards.map((card) => ({
     ...card,
-    isSoldOut: card.remainingCount === 0,
+    isSoldOut: card.remainingCount === 0, // 품절 여부
   }));
 
   return { cards: cardsWithSoldOutFlag, totalCount };
@@ -80,7 +80,7 @@ export const getShopCardByShopId = async (cardId) => {
   };
 };
 
-export const updateShopCard = async (data) => {
+export const updateShopCㅈard = async (data) => {
   return await shopRepository.updateShopCard(data);
 };
 
