@@ -9,7 +9,7 @@ const accessExtractor = function (req) {
   } else {
     token = req.headers.authorization;
   }
-  console.log("엑세스" + token);
+  // console.log("엑세스" + token);
   return token;
 };
 
@@ -21,7 +21,7 @@ const refreshExtractor = function (req) {
   } else {
     token = req.headers.refreshtoken;
   }
-  console.log("리프레쉬" + token);
+  // console.log("리프레쉬" + token);
   return token;
 };
 
