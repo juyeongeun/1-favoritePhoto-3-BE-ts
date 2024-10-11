@@ -10,9 +10,8 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-app.use("/users", userRouter);
-app.use("/users", userRouter);
-app.use("/api/shop", shopRouter);
+app.use("/users", userRouter); // 2개여서 1개 삭제함
+app.use("/shop", shopRouter);
 app.use("/cards", cardRouter);
 
 app.use(errorHandler);
