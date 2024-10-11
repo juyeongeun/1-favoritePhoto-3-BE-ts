@@ -1,7 +1,7 @@
 import express from "express";
 import userService from "../services/userService.js";
 import userValidation from "../middlewares/users/userValidation.js";
-import { asyncHandle } from "../utils/error/asyncHandle.js";
+import asyncHandle from "../utils/error/asyncHandle.js";
 import cookiesConfig from "../config/cookiesConfig.js";
 import passport from "../config/passportConfig.js";
 
@@ -85,6 +85,24 @@ router.get(
   })
 );
 
+router.post(
+  "/check-email",
+  asyncHandle(async (req, res, next) => {
+    try {
+      const { email } = req.body;
+      //카드 서비스함수 호출 필요
+      const user = await userService.getUserByEmail(email);
+      if (user) {
+        res.status(200).send({ message: "사용중인 이메일입니다." });
+      } else {
+        res.status(404).send();
+      }
+    } catch (error) {
+      next(error);
+    }
+  })
+);
+
 router.get(
   "/refresh-token",
   (req, res, next) => {
@@ -124,6 +142,45 @@ router.get(
 
         res.status(200).send(nextUser);
       }
+    } catch (error) {
+      next(error);
+    }
+  })
+);
+
+router.get(
+  "/my-cards",
+  passport.authenticate("access-token", { session: false }),
+  asyncHandle(async (req, res, next) => {
+    try {
+      const { id: userId } = req.user;
+      //카드 서비스함수 호출 필요
+    } catch (error) {
+      next(error);
+    }
+  })
+);
+
+router.get(
+  "/my-exchange",
+  passport.authenticate("access-token", { session: false }),
+  asyncHandle(async (req, res, next) => {
+    try {
+      const { id: userId } = req.user;
+      //교환 서비스함수 호출 필요
+    } catch (error) {
+      next(error);
+    }
+  })
+);
+
+router.get(
+  "/my-sales",
+  passport.authenticate("access-token", { session: false }),
+  asyncHandle(async (req, res, next) => {
+    try {
+      const { id: userId } = req.user;
+      //판매 서비스함수 호출 필요
     } catch (error) {
       next(error);
     }

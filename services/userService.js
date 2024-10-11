@@ -27,15 +27,6 @@ const getUser = async ({ email, password }) => {
 const getUserByEmail = async (email) => {
   const user = await userRepository.getByEmail(email);
 
-  if (!user) {
-    const error = new Error("Mot found");
-    error.status = 404;
-    error.data = {
-      message: "등록된 사용자가 없습니다.",
-      email,
-    };
-  }
-
   return filterSensitiveUserData(user);
 };
 
