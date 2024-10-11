@@ -1,6 +1,6 @@
 import express from "express";
 import * as purchaseService from "../services/purchaseService.js";
-import { asyncHandle } from "../utils/error/asyncHandle.js";
+import asyncHandle from "../utils/error/asyncHandle.js";
 
 const router = express.Router();
 
