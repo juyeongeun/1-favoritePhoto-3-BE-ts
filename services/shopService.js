@@ -1,5 +1,7 @@
 import * as shopRepository from "../repositorys/shopRepository.js";
 
+// 사용자 포토카드 목록 조회 필요(포토 카드 등록시 필요)
+
 /* 상점에 포토카드 판매 등록 */
 const createShopCard = async (data) => {
   // 카드 판매 시, 재고 확인
@@ -30,8 +32,26 @@ const createShopCard = async (data) => {
 
 /* 상점에 등록한 포토 카드 전체 리스트 조회 */
 const getShopCards = async (filters) => {
-  const cards = await shopRepository.getShopCards(filters);
-  const totalCount = await shopRepository.getShopCardCount(filters);
+  const {
+    page = 1,
+    pageSize = 9,
+    orderBy = "recent",
+    keyword = "",
+    grade = "",
+    genre = "",
+  } = filters;
+
+  const parsedFilters = {
+    page: parseInt(page, 10),
+    pageSize: parseInt(pageSize, 10),
+    orderBy,
+    keyword,
+    grade,
+    genre,
+  };
+
+  const cards = await shopRepository.getShopCards(parsedFilters);
+  const totalCount = await shopRepository.getShopCardCount(parsedFilters);
 
   const cardsWithSoldOutFlag = cards.map((card) => ({
     ...card,
@@ -62,7 +82,24 @@ const getShopCardByShopId = async (cardId) => {
   };
 };
 
+/* 판매중인 포토카드 수정 */
 const updateShopCard = async (data) => {
+  // 카드 존재 여부 확인
+  const card = await shopRepository.getShopCardById(data.shopId);
+  if (!card) {
+    const error = new Error("Card not found");
+    error.status = 404;
+    throw error;
+  }
+
+  // 수정 요청을 보내는 사용자 ID와 카드의 소유자 ID 일치 여부 확인
+  if (card.userId !== data.userId) {
+    const error = new Error("Unauthorized access to this card");
+    error.status = 403;
+    throw error;
+  }
+
+  // 업데이트 호출
   return await shopRepository.updateShopCard(data);
 };
 

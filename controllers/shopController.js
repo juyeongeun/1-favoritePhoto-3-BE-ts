@@ -85,12 +85,23 @@ router.patch(
   shopEditValidation,
   asyncHandle(async (req, res, next) => {
     const { shopId } = req.params;
-    const { price, totalCount } = req.body;
+    const {
+      price,
+      totalCount,
+      exchangeGrade,
+      exchangeGenre,
+      exchangeDescription,
+    } = req.body;
+
     const updatedCard = await shopService.updateShopCard({
       shopId: parseInt(shopId, 10),
       price,
       totalCount,
+      exchangeGrade,
+      exchangeGenre,
+      exchangeDescription,
     });
+
     return res.status(200).json(updatedCard);
   })
 );

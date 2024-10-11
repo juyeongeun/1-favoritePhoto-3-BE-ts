@@ -128,7 +128,13 @@ const getUserById = async (userId) => {
 const updateShopCard = async (data) => {
   return await prismaClient.shopCard.update({
     where: { id: data.shopId },
-    data: { price: data.price, totalCount: data.totalCount },
+    data: {
+      price: data.price,
+      totalCount: data.totalCount,
+      exchangeGrade: data.exchangeGrade,
+      exchangeGenre: data.exchangeGenre,
+      exchangeDescription: data.exchangeDescription,
+    },
   });
 };
 
