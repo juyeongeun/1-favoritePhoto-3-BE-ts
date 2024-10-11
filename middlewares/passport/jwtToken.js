@@ -1,5 +1,6 @@
 import { Strategy as JwtStrategy } from "passport-jwt";
 import userService from "../../service/userService.js";
+import { JWT_SECRET } from "../../env.js";
 
 const accessExtractor = function (req) {
   var token = null;
@@ -25,12 +26,12 @@ const refreshExtractor = function (req) {
 
 const accessTokenOptions = {
   jwtFromRequest: accessExtractor,
-  secretOrKey: process.env.JWT_SECRET,
+  secretOrKey: JWT_SECRET,
 };
 
 const refreshTokenOptions = {
   jwtFromRequest: refreshExtractor,
-  secretOrKey: process.env.JWT_SECRET,
+  secretOrKey: JWT_SECRET,
 };
 
 async function jwtVerify(payload, done) {
