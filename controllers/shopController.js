@@ -1,6 +1,6 @@
 import express from "express";
 import * as shopService from "../services/shopService.js";
-import asyncHandle from "../utils/error/asyncHandle.js";
+import { asyncHandle } from "../utils/error/asyncHandle.js";
 import {
   shopValidation,
   shopEditValidation,

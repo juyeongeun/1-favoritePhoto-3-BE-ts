@@ -1,22 +1,22 @@
 import * as shopRepository from "../repositorys/shopRepository.js";
 
-const filters = {
-  page: parseInt(page, 10),
-  pageSize: parseInt(pageSize, 10),
-  orderBy,
-  keyword,
-  grade,
-  genre,
-  isSoldOut:
-    isSoldOut === "true" ? true : isSoldOut === "false" ? false : undefined,
-};
+// const filters = {
+//   page: parseInt(page, 10),
+//   pageSize: parseInt(pageSize, 10),
+//   orderBy,
+//   keyword,
+//   grade,
+//   genre,
+//   isSoldOut:
+//     isSoldOut === "true" ? true : isSoldOut === "false" ? false : undefined,
+// };
 
-// 카드 목록 조회시, 품절 카드 필터링
-if (filters.isSoldOut !== undefined) {
-  cards = cards.filter(
-    (card) => (card.remainingCount === 0) === filters.isSoldOut
-  );
-}
+// // 카드 목록 조회시, 품절 카드 필터링
+// if (filters.isSoldOut !== undefined) {
+//   cards = cards.filter(
+//     (card) => (card.remainingCount === 0) === filters.isSoldOut
+//   );
+// }
 
 /* 상점에 포토카드 판매 등록 */
 export const createShopCard = async (data) => {
