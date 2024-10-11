@@ -1,4 +1,4 @@
-import * as cardRepository from "../repository/cardRepository";
+import * as cardRepository from "../repositorys/cardRepository.js";
 
 // 카드 생성
 export const createCard = async (data) => {
@@ -10,11 +10,13 @@ export const createCard = async (data) => {
 };
 
 // 모든 카드 조회
-export const getAllCards = async () => {
+export const getUserCards = async (filters) => {
   try {
-    return await cardRepository.getAllCards();
+    // 카드 목록을 조회하는 리포지토리 호출
+    const { cards, nextCursor } = await cardRepository.getUserCards(filters);
+    return { cards, nextCursor };
   } catch (error) {
-    throw new Error("모든 카드 조회 중 오류 발생");
+    throw new Error("사용자 카드 목록 조회 중 오류 발생");
   }
 };
 
