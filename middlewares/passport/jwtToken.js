@@ -1,14 +1,10 @@
 import { Strategy as JwtStrategy } from "passport-jwt";
-<<<<<<< HEAD
-import userService from "../../services/userService.js"; // 경로 수정
-=======
 import userService from "../../services/userService.js";
 import { JWT_SECRET } from "../../env.js";
->>>>>>> 349580d9472995837b7f1a0df14fe098331d956f
 
 const accessExtractor = function (req) {
   var token = null;
-  if (req && req.cookies["access-token"]) {
+  if (req && req.cookies) {
     token = req.cookies["access-token"];
   } else {
     token = req.headers.authorization;
@@ -19,7 +15,8 @@ const accessExtractor = function (req) {
 
 const refreshExtractor = function (req) {
   var token = null;
-  if (req && req.cookies["refresh-token"]) {
+  console.log(req.cookies);
+  if (req && req.cookies) {
     token = req.cookies["refresh-token"];
   } else {
     token = req.headers.refreshtoken;
