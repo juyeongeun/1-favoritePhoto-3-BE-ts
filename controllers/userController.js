@@ -1,7 +1,7 @@
 import express from "express";
 import userService from "../services/userService.js";
 import userValidation from "../middlewares/users/userValidation.js";
-import { asyncHandle } from "../utils/error/asyncHandle.js";
+import asyncHandle from "../utils/error/asyncHandle.js";
 import cookiesConfig from "../config/cookiesConfig.js";
 import passport from "../config/passportConfig.js";
 
@@ -85,6 +85,64 @@ router.get(
   })
 );
 
+router.post(
+  "/check-email",
+  asyncHandle(async (req, res, next) => {
+    try {
+      const { email } = req.body;
+      const user = await userService.getUserByEmail(email);
+      if (user) {
+        res.status(400).send({
+          isApprove: false,
+          data: {
+            message: "사용중인 이메일입니다.",
+            email,
+          },
+        });
+      } else {
+        res.status(200).send({
+          isApprove: true,
+          data: {
+            message: "사용가능한 이메일입니다.",
+            email,
+          },
+        });
+      }
+    } catch (error) {
+      next(error);
+    }
+  })
+);
+
+router.post(
+  "/check-nickname",
+  asyncHandle(async (req, res, next) => {
+    try {
+      const { nickname } = req.body;
+      const user = await userService.getUserByNickname(nickname);
+      if (user) {
+        res.status(400).send({
+          isApprove: false,
+          data: {
+            message: "사용중인 닉네임입니다.",
+            nickname,
+          },
+        });
+      } else {
+        res.status(200).send({
+          isApprove: true,
+          data: {
+            message: "사용가능한 닉네임입니다.",
+            nickname,
+          },
+        });
+      }
+    } catch (error) {
+      next(error);
+    }
+  })
+);
+
 router.get(
   "/refresh-token",
   (req, res, next) => {
@@ -99,16 +157,21 @@ router.get(
   asyncHandle(async (req, res, next) => {
     try {
       const { id: userId } = req.user;
-      const refreshToken = req.cookies["refresh-token"];
+      let refreshToken = null;
+      if (req.cookies) {
+        refreshToken = req.cookies["refresh-token"];
+      } else {
+        refreshToken = req.headers.refreshtoken;
+      }
       const validationToken = await userService.refreshToken(
         userId,
         refreshToken
       );
       if (validationToken) {
-        const accessToken = userService.createToken(user);
-        const newRefreshToken = userService.createToken(user, "refresh");
-        const nextUser = await userService.updateUser(user.id, {
-          newRefreshToken,
+        const accessToken = userService.createToken(req.user);
+        const newRefreshToken = userService.createToken(req.user, "refresh");
+        const nextUser = await userService.updateUser(req.user.id, {
+          refreshToken: newRefreshToken,
         });
 
         res.cookie(
@@ -124,6 +187,45 @@ router.get(
 
         res.status(200).send(nextUser);
       }
+    } catch (error) {
+      next(error);
+    }
+  })
+);
+
+router.get(
+  "/my-cards",
+  passport.authenticate("access-token", { session: false }),
+  asyncHandle(async (req, res, next) => {
+    try {
+      const { id: userId } = req.user;
+      //카드 서비스함수 호출 필요
+    } catch (error) {
+      next(error);
+    }
+  })
+);
+
+router.get(
+  "/my-exchange",
+  passport.authenticate("access-token", { session: false }),
+  asyncHandle(async (req, res, next) => {
+    try {
+      const { id: userId } = req.user;
+      //교환 서비스함수 호출 필요
+    } catch (error) {
+      next(error);
+    }
+  })
+);
+
+router.get(
+  "/my-sales",
+  passport.authenticate("access-token", { session: false }),
+  asyncHandle(async (req, res, next) => {
+    try {
+      const { id: userId } = req.user;
+      //판매 서비스함수 호출 필요
     } catch (error) {
       next(error);
     }

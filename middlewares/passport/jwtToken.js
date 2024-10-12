@@ -4,7 +4,7 @@ import { JWT_SECRET } from "../../env.js";
 
 const accessExtractor = function (req) {
   var token = null;
-  if (req && req.cookies["access-token"]) {
+  if (req && req.cookies) {
     token = req.cookies["access-token"];
   } else {
     token = req.headers.authorization;
@@ -15,7 +15,8 @@ const accessExtractor = function (req) {
 
 const refreshExtractor = function (req) {
   var token = null;
-  if (req && req.cookies["refresh-token"]) {
+  console.log(req.cookies);
+  if (req && req.cookies) {
     token = req.cookies["refresh-token"];
   } else {
     token = req.headers.refreshtoken;

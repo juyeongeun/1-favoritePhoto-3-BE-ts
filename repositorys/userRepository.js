@@ -8,6 +8,14 @@ const getByEmail = (email) => {
   });
 };
 
+const getByNickname = (nickname) => {
+  return prismaClient.user.findFirst({
+    where: {
+      nickname,
+    },
+  });
+};
+
 const getById = (id) => {
   return prismaClient.user.findUnique({
     where: {
@@ -22,7 +30,7 @@ const create = (data) => {
   });
 };
 
-const update = ({ id, data }) => {
+const update = (id, data) => {
   return prismaClient.user.update({
     where: {
       id,
@@ -44,6 +52,7 @@ const deleteUser = (id) => {
 
 export default {
   getByEmail,
+  getByNickname,
   getById,
   create,
   update,

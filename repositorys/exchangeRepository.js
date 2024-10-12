@@ -10,7 +10,21 @@ const create = async (data) => {
         },
       },
       card: true,
-      exchangeCard: true,
+      Shop: {
+        include: {
+          user: {
+            select: {
+              nickname: true,
+            },
+          },
+          card: {
+            select: {
+              name: true,
+              grade: true,
+            },
+          },
+        },
+      },
     },
   });
 };
@@ -53,7 +67,21 @@ const getById = async (id) => {
         },
       },
       card: true,
-      exchangeCard: true,
+      Shop: {
+        include: {
+          user: {
+            select: {
+              nickname: true,
+            },
+          },
+          card: {
+            select: {
+              name: true,
+              grade: true,
+            },
+          },
+        },
+      },
     },
   });
 };
