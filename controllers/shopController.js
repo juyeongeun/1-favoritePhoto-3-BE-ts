@@ -3,16 +3,31 @@
 import express from "express";
 import * as shopService from "../services/shopService.js";
 import asyncHandle from "../utils/error/asyncHandle.js";
-import { shopValidation } from "../middlewares/shop/shopValidation.js";
+import {
+  shopValidation,
+  shopEditValidation,
+} from "../middlewares/shop/shopValidation.js";
+import passport from "passport"; // passport 가져오기
 
 const router = express.Router();
 
 // 판매할 포토카드 등록하기
 router.post(
   "/",
+  (req, res, next) => {
+    passport.authenticate("jwt", { session: false }, (err, user, info) => {
+      if (err || !user) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      req.user = user; // 인증된 사용자 정보 설정
+      next(); // 다음 미들웨어로 이동
+    })(req, res, next);
+  },
   shopValidation, // 요청 본문의 유효성을 검사하는 미들웨어
   asyncHandle(async (req, res) => {
     // 요청 본문에서 카드 ID, 가격, 총 판매 수량, 교환 희망 정보를 추출
+    console.log(req.user);
+
     const userId = req.user.id;
     const {
       cardId,
@@ -41,12 +56,23 @@ router.post(
 // 판매중인 포토 카드 상세 조회
 router.get(
   "/cards/:shopId/:cardId",
+  passport.authenticate("jwt", { session: false }), // JWT 인증 미들웨어 추가
   asyncHandle(async (req, res, next) => {
     const { shopId, cardId } = req.params;
+    const userId = req.user.id; // 로그인한 사용자 ID 가져오기
+
     const cardDetails = await shopService.getShopByShopId(
       parseInt(shopId, 10), // shopId로 상점 확인
       parseInt(cardId, 10) // cardId로 카드 확인
     );
+
+    // 요청한 카드의 소유자와 로그인한 사용자가 같은지 확인
+    if (cardDetails.userId !== userId) {
+      return res
+        .status(403)
+        .json({ message: "Unauthorized access to this card" });
+    }
+
     return res.status(200).json(cardDetails);
   })
 );
@@ -54,7 +80,8 @@ router.get(
 // 판매 중인 카드 수정하기
 router.patch(
   "/cards/:shopId/:cardId",
-  shopValidation, // 등록할때와 같은 shop 유효성검사 미들웨어 사용
+  passport.authenticate("jwt", { session: false }), // JWT 인증 미들웨어 추가
+  shopEditValidation,
   asyncHandle(async (req, res, next) => {
     const { shopId } = req.params;
     const {
@@ -82,6 +109,7 @@ router.patch(
 // 판매중인 카드 판매 취소(판매 내리기)
 router.delete(
   "/cards/:shopId/:cardId",
+  passport.authenticate("jwt", { session: false }), // JWT 인증 미들웨어 추가
   asyncHandle(async (req, res, next) => {
     const { shopId } = req.params;
     const userId = req.user.id; // JWT로부터 사용자 ID 가져오기
