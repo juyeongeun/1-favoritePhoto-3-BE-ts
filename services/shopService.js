@@ -4,6 +4,9 @@ import prismaClient from "../utils/prismaClient.js";
 
 /* 상점에 포토카드 판매 등록 */
 const createShopCard = async (data) => {
+  const start = performance.now();
+  console.log("Starting createShopCard");
+
   // 카드 판매 시, 재고 확인
   if (data.totalCount <= 0) {
     const error = new Error("Total count must be greater than zero");
@@ -32,6 +35,9 @@ const createShopCard = async (data) => {
       },
     });
   });
+
+  const end = performance.now();
+  console.log(`createShopCard execution time: ${end - start}ms`);
 
   return newCard;
 };
