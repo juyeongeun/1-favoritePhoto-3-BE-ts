@@ -1,6 +1,5 @@
+//services\shopService.js
 import * as shopRepository from "../repositorys/shopRepository.js";
-
-// 사용자 포토카드 목록 조회 필요(포토 카드 등록시 필요)
 
 /* 상점에 포토카드 판매 등록 */
 const createShopCard = async (data) => {
@@ -13,6 +12,7 @@ const createShopCard = async (data) => {
 
   // 이미 상점에 등록된 카드인지 확인
   const card = await shopRepository.getCheckCardById(data.userId, data.cardId);
+
   // 등록되어있는 카드인 경우
   if (card) {
     const error = new Error("Card already registered in shop");
@@ -30,62 +30,24 @@ const createShopCard = async (data) => {
   return newCard;
 };
 
-/* 상점에 등록한 포토 카드 전체 리스트 조회 */
-const getShopCards = async (filters) => {
-  const {
-    page = 1,
-    pageSize = 9,
-    orderBy = "recent",
-    keyword = "",
-    grade = "",
-    genre = "",
-  } = filters;
-
-  const parsedFilters = {
-    page: parseInt(page, 10),
-    pageSize: parseInt(pageSize, 10),
-    orderBy,
-    keyword,
-    grade,
-    genre,
-  };
-
-  const cards = await shopRepository.getShopCards(parsedFilters);
-  const totalCount = await shopRepository.getShopCardCount(parsedFilters);
-
-  const cardsWithSoldOutFlag = cards.map((card) => ({
-    ...card,
-    isSoldOut: card.remainingCount === 0,
-  }));
-
-  return { cards: cardsWithSoldOutFlag, totalCount };
-};
-
 /* 상점에 등록한 포토 카드 상세 조회 */
-const getShopCardByShopId = async (cardId) => {
-  const card = await shopRepository.getShopCardById(cardId);
-
-  // 등록된 카드 없는 경우
-  if (!card) {
-    const error = new Error("Card not found");
-    error.status = 404;
-    throw error;
-  }
+const getShopByShopId = async (shopId, cardId) => {
+  console.log(`Fetching shop details for shopId: ${shopId}, cardId: ${cardId}`);
+  const shopDetails = await shopRepository.getShopById(shopId, cardId);
 
   // 판매자 정보 포함하여 반환
-  const user = await shopRepository.getUserById(card.userId);
   return {
-    ...card,
-    sellerNickname: user.nickname, // 판매자 닉네임 추가
-    genre: card.card.genre, // 장르 추가
-    grade: card.card.grade, // 등급 추가
+    ...shopDetails,
+    sellerNickname: shopDetails.user.nickname,
   };
 };
 
 /* 판매중인 포토카드 수정 */
 const updateShopCard = async (data) => {
-  // 카드 존재 여부 확인
-  const card = await shopRepository.getShopCardById(data.shopId);
+  // 판매 중인 상점에 해당 카드가 등록되어 있는지 확인
+  const card = await shopRepository.getShopById(data.cardId);
+
+  // 카드가 없는 경우
   if (!card) {
     const error = new Error("Card not found");
     error.status = 404;
@@ -103,45 +65,27 @@ const updateShopCard = async (data) => {
   return await shopRepository.updateShopCard(data);
 };
 
-const deleteShopCard = async (shopId) => {
-  return await shopRepository.deleteShopCard(shopId);
-};
+/* 판매 중인 포토 카드 취소 */
+const deleteShopCard = async (shopId, userId) => {
+  // 판매 중인 상점에 해당 카드가 등록되어 있는지 확인
+  const card = await shopRepository.getShopById(shopId);
 
-const purchaseShopCard = async (data) => {
-  const { shopId, count } = data;
-
-  // 카드 정보 조회
-  const shopCard = await shopRepository.getShopCardById(shopId);
-
-  if (!shopCard || shopCard.remainingCount < count) {
-    const error = new Error("Not enough stock available");
-    error.status = 400;
+  // 카드가 없는 경우
+  if (!card) {
+    const error = new Error("Card not found");
+    error.status = 404;
     throw error;
   }
 
-  // 구매 처리
-  const result = await shopRepository.purchaseShopCard(data);
+  // 삭제 요청을 보낸 사용자 ID와 카드의 소유자 ID 일치 여부 확인
+  if (card.userId !== userId) {
+    const error = new Error("Unauthorized access to this card");
+    error.status = 403;
+    throw error;
+  }
 
-  // 판매 포토카드 수 재고 차감
-  await shopRepository.updateRemainingCount(
-    shopId,
-    shopCard.remainingCount - count
-  );
-
-  return result;
+  // 카드 삭제 후, 삭제 결과 반환
+  return await shopRepository.deleteShopCard(shopId);
 };
 
-// 카드 판매 히스토리 조회
-const getPurchaseHistoryByCardId = async (cardId) => {
-  return await shopRepository.getPurchaseHistory(cardId);
-};
-
-export {
-  createShopCard,
-  getShopCards,
-  getShopCardByShopId,
-  updateShopCard,
-  deleteShopCard,
-  purchaseShopCard,
-  getPurchaseHistoryByCardId,
-};
+export { createShopCard, getShopByShopId, updateShopCard, deleteShopCard };
