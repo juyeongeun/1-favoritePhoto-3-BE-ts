@@ -1,8 +1,12 @@
 //services\shopService.js
 import * as shopRepository from "../repositorys/shopRepository.js";
+import prismaClient from "../utils/prismaClient.js";
 
 /* 상점에 포토카드 판매 등록 */
 const createShopCard = async (data) => {
+  const start = performance.now();
+  console.log("Starting createShopCard");
+
   // 카드 판매 시, 재고 확인
   if (data.totalCount <= 0) {
     const error = new Error("Total count must be greater than zero");
@@ -10,22 +14,30 @@ const createShopCard = async (data) => {
     throw error;
   }
 
-  // 이미 상점에 등록된 카드인지 확인
-  const card = await shopRepository.getCheckCardById(data.userId, data.cardId);
+  const newCard = await prismaClient.$transaction(async (prisma) => {
+    // 이미 상점에 등록된 카드인지 확인
+    const card = await prisma.shop.findUnique({
+      where: { userId_cardId: { userId: data.userId, cardId: data.cardId } },
+    });
 
-  // 등록되어있는 카드인 경우
-  if (card) {
-    const error = new Error("Card already registered in shop");
-    error.status = 409;
-    error.data = { shopId: card.id };
-    throw error;
-  }
+    if (card) {
+      const error = new Error("Card already registered in shop");
+      error.status = 409;
+      error.data = { shopId: card.id };
+      throw error; // 중복 카드가 있을 경우 에러 던짐
+    }
 
-  // 새로운 카드 등록
-  const newCard = await shopRepository.createShopCard({
-    ...data,
-    remainingCount: data.totalCount, // remainingCount 추가 (남아있는 카드 개수 초기화)
+    // 새로운 카드 등록
+    return await prisma.shop.create({
+      data: {
+        ...data,
+        remainingCount: data.totalCount, // 남아있는 카드 개수 초기화
+      },
+    });
   });
+
+  const end = performance.now();
+  console.log(`createShopCard execution time: ${end - start}ms`);
 
   return newCard;
 };
@@ -45,7 +57,7 @@ const getShopByShopId = async (shopId, cardId) => {
 /* 판매중인 포토카드 수정 */
 const updateShopCard = async (data) => {
   // 판매 중인 상점에 해당 카드가 등록되어 있는지 확인
-  const card = await shopRepository.getShopById(data.cardId);
+  const card = await shopRepository.getShopById(data.shopId, data.cardId);
 
   // 카드가 없는 경우
   if (!card) {
