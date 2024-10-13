@@ -14,9 +14,11 @@ const router = express.Router();
 // 판매할 포토카드 등록하기
 router.post(
   "/",
+  // 테스트를 위해 임시 인증 미들웨어 설정함(인증이 실패했을 때 처리 추가)
   (req, res, next) => {
-    passport.authenticate("jwt", { session: false }, (err, user, info) => {
+    passport.authenticate("jwt", { session: false }, (err, user) => {
       if (err || !user) {
+        // 에러 발생 또는 사용자 없는 경우
         return res.status(401).json({ message: "Unauthorized" });
       }
       req.user = user; // 인증된 사용자 정보 설정
@@ -44,7 +46,7 @@ router.post(
       cardId,
       price,
       totalCount,
-      exchangeGrade, // 사용자로부터 교환 희망 정보 수신
+      exchangeGrade,
       exchangeGenre,
       exchangeDescription,
     });
@@ -56,22 +58,27 @@ router.post(
 // 판매중인 포토 카드 상세 조회
 router.get(
   "/cards/:shopId/:cardId",
-  passport.authenticate("jwt", { session: false }), // JWT 인증 미들웨어 추가
-  asyncHandle(async (req, res, next) => {
+  (req, res, next) => {
+    passport.authenticate("jwt", { session: false }, (err, user) => {
+      if (err) {
+        console.error("Authentication error:", err);
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      if (!user) {
+        console.error("No user found");
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      req.user = user; // 인증된 사용자 정보 설정
+      next(); // 다음 미들웨어로 이동
+    })(req, res, next);
+  },
+  asyncHandle(async (req, res) => {
     const { shopId, cardId } = req.params;
-    const userId = req.user.id; // 로그인한 사용자 ID 가져오기
 
     const cardDetails = await shopService.getShopByShopId(
       parseInt(shopId, 10), // shopId로 상점 확인
       parseInt(cardId, 10) // cardId로 카드 확인
     );
-
-    // 요청한 카드의 소유자와 로그인한 사용자가 같은지 확인
-    if (cardDetails.userId !== userId) {
-      return res
-        .status(403)
-        .json({ message: "Unauthorized access to this card" });
-    }
 
     return res.status(200).json(cardDetails);
   })
@@ -80,10 +87,20 @@ router.get(
 // 판매 중인 카드 수정하기
 router.patch(
   "/cards/:shopId/:cardId",
-  passport.authenticate("jwt", { session: false }), // JWT 인증 미들웨어 추가
+  // 테스트를 위해 임시 인증 미들웨어 설정함(인증이 실패했을 때 처리 추가)
+  (req, res, next) => {
+    passport.authenticate("jwt", { session: false }, (err, user) => {
+      if (err || !user) {
+        // 에러 발생 또는 사용자 없는 경우
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      req.user = user; // 인증된 사용자 정보 설정
+      next(); // 다음 미들웨어로 이동
+    })(req, res, next);
+  },
   shopEditValidation,
-  asyncHandle(async (req, res, next) => {
-    const { shopId } = req.params;
+  asyncHandle(async (req, res) => {
+    const { shopId, cardId } = req.params;
     const {
       price,
       totalCount,
@@ -94,12 +111,13 @@ router.patch(
 
     const updatedCard = await shopService.updateShopCard({
       shopId: parseInt(shopId, 10),
+      cardId: parseInt(cardId, 10), // 카드 ID 추가
       price,
       totalCount,
       exchangeGrade,
       exchangeGenre,
       exchangeDescription,
-      userId: req.user.id, // 수정 요청 하는 사용자의 ID 추가
+      userId: req.user.id, // 수정 요청하는 사용자의 ID 추가
     });
 
     return res.status(200).json(updatedCard);
@@ -109,11 +127,26 @@ router.patch(
 // 판매중인 카드 판매 취소(판매 내리기)
 router.delete(
   "/cards/:shopId/:cardId",
-  passport.authenticate("jwt", { session: false }), // JWT 인증 미들웨어 추가
-  asyncHandle(async (req, res, next) => {
-    const { shopId } = req.params;
+  // 테스트를 위해 임시 인증 미들웨어 설정함(인증이 실패했을 때 처리 추가)
+  (req, res, next) => {
+    passport.authenticate("jwt", { session: false }, (err, user) => {
+      if (err || !user) {
+        // 에러 발생 또는 사용자 없는 경우
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      req.user = user; // 인증된 사용자 정보 설정
+      next(); // 다음 미들웨어로 이동
+    })(req, res, next);
+  },
+  asyncHandle(async (req, res) => {
+    const { shopId, cardId } = req.params;
     const userId = req.user.id; // JWT로부터 사용자 ID 가져오기
-    await shopService.deleteShopCard(parseInt(shopId, 10), userId);
+
+    await shopService.deleteShopCard(
+      parseInt(shopId, 10),
+      userId, // userId를 함께 전달
+      parseInt(cardId, 10)
+    );
     return res.status(200).json({ message: "삭제되었습니다." });
   })
 );
