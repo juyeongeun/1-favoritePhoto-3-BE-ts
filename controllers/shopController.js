@@ -16,7 +16,6 @@ router.post(
   (req, res, next) => {
     passport.authenticate("jwt", { session: false }, (err, user) => {
       if (err || !user) {
-        // 에러 발생 또는 사용자 없는 경우
         return res.status(401).json({ message: "Unauthorized" });
       }
       req.user = user; // 인증된 사용자 정보 설정
@@ -25,9 +24,7 @@ router.post(
   },
   shopValidation, // 요청 본문의 유효성을 검사하는 미들웨어
   asyncHandle(async (req, res) => {
-    // 요청 본문에서 카드 ID, 가격, 총 판매 수량, 교환 희망 정보를 추출
     console.log(req.user);
-
     const userId = req.user.id;
     const {
       cardId,
@@ -48,7 +45,6 @@ router.post(
       exchangeGenre,
       exchangeDescription,
     });
-    // 카드 등록 성공 시, 새로 등록된 카드 정보를 클라이언트에 반환
     return res.status(201).json(newCard);
   })
 );
@@ -72,12 +68,10 @@ router.get(
   },
   asyncHandle(async (req, res) => {
     const { shopId, cardId } = req.params;
-
     const cardDetails = await shopService.getShopByShopId(
       parseInt(shopId, 10), // shopId로 상점 확인
       parseInt(cardId, 10) // cardId로 카드 확인
     );
-
     return res.status(200).json(cardDetails);
   })
 );
@@ -89,7 +83,6 @@ router.patch(
   (req, res, next) => {
     passport.authenticate("jwt", { session: false }, (err, user) => {
       if (err || !user) {
-        // 에러 발생 또는 사용자 없는 경우
         return res.status(401).json({ message: "Unauthorized" });
       }
       req.user = user; // 인증된 사용자 정보 설정
@@ -129,7 +122,6 @@ router.delete(
   (req, res, next) => {
     passport.authenticate("jwt", { session: false }, (err, user) => {
       if (err || !user) {
-        // 에러 발생 또는 사용자 없는 경우
         return res.status(401).json({ message: "Unauthorized" });
       }
       req.user = user; // 인증된 사용자 정보 설정
