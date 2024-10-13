@@ -1,3 +1,4 @@
+//services\shopService.js
 import * as shopRepository from "../repositorys/shopRepository.js";
 import prismaClient from "../utils/prismaClient.js";
 
@@ -45,6 +46,9 @@ const createShopCard = async (data) => {
       error.data = { shopId: card.id };
       throw error; // 중복 카드가 있을 경우 에러 던짐
     }
+
+    // 카드 등록시, 남은 개수를 판매 등록 수량만큼 감소
+    await shopRepository.updateCardRemainingCount(data.cardId, data.totalCount);
 
     return await prisma.shop.create({
       data: {

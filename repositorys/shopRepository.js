@@ -1,3 +1,5 @@
+//repositorys\shopRepository.js
+
 import prismaClient from "../utils/prismaClient.js";
 
 // 사용자가 포토카드를 이미 상점에 등록했는지 확인
@@ -18,6 +20,14 @@ const createShopCard = async (data) => {
       exchangeGenre: data.exchangeGenre,
       exchangeDescription: data.exchangeDescription,
     },
+  });
+};
+
+// 카드 잔여 개수 업데이트
+const updateCardRemainingCount = async (cardId, decrement) => {
+  return await prismaClient.card.update({
+    where: { id: cardId },
+    data: { remainingCount: { decrement } },
   });
 };
 
@@ -122,4 +132,5 @@ export {
   getShopById,
   updateShopCard,
   deleteShopCard,
+  updateCardRemainingCount,
 };
