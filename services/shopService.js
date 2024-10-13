@@ -26,6 +26,19 @@ const createShopCard = async (data) => {
       where: { userId_cardId: { userId: data.userId, cardId: data.cardId } },
     });
 
+    // 판매하려는 수량이 원래 카드의 총 개수 보다 큰지 확인
+    const originalCard = await prisma.card.findUnique({
+      where: { id: data.cardId },
+    });
+
+    if (data.totalCount > originalCard.totalCount) {
+      const error = new Error(
+        `Cannot sell more than the total count of ${originalCard.totalCount}`
+      );
+      error.status = 400;
+      throw error;
+    }
+
     if (card) {
       const error = new Error("Card already registered in shop");
       error.status = 409;
