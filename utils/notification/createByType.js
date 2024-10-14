@@ -16,10 +16,31 @@ const switchingType = (type, exchange) => {
         type: "교환거절",
         content: `${shop.user.nickname}님과의 [${shop.card.grade} | ${shop.card.name}]의 포토 카드 교환이 거절되었습니다.`,
       };
-    case 4:
-      return "등록하신 상품의 교환 신청이 있습니다.";
-    case 5:
-      return "등록하신 상품의 교환 신청이 있습니다.";
+    case 4: // 판매성사 시, 구매자에게
+      return {
+        type: "구매완료",
+        content: `[${shop.card.grade} | ${shop.card.name}] (구매한 개수)장을 성공적으로 구매했습니다.`,
+      };
+    case 5: // 판매성사 시, 판매자에게
+      return {
+        type: "판매완료",
+        content: `(구매자)님이 [${shop.card.grade} | ${shop.card.name}]을 (구매한 개수)장 구매했습니다.`,
+      };
+    case 6: // 포토 카드 품절
+      return {
+        type: "품절",
+        content: `[${shop.card.grade} | ${shop.card.name}]이 품절되었습니다.`,
+      };
+    case 7: // 포토카드 판매 등록시, 사용자에게
+      return {
+        type: "등록완료",
+        content: `[${card.grade} | ${card.name}]가 성공적으로 등록되었습니다.`,
+      };
+    case 7: // 포토카드 판매 취소시, 사용자에게
+      return {
+        type: "등록완료",
+        content: `[${shop.card.grade} | ${shop.card.name}]의 판매가 성공적으로 취소되었습니다.`,
+      };
   }
 };
 
