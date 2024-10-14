@@ -1,4 +1,4 @@
-import exchangeRepository from "../repositorys/exchangeRepository";
+import exchangeRepository from "../repositorys/exchangeRepository.js";
 
 const whereConditions = (userId, keyword) => {
   const where = { userId };
@@ -64,6 +64,17 @@ const deleteExchange = async (id, userId) => {
   }
 };
 
+const acceptExchange = async (id, userId) => {
+  try {
+  } catch (error) {
+    error.status = 500;
+    error.data = {
+      message: "교환거절에 실패 했습니다.",
+    };
+    throw error;
+  }
+};
+
 const refuseExchange = async (id, userId) => {
   try {
     const exchange = await exchangeRepository.getById(id);
@@ -99,9 +110,9 @@ const refuseExchange = async (id, userId) => {
 
 const getByUserId = async (userId, { data }) => {
   const { limit, cursor, keyword } = data;
-  const wheres = whereConditions(userId, keyword);
+  const where = whereConditions(userId, keyword);
   const exchanges = await exchangeRepository.getByUserId({
-    wheres,
+    where,
     limit,
     cursor,
   });

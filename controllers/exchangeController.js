@@ -29,6 +29,24 @@ router.post(
 );
 
 router.post(
+  "/:id/accept",
+  passport.authenticate("access-token", { session: false }),
+  asyncHandle(async (req, res, next) => {
+    try {
+      const { id: userId } = req.user;
+      const { id } = req.params;
+
+      const response = await exchangeService.acceptExchange(id, userId);
+      if (response) {
+        res.status(200).send({ message: "교환제안 승인" });
+      }
+    } catch (error) {
+      next(error);
+    }
+  })
+);
+
+router.post(
   "/:id/refuse",
   passport.authenticate("access-token", { session: false }),
   asyncHandle(async (req, res, next) => {
