@@ -1,6 +1,7 @@
 //services\shopService.js
 import * as shopRepository from "../repositorys/shopRepository.js";
 import prismaClient from "../utils/prismaClient.js";
+import createNotificationFromType from "../utils/notification/createByType.js"; // 알림 생성 유틸리티 임포트
 
 /* 카드 존재 여부 확인 */
 const checkCardExists = async (shopId, cardId) => {
@@ -50,12 +51,25 @@ const createShopCard = async (data) => {
     // 카드 등록시, 남은 개수를 판매 등록 수량만큼 감소
     await shopRepository.updateCardRemainingCount(data.cardId, data.totalCount);
 
-    return await prisma.shop.create({
+    // 포토카드 판매 등록
+    const newShopCard = await prisma.shop.create({
       data: {
         ...data,
         remainingCount: data.totalCount, // 남아있는 카드 개수 초기화
       },
     });
+
+    // 카드 정보를 가져와 알림 생성
+    const cardInfo = await prisma.card.findUnique({
+      where: { id: data.cardId },
+    });
+
+    // 알림 생성
+    await createNotificationFromType(data.userId, 7, {
+      shop: newShopCard,
+      card: cardInfo, // 카드 정보를 추가
+    });
+    return newShopCard;
   });
 
   return newCard;
