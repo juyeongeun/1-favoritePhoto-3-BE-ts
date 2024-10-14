@@ -63,11 +63,14 @@ const createShopCard = async (data) => {
       where: { id: data.cardId },
     });
 
-    // 알림 생성
-    await createNotificationFromType(data.userId, 7, {
+    // 알림 생성(등록한 사용자에게 알림)
+    await createNotificationFromType(5, {
+      // 알림 타입 변경
       shop: newShopCard,
-      card: cardInfo, // 카드 정보를 추가
+      card: cardInfo,
+      userId: data.userId, // 알림을 받을 사용자의 ID
     });
+
     return newShopCard;
   });
 
@@ -107,6 +110,19 @@ const deleteShopCard = async (shopId, userId, cardId) => {
     error.status = 403;
     throw error;
   }
+
+  // 카드 정보를 가져와 알림 생성
+  const cardInfo = await prismaClient.card.findUnique({
+    where: { id: card.cardId },
+  });
+
+  // 알림 생성
+  await createNotificationFromType(6, {
+    shop: {
+      userId: card.userId,
+      card: cardInfo,
+    },
+  });
 
   return await shopRepository.deleteShopCard(shopId, userId, cardId);
 };
