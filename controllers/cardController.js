@@ -11,16 +11,17 @@ const router = express.Router(); // express 라우터 생성
 router.post(
   "/",
   passport.authenticate("access-token", { session: false }),
-  imageUpload.array("imageURL", 1),
+  imageUpload.single("imageURL"),
   cardValidation,
   asyncHandle(async (req, res, next) => {
     try {
       const { name, grade, genre, description, totalCount } = req.body;
       const userId = req.user?.id || "";
-      let imageURL = "";
-      if (req.files && req.files.length > 0) {
-        // 업로드된 이미지 파일의 S3 URL 추출
-        imageURL = req.files[0].location;
+      const imageURL = req.file ? req.file.location : "";
+      if (!imageURL) {
+        return res
+          .status(400)
+          .send({ message: "이미지 업로드가 실패했습니다." });
       }
 
       const newCard = await cardService.createCard({
