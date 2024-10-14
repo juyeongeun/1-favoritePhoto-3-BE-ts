@@ -101,7 +101,7 @@ const getByUserId = async (data) => {
   const { where, limit, cursor } = data;
   return prismaClient.exchange.findFirst({
     where,
-    take: limit + 1,
+    take: limit + 1, //추가적인 데이터가 있는지 확인을 위함
     skip: cursor ? { id: cursor } : undefined,
     include: {
       user: {
@@ -152,6 +152,7 @@ const acceptExchange = async (exchange) => {
   const { card: exchangeCard } = exchange;
   const [updateShopItem, consumerCard, ownerCard] =
     await prismaClient.$transaction([
+      //판매의 남은 수량 변경
       prismaClient.shop.update({
         where: {
           id: exchange.shopId,
@@ -161,7 +162,8 @@ const acceptExchange = async (exchange) => {
             decrement: exchange.count,
           },
         },
-      }), //샵의 남은 카드수 수정
+      }),
+      //제안한 사람의 userId로 새로운 레코드생성
       prismaClient.card.create({
         data: {
           ...card,
@@ -170,7 +172,8 @@ const acceptExchange = async (exchange) => {
           remainingCount: exchange.count,
           userId: exchange.userId,
         },
-      }), //제안한 사람의 userId로 새로운 레코드생성
+      }),
+      //판매한 사람의 userId로 새로운 레코드생성
       prismaClient.card.create({
         data: {
           ...exchangeCard,
@@ -179,7 +182,7 @@ const acceptExchange = async (exchange) => {
           remainingCount: exchange.count,
           userId: ownerId,
         },
-      }), //판매한 사람의 userId로 새로운 레코드생성
+      }),
     ]);
 
   return { updateShopItem, consumerCard, ownerCard };

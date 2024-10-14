@@ -43,6 +43,7 @@ router.post(
         parseInt(exchangeId),
         userId
       );
+      //승인자의 id로 새로 생성된 card 객체 반환
       res.status(200).send(response);
     } catch (error) {
       next(error);

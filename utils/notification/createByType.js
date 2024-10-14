@@ -22,6 +22,12 @@ const switchingType = (type, exchange) => {
         type: "교환거절",
         content: `${shop.user.nickname}님과의 [${shop.card.grade} | ${shop.card.name}]의 포토 카드 교환이 거절되었습니다.`,
       };
+    case 4: //교환승인후 품절이라면 교환을 제안한 모든 사람에게
+      return {
+        userId: consumerId,
+        type: "품절",
+        content: `${shop.user.nickname}님과의 [${shop.card.grade} | ${shop.card.name}]의 포토 카드 교환이 거절되었습니다.(품절)`,
+      };
   }
 };
 
@@ -75,7 +81,6 @@ const switchingTypeForShop = (type, shop) => {
 const createNotificationFromType = async (type, data) => {
   try {
     var notificationData;
-
     if (data.exchange) {
       // 교환 관련 알림 처리
       notificationData = switchingType(type, data.exchange);
