@@ -45,9 +45,12 @@ const getNotificationsByType = async (userId, type) => {
   }
 };
 
+/* 알림 업데이트 */
 const updateNotification = async (id, data) => {
   try {
-    const notification = await notificationRepository.getNotificationById(id);
+    const notification = await notificationRepository.getNotificationById(
+      parseInt(id, 10)
+    );
     if (!notification) {
       const error = new Error("알림을 찾을 수 없습니다.");
       error.status = 404; // 404 상태 코드 설정
@@ -56,7 +59,10 @@ const updateNotification = async (id, data) => {
       };
       throw error;
     }
-    return await notificationRepository.updateNotification(id, data);
+    return await notificationRepository.updateNotification({
+      id: parseInt(id, 10), // id 객체로 전달
+      data,
+    });
   } catch (error) {
     const serviceError = new Error("알림 업데이트 중 오류 발생");
     serviceError.status = 500;

@@ -50,17 +50,21 @@ router.get(
 );
 
 // 알림 업데이트 (읽음 상태 변경 등)
-router.put("/:id", async (req, res, next) => {
-  try {
-    const updatedNotification = await notificationService.updateNotification(
-      req.params.id,
-      req.body
-    );
-    res.status(200).send({ success: true, updatedNotification });
-  } catch (error) {
-    next(error);
+router.put(
+  "/:id",
+  passport.authenticate("access-token", { session: false }),
+  async (req, res, next) => {
+    try {
+      const updatedNotification = await notificationService.updateNotification(
+        req.params.id,
+        req.body
+      );
+      res.status(200).send({ success: true, updatedNotification });
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
 // 알림 삭제
 router.delete("/:id", async (req, res, next) => {

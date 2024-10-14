@@ -24,10 +24,13 @@ const getNotificationsByType = (userId, type) => {
   });
 };
 
+/* 알림 상태 업데이트(읽음 여부) */
 const updateNotification = ({ id, data }) => {
   return prismaClient.notification.update({
     where: { id },
-    data,
+    data: {
+      ...data,
+    },
   });
 };
 
