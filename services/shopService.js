@@ -64,7 +64,7 @@ const createShopCard = async (data) => {
     });
 
     // 알림 생성(등록한 사용자에게 알림)
-    await createNotificationFromType(5, {
+    await createNotificationFromType(4, {
       // 알림 타입 변경
       shop: newShopCard,
       card: cardInfo,
@@ -103,7 +103,7 @@ const updateShopCard = async (data) => {
   });
 
   // 알림 생성
-  await createNotificationFromType(7, {
+  await createNotificationFromType(6, {
     shop: {
       userId: card.userId,
       card: cardInfo,
@@ -130,7 +130,7 @@ const deleteShopCard = async (shopId, userId, cardId) => {
   });
 
   // 알림 생성
-  await createNotificationFromType(6, {
+  await createNotificationFromType(5, {
     shop: {
       userId: card.userId,
       card: cardInfo,
