@@ -14,7 +14,7 @@ app.use(cors());
 app.use("/users", userRouter); // 2개여서 1개 삭제함
 app.use("/shop", shopRouter);
 app.use("/cards", cardRouter);
-app.use("/purchase", purchaseRouter);
+app.use("/purchases", purchaseRouter);
 
 app.use(errorHandler);
 

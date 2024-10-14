@@ -44,12 +44,6 @@ const createPurchase = async (buyerId, count, shopId) => {
       data: { remainingCount: { decrement: count } },
     });
 
-    // 판매자 카드 재고 업데이트
-    await prisma.card.update({
-      where: { id: shopInfo.card.id },
-      data: { remainingCount: { decrement: count } },
-    });
-
     // 구매자에게 새로운 카드 생성
     const newCard = await prisma.card.create({
       data: {

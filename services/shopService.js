@@ -21,10 +21,9 @@ const createShopCard = async (data) => {
     error.status = 400;
     throw error;
   }
-
   const newCard = await prismaClient.$transaction(async (prisma) => {
-    const card = await prisma.shop.findUnique({
-      where: { userId_cardId: { userId: data.userId, cardId: data.cardId } },
+    const card = await prisma.shop.findFirst({
+      where: { userId: data.userId, cardId: data.cardId },
     });
 
     // 판매하려는 수량이 원래 카드의 총 개수 보다 큰지 확인
