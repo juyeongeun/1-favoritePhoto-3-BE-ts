@@ -97,6 +97,19 @@ const updateShopCard = async (data) => {
     throw error;
   }
 
+  // 카드 정보를 가져와 알림 생성
+  const cardInfo = await prismaClient.card.findUnique({
+    where: { id: card.cardId },
+  });
+
+  // 알림 생성
+  await createNotificationFromType(7, {
+    shop: {
+      userId: card.userId,
+      card: cardInfo,
+    },
+  });
+
   return await shopRepository.updateShopCard(data);
 };
 
