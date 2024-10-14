@@ -12,7 +12,8 @@ router.post(
     try {
       const buyerId = req.user?.id || "";
       const { count } = req.body;
-      const shopId = req.params;
+      const shopId = parseInt(req.params.shopId);
+
       const purchase = await purchaseService.createPurchase(
         buyerId,
         count,
