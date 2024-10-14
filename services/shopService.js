@@ -1,4 +1,3 @@
-//services\shopService.js
 import * as shopRepository from "../repositorys/shopRepository.js";
 import prismaClient from "../utils/prismaClient.js";
 import createNotificationFromType from "../utils/notification/createByType.js"; // 알림 생성 유틸리티 임포트
@@ -53,8 +52,14 @@ const createShopCard = async (data) => {
     // 포토카드 판매 등록
     const newShopCard = await prisma.shop.create({
       data: {
-        ...data,
-        remainingCount: data.totalCount, // 남아있는 카드 개수 초기화
+        userId: data.userId,
+        cardId: data.cardId,
+        price: data.price,
+        totalCount: data.totalCount, // 남아있는 카드 개수 초기화
+        exchangeGrade: data.exchangeGrade,
+        exchangeGenre: data.exchangeGenre,
+        exchangeDescription: data.exchangeDescription,
+        remainingCount: data.totalCount,
       },
     });
 
@@ -65,10 +70,10 @@ const createShopCard = async (data) => {
 
     // 알림 생성(등록한 사용자에게 알림)
     await createNotificationFromType(4, {
-      // 알림 타입 변경
-      shop: newShopCard,
-      card: cardInfo,
-      userId: data.userId, // 알림을 받을 사용자의 ID
+      shop: {
+        userId: data.userId,
+        card: cardInfo, // 카드 정보 포함
+      },
     });
 
     return newShopCard;
