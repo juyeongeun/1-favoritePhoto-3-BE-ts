@@ -30,6 +30,7 @@ model User {
   purchase     Purchase[]
   exchange     Exchange[]
   isdeleted    Boolean        @default(false)
+
 }
 
 model Card {
@@ -49,6 +50,7 @@ model Card {
   shop           Shop[]
   purchase       Purchase[]
   exchange       Exchange[] @relation("CardExchanges") //교환 신청자의 카드
+
 }
 
 model Notification {
@@ -78,6 +80,8 @@ model Shop {
   exchangeDescription String? //교환희망 설명
   exchangeGrade       String // 교환희망 카드 등급
   exchangeGenre       String // 교환희망 카드 장르
+
+  @@unique([userId, cardId]) // 유니크 제약 조건 추가
 }
 
 model Purchase {
@@ -88,6 +92,7 @@ model Purchase {
   cardId   Int
   user     User     @relation(fields: [userId], references: [id])
   userId   Int
+
 }
 
 model Exchange {
@@ -102,4 +107,5 @@ model Exchange {
   Shop        Shop     @relation(fields: [shopId], references: [id]) //예시 ) 구매자가 구매후 판매샵의 남아있는 카드수를 카운트 하기 위한 관계
   shopId      Int //교환의 희망하는 판매상품 
   isApprove   Boolean  @default(true)
+
 }
