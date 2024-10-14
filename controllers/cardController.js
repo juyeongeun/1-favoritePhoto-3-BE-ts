@@ -2,6 +2,8 @@ import express from "express"; // express 모듈 임포트
 import * as cardService from "../services/cardService.js"; // 서비스 임포트
 import asyncHandle from "../utils/error/asyncHandle.js";
 import passport from "../config/passportConfig.js";
+import cardValidation from "../middlewares/card/cardValidation.js";
+import imageUpload from "../middlewares/card/imageUpload.js";
 
 const router = express.Router(); // express 라우터 생성
 
@@ -9,11 +11,18 @@ const router = express.Router(); // express 라우터 생성
 router.post(
   "/",
   passport.authenticate("access-token", { session: false }),
+  imageUpload.single("imageURL"),
+  cardValidation,
   asyncHandle(async (req, res, next) => {
     try {
-      const { name, grade, genre, description, totalCount, imageURL } =
-        req.body;
+      const { name, grade, genre, description, totalCount } = req.body;
       const userId = req.user?.id || "";
+      const imageURL = req.file ? req.file.location : "";
+      if (!imageURL) {
+        return res
+          .status(400)
+          .send({ message: "이미지 업로드가 실패했습니다." });
+      }
 
       const newCard = await cardService.createCard({
         name,

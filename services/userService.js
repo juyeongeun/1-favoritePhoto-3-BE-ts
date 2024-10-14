@@ -10,7 +10,6 @@ const createToken = (user, type) => {
 
 const getUser = async ({ email, password }) => {
   const user = await userRepository.getByEmail(email);
-  console.log(user);
   if (!user) {
     const error = new Error("Mot found");
     error.status = 404;
