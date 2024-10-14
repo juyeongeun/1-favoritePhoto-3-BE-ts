@@ -99,7 +99,7 @@ const create = async (data) => {
     error.status = 422;
     error.data = {
       message: "사용중인 닉네임입니다.",
-      nickname: userByEmail.nickname,
+      nickname: userByNickname.nickname,
     };
     throw error;
   }

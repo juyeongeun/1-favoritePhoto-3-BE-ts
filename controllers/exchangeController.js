@@ -21,7 +21,41 @@ router.post(
         userId,
       });
 
-      res.status(201).sned(exchange);
+      res.status(201).send(exchange);
+    } catch (error) {
+      next(error);
+    }
+  })
+);
+
+router.post(
+  "/:id/refuse",
+  passport.authenticate("access-token", { session: false }),
+  asyncHandle(async (req, res, next) => {
+    try {
+      const { id: userId } = req.user;
+      const { id } = req.params;
+
+      const response = await exchangeService.refuseExchange(id, userId);
+      if (response) {
+        res.status(200).send({ message: "교환제안 거절" });
+      }
+    } catch (error) {
+      next(error);
+    }
+  })
+);
+
+router.delete(
+  "/:id",
+  passport.authenticate("access-token", { session: false }),
+  asyncHandle(async (req, res, next) => {
+    try {
+      const { id: userId } = req.user;
+      const { id } = req.params;
+
+      const response = await exchangeService.refuseExchange(id, userId);
+      res.status(204).send(response);
     } catch (error) {
       next(error);
     }
