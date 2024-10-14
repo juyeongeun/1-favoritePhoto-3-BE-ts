@@ -1,4 +1,3 @@
-//services\shopService.js
 import * as shopRepository from "../repositorys/shopRepository.js";
 import prismaClient from "../utils/prismaClient.js";
 import createNotificationFromType from "../utils/notification/createByType.js"; // 알림 생성 유틸리티 임포트
@@ -53,8 +52,14 @@ const createShopCard = async (data) => {
     // 포토카드 판매 등록
     const newShopCard = await prisma.shop.create({
       data: {
-        ...data,
-        remainingCount: data.totalCount, // 남아있는 카드 개수 초기화
+        userId: data.userId,
+        cardId: data.cardId,
+        price: data.price,
+        totalCount: data.totalCount, // 남아있는 카드 개수 초기화
+        exchangeGrade: data.exchangeGrade,
+        exchangeGenre: data.exchangeGenre,
+        exchangeDescription: data.exchangeDescription,
+        remainingCount: data.totalCount,
       },
     });
 
@@ -63,11 +68,14 @@ const createShopCard = async (data) => {
       where: { id: data.cardId },
     });
 
-    // 알림 생성
-    await createNotificationFromType(data.userId, 7, {
-      shop: newShopCard,
-      card: cardInfo, // 카드 정보를 추가
+    // 알림 생성(등록한 사용자에게 알림)
+    await createNotificationFromType(4, {
+      shop: {
+        userId: data.userId,
+        card: cardInfo, // 카드 정보 포함
+      },
     });
+
     return newShopCard;
   });
 
@@ -94,6 +102,19 @@ const updateShopCard = async (data) => {
     throw error;
   }
 
+  // 카드 정보를 가져와 알림 생성
+  const cardInfo = await prismaClient.card.findUnique({
+    where: { id: card.cardId },
+  });
+
+  // 알림 생성
+  await createNotificationFromType(6, {
+    shop: {
+      userId: card.userId,
+      card: cardInfo,
+    },
+  });
+
   return await shopRepository.updateShopCard(data);
 };
 
@@ -107,6 +128,19 @@ const deleteShopCard = async (shopId, userId, cardId) => {
     error.status = 403;
     throw error;
   }
+
+  // 카드 정보를 가져와 알림 생성
+  const cardInfo = await prismaClient.card.findUnique({
+    where: { id: card.cardId },
+  });
+
+  // 알림 생성
+  await createNotificationFromType(5, {
+    shop: {
+      userId: card.userId,
+      card: cardInfo,
+    },
+  });
 
   return await shopRepository.deleteShopCard(shopId, userId, cardId);
 };

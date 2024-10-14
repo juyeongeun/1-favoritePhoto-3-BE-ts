@@ -126,14 +126,6 @@ const deleteShopCard = async (shopId, userId, cardId) => {
       where: { id: shopId },
     });
 
-    // 삭제 알림 생성
-    await prisma.notification.create({
-      data: {
-        content: `당신의 [${shopCard.card.grade} | ${shopCard.card.name}]이 판매 취소되었습니다.`,
-        userId: shopCard.userId,
-      },
-    });
-
     return { deletedShopCard, updatedCard }; // 삭제된 카드 정보 반환
   });
 };
