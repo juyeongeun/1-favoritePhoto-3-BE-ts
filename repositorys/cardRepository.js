@@ -4,4 +4,4 @@ const createCard = async (data) => {
   return await prismaClient.card.create({ data });
 };
 
-export { createCard, updateCard };
+export { createCard };

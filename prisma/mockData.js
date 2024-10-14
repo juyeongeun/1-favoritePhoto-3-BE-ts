@@ -1,60 +1,50 @@
 export const user = [
   {
-    id: 1,
     email: "codeit1@codeit.co.kr",
     nickname: "james93",
     password: "f8u3j9q2",
   },
   {
-    id: 2,
     email: "codeit2@codeit.co.kr",
     nickname: "sara88",
     password: "h5w8t7v1",
   },
   {
-    id: 3,
     email: "codeit3@codeit.co.kr",
     nickname: "michael77",
     password: "p2k4f1r9",
   },
   {
-    id: 4,
     email: "codeit4@codeit.co.kr",
     nickname: "lily10",
     password: "a3s6d5f2",
   },
   {
-    id: 5,
     email: "codeit5@codeit.co.kr",
     nickname: "david_w",
     password: "j8k1l4q7",
   },
   {
-    id: 6,
     email: "codeit6@codeit.co.kr",
     nickname: "emma.stone",
     password: "z1e6q3j8",
   },
   {
-    id: 7,
     email: "codeit7@codeit.co.kr",
     nickname: "robert99",
     password: "r4f2c6b5",
   },
   {
-    id: 8,
     email: "codeit8@codeit.co.kr",
     nickname: "ava_smith",
     password: "y7v1u9g3",
   },
   {
-    id: 9,
     email: "codeit9@codeit.co.kr",
     nickname: "charlie88",
     password: "t3h6w5j1",
   },
   {
-    id: 10,
     email: "codeit10@codeit.co.kr",
     nickname: "zoe.brown",
     password: "c2b8k9f4",
@@ -69,7 +59,7 @@ export const card = [
     description: "푸른 바다의 사진입니다.",
     totalCount: 3,
     remainingCount: 3,
-    userId: 2,
+    userId: user[0].id,
   },
   {
     name: "고요한 숲",
@@ -78,7 +68,7 @@ export const card = [
     description: "고요한 숲의 모습입니다.",
     totalCount: 5,
     remainingCount: 5,
-    userId: 4,
+    userId: user[1].id,
   },
   {
     name: "활기찬 도시",
@@ -87,7 +77,7 @@ export const card = [
     description: "활기찬 도시의 모습입니다.",
     totalCount: 2,
     remainingCount: 2,
-    userId: 1,
+    userId: user[3].id,
   },
   {
     name: "눈부신 일출",
@@ -96,7 +86,7 @@ export const card = [
     description: "눈부신 일출의 순간입니다.",
     totalCount: 1,
     remainingCount: 1,
-    userId: 7,
+    userId: user[7].id,
   },
   {
     name: "사계절의 변화",
@@ -105,7 +95,7 @@ export const card = [
     description: "사계절의 아름다움을 담은 사진입니다.",
     totalCount: 4,
     remainingCount: 4,
-    userId: 3,
+    userId: user[4].id,
   },
   {
     name: "가을의 풍경",
@@ -114,7 +104,7 @@ export const card = [
     description: "가을의 색깔을 담은 사진입니다.",
     totalCount: 6,
     remainingCount: 6,
-    userId: 5,
+    userId: user[5].id,
   },
   {
     name: "겨울의 정적",
@@ -123,7 +113,7 @@ export const card = [
     description: "겨울의 고요함을 담은 사진입니다.",
     totalCount: 2,
     remainingCount: 2,
-    userId: 8,
+    userId: user[8].id,
   },
   {
     name: "여름의 열기",

@@ -9,4 +9,4 @@ const createCard = async (data) => {
   }
 };
 
-export { createCard, updateCard };
+export { createCard };
