@@ -1,3 +1,5 @@
+//controllers\shopController.js
+
 import express from "express";
 import * as shopService from "../services/shopService.js";
 import asyncHandle from "../utils/error/asyncHandle.js";
@@ -12,16 +14,7 @@ const router = express.Router();
 // 판매할 포토카드 등록하기
 router.post(
   "/",
-  // 테스트를 위해 임시 인증 미들웨어 설정함(인증이 실패했을 때 처리 추가)
-  (req, res, next) => {
-    passport.authenticate("jwt", { session: false }, (err, user) => {
-      if (err || !user) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
-      req.user = user; // 인증된 사용자 정보 설정
-      next(); // 다음 미들웨어로 이동
-    })(req, res, next);
-  },
+  passport.authenticate("access-token", { session: false }),
   shopValidation, // 요청 본문의 유효성을 검사하는 미들웨어
   asyncHandle(async (req, res) => {
     console.log(req.user);
@@ -52,20 +45,7 @@ router.post(
 // 판매중인 포토 카드 상세 조회
 router.get(
   "/cards/:shopId/:cardId",
-  (req, res, next) => {
-    passport.authenticate("jwt", { session: false }, (err, user) => {
-      if (err) {
-        console.error("Authentication error:", err);
-        return res.status(401).json({ message: "Unauthorized" });
-      }
-      if (!user) {
-        console.error("No user found");
-        return res.status(401).json({ message: "Unauthorized" });
-      }
-      req.user = user; // 인증된 사용자 정보 설정
-      next(); // 다음 미들웨어로 이동
-    })(req, res, next);
-  },
+  passport.authenticate("access-token", { session: false }),
   asyncHandle(async (req, res) => {
     const { shopId, cardId } = req.params;
     const cardDetails = await shopService.getShopByShopId(
@@ -79,16 +59,7 @@ router.get(
 // 판매 중인 카드 수정하기
 router.patch(
   "/cards/:shopId/:cardId",
-  // 테스트를 위해 임시 인증 미들웨어 설정함(인증이 실패했을 때 처리 추가)
-  (req, res, next) => {
-    passport.authenticate("jwt", { session: false }, (err, user) => {
-      if (err || !user) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
-      req.user = user; // 인증된 사용자 정보 설정
-      next(); // 다음 미들웨어로 이동
-    })(req, res, next);
-  },
+  passport.authenticate("access-token", { session: false }),
   shopEditValidation,
   asyncHandle(async (req, res) => {
     const { shopId, cardId } = req.params;
@@ -118,16 +89,7 @@ router.patch(
 // 판매중인 카드 판매 취소(판매 내리기)
 router.delete(
   "/cards/:shopId/:cardId",
-  // 테스트를 위해 임시 인증 미들웨어 설정함(인증이 실패했을 때 처리 추가)
-  (req, res, next) => {
-    passport.authenticate("jwt", { session: false }, (err, user) => {
-      if (err || !user) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
-      req.user = user; // 인증된 사용자 정보 설정
-      next(); // 다음 미들웨어로 이동
-    })(req, res, next);
-  },
+  passport.authenticate("access-token", { session: false }),
   asyncHandle(async (req, res) => {
     const { shopId, cardId } = req.params;
     const userId = req.user.id; // JWT로부터 사용자 ID 가져오기
