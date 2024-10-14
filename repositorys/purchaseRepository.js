@@ -25,18 +25,19 @@ const createPurchase = async (buyerId, count, shopId) => {
   if (buyer.point < totalPrice) throw new Error("Not enough Points");
 
   // 트랜잭션으로 묶어서 작업 진행
-  const result = await prismaClient.$transaction(async (prisma) => {
+  await prismaClient.$transaction(async (prisma) => {
     // 구매자 포인트 차감 및 판매자 포인트 증가
-    await prisma.user.updateMany([
-      {
-        where: { id: buyerId },
-        data: { point: { decrement: totalPrice } },
-      },
-      {
-        where: { id: shopInfo.user.id },
-        data: { point: { increment: totalPrice } },
-      },
-    ]);
+    // 구매자 포인트 차감
+    await prisma.user.update({
+      where: { id: buyerId },
+      data: { point: { decrement: totalPrice } },
+    });
+
+    // 판매자 포인트 증가
+    await prisma.user.update({
+      where: { id: shopInfo.user.id },
+      data: { point: { increment: totalPrice } },
+    });
 
     // 상점 재고 업데이트
     await prisma.shop.update({
@@ -64,13 +65,30 @@ const createPurchase = async (buyerId, count, shopId) => {
       data: {
         cardId: newCard.id,
         userId: buyerId,
+        shopId: shopId,
       },
     });
-
-    return newCard;
   });
 
-  return result;
+  // 트랜잭션이 완료된 후, 최신 상점 정보 다시 조회
+  const updatedShopInfo = await prismaClient.shop.findFirst({
+    where: {
+      id: shopId,
+    },
+    include: {
+      card: true,
+      user: {
+        select: {
+          id: true,
+          email: true,
+          nickname: true,
+          point: true,
+        },
+      },
+    },
+  });
+
+  return updatedShopInfo;
 };
 
 export { createPurchase };
