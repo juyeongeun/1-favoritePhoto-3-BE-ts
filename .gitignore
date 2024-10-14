@@ -33,3 +33,5 @@ swagger.js
 commentsMock.js
 
 upload
+
+test.http

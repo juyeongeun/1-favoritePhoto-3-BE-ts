@@ -17,15 +17,14 @@ router.post(
   passport.authenticate("access-token", { session: false }),
   shopValidation, // 요청 본문의 유효성을 검사하는 미들웨어
   asyncHandle(async (req, res) => {
-    console.log(req.user);
     const userId = req.user.id;
     const {
       cardId,
       price,
       totalCount,
-      exchangeGrade,
-      exchangeGenre,
-      exchangeDescription,
+      exchangeGrade = "",
+      exchangeGenre = "",
+      exchangeDescription = "",
     } = req.body;
 
     // 카드 정보를 상점에 등록
