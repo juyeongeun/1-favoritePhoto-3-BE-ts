@@ -1,4 +1,6 @@
-import prismaClient from "../utils/prismaClient";
+import prismaClient from "../utils/prismaClient.js";
+import { updateCardRemainingCount } from "./shopRepository.js";
+import { createCard } from "./cardRepository.js";
 
 const create = async (data) => {
   return prismaClient.exchange.create({
@@ -87,9 +89,9 @@ const getById = async (id) => {
 };
 
 const getByUserId = async (data) => {
-  const { whereConditions, limit, cursor } = data;
+  const { where, limit, cursor } = data;
   return prismaClient.exchange.findUnique({
-    where: whereConditions,
+    where,
     take: limit + 1,
     skip: cursor ? { id: cursor } : undefined,
     include: {
