@@ -1,18 +1,55 @@
 import * as purchaseRepository from "../repositorys/purchaseRepository.js";
+import createNotificationFromType from "../utils/notification/createByType.js";
+import prismaClient from "../utils/prismaClient.js";
 
 const createPurchase = async (buyerId, count, shopId) => {
-  const cards = await purchaseRepository.createPurchase(buyerId, count, shopId);
+  const shop = await purchaseRepository.createPurchase(buyerId, count, shopId);
 
-  // if (cards) {
-  //   // 구매 알림
-  //   // 판매 알림
-  // }
-  // if (cards.remainingCount === 0) {
-  //   //품절알림 -> 구매자
-  //   //교환알림 -> exchange 테이블 직접 접근
-  // }
+  if (shop) {
+    // 구매 성공 알림 생성
 
-  return { cards };
+    // 구매자 알림 (구매 성공)
+    await createNotificationFromType(7, {
+      userId: buyerId,
+      shop,
+    });
+
+    // 판매자 알림 (판매 성공)
+    await createNotificationFromType(8, {
+      userId: shop.userId,
+      shop,
+    });
+  }
+
+  if (shop.remainingCount === 0) {
+    // 품절 알림 (구매자에게)
+    await createNotificationFromType(9, {
+      userId: shop.userId,
+      shop,
+    });
+
+    // 교환 알림 (교환 요청자가 있는 경우)
+    const exchangeRequests = await prismaClient.exchange.findMany({
+      where: {
+        shopId: shopId,
+        isApprove: false,
+      },
+      include: {
+        shop: true,
+      },
+    });
+
+    await Promise.all(
+      exchangeRequests.map((exchange) =>
+        createNotificationFromType(9, {
+          userId: exchange.userId,
+          shop,
+        })
+      )
+    );
+  }
+
+  return { shop };
 };
 
 export { createPurchase };

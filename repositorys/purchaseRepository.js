@@ -3,7 +3,7 @@ import prismaClient from "../utils/prismaClient.js";
 // 사용자 구매
 const createPurchase = async (buyerId, count, shopId) => {
   // 상점 정보 및 재고 확인
-  const shopInfo = await prismaClient.shop.findUnique({
+  const shopInfo = await prismaClient.shop.findFirst({
     where: {
       id: shopId,
       remainingCount: { gt: 0 },
@@ -25,7 +25,7 @@ const createPurchase = async (buyerId, count, shopId) => {
   if (buyer.point < totalPrice) throw new Error("Not enough Points");
 
   // 트랜잭션으로 묶어서 작업 진행
-  const result = await prismaClient.$transaction(async (prisma) => {
+  await prismaClient.$transaction(async (prisma) => {
     // 구매자 포인트 차감 및 판매자 포인트 증가
     // 구매자 포인트 차감
     await prisma.user.update({
@@ -68,11 +68,17 @@ const createPurchase = async (buyerId, count, shopId) => {
         shopId: shopId,
       },
     });
-
-    return newCard;
   });
 
-  return result;
+  // 트랜잭션이 완료된 후, 최신 상점 정보 다시 조회
+  const updatedShopInfo = await prismaClient.shop.findFirst({
+    where: {
+      id: shopId,
+    },
+    include: { card: true, user: true },
+  });
+
+  return updatedShopInfo;
 };
 
 export { createPurchase };
