@@ -6,7 +6,8 @@ import userRouter from "./controllers/userController.js";
 import shopRouter from "./controllers/shopController.js";
 import cardRouter from "./controllers/cardController.js";
 import purchaseRouter from "./controllers/purchaseController.js";
-import notificationController from "./controllers/notificationController.js";
+import notificationRouter from "./controllers/notificationController.js";
+import exchangeRouter from "./controllers/exchangeController.js";
 
 const app = express();
 app.use(express.json());
@@ -16,7 +17,8 @@ app.use("/users", userRouter); // 2개여서 1개 삭제함
 app.use("/shop", shopRouter);
 app.use("/cards", cardRouter);
 app.use("/purchases", purchaseRouter);
-app.use("/notifications", notificationController);
+app.use("/exchange", exchangeRouter);
+app.use("/notifications", notificationRouter);
 
 app.use(errorHandler);
 
