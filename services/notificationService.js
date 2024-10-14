@@ -1,6 +1,8 @@
-import * as notificationRepository from "../repository/notificationRepository";
+//services\notificationService.js
 
-export const createNotification = async (data) => {
+import notificationRepository from "../repositorys/notificationRepository.js";
+
+const createNotification = async (data) => {
   try {
     return await notificationRepository.createNotification(data);
   } catch (error) {
@@ -14,7 +16,7 @@ export const createNotification = async (data) => {
   }
 };
 
-export const getAllNotifications = async (userId) => {
+const getAllNotifications = async (userId) => {
   try {
     return await notificationRepository.getAllNotifications(userId);
   } catch (error) {
@@ -28,7 +30,7 @@ export const getAllNotifications = async (userId) => {
   }
 };
 
-export const getNotificationsByType = async (userId, type) => {
+const getNotificationsByType = async (userId, type) => {
   try {
     return await notificationRepository.getNotificationsByType(userId, type);
   } catch (error) {
@@ -43,7 +45,7 @@ export const getNotificationsByType = async (userId, type) => {
   }
 };
 
-export const updateNotification = async (id, data) => {
+const updateNotification = async (id, data) => {
   try {
     const notification = await notificationRepository.getNotificationById(id);
     if (!notification) {
@@ -67,7 +69,7 @@ export const updateNotification = async (id, data) => {
   }
 };
 
-export const deleteNotification = async (id) => {
+const deleteNotification = async (id) => {
   try {
     const notification = await notificationRepository.getNotificationById(id);
     if (!notification) {
@@ -88,4 +90,12 @@ export const deleteNotification = async (id) => {
     };
     throw serviceError;
   }
+};
+
+export default {
+  createNotification,
+  deleteNotification,
+  getAllNotifications,
+  updateNotification,
+  getNotificationsByType,
 };

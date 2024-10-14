@@ -1,20 +1,26 @@
+//repositorys\notificationRepository.js
+
 import prismaClient from "../utils/prismaClient.js";
 
 const createNotification = (data) => {
   return prismaClient.notification.create({ data });
 };
 
+const getNotificationById = (id) => {
+  return prismaClient.notification.findUnique({ where: { id } });
+};
+
 const getAllNotifications = (userId) => {
   return prismaClient.notification.findMany({
     where: { userId },
-    orderBy: { createdAt: "desc" }, // 최신 알림 맨 위 상단에 위치
+    orderBy: { createAt: "desc" }, // 최신 알림 맨 위 상단에 위치
   });
 };
 
 const getNotificationsByType = (userId, type) => {
   return prismaClient.notification.findMany({
     where: { userId, type },
-    orderBy: { createdAt: "desc" },
+    orderBy: { createAt: "desc" },
   });
 };
 
@@ -35,4 +41,5 @@ export default {
   getNotificationsByType,
   updateNotification,
   deleteNotification,
+  getNotificationById,
 };
