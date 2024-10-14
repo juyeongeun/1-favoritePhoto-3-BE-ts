@@ -75,7 +75,17 @@ const createPurchase = async (buyerId, count, shopId) => {
     where: {
       id: shopId,
     },
-    include: { card: true, user: true },
+    include: {
+      card: true,
+      user: {
+        select: {
+          id: true,
+          email: true,
+          nickname: true,
+          point: true,
+        },
+      },
+    },
   });
 
   return updatedShopInfo;
