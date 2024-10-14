@@ -8,8 +8,8 @@ const createPurchase = async (buyerId, count, shopId) => {
   //   // 판매 알림
   // }
   // if (cards.remainingCount === 0) {
-  //   //품절알림
-  //   //교환알림
+  //   //품절알림 -> 구매자
+  //   //교환알림 -> exchange 테이블 직접 접근
   // }
 
   return { cards };

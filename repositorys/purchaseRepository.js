@@ -2,11 +2,11 @@ import prismaClient from "../utils/prismaClient.js";
 
 // 사용자 구매
 const createPurchase = async (buyerId, count, shopId) => {
+  console.log(shopId);
   // 상점 정보 및 재고 확인
-  const shopInfo = await prismaClient.shop.findFirst({
+  const shopInfo = await prismaClient.shop.findUnique({
     where: {
       id: shopId,
-      remainingCount: { gt: 0 },
     },
     include: { card: true, user: true },
   });
@@ -27,16 +27,17 @@ const createPurchase = async (buyerId, count, shopId) => {
   // 트랜잭션으로 묶어서 작업 진행
   const result = await prismaClient.$transaction(async (prisma) => {
     // 구매자 포인트 차감 및 판매자 포인트 증가
-    await prisma.user.updateMany([
-      {
-        where: { id: buyerId },
-        data: { point: { decrement: totalPrice } },
-      },
-      {
-        where: { id: shopInfo.user.id },
-        data: { point: { increment: totalPrice } },
-      },
-    ]);
+    // 구매자 포인트 차감
+    await prisma.user.update({
+      where: { id: buyerId },
+      data: { point: { decrement: totalPrice } },
+    });
+
+    // 판매자 포인트 증가
+    await prisma.user.update({
+      where: { id: shopInfo.user.id },
+      data: { point: { increment: totalPrice } },
+    });
 
     // 상점 재고 업데이트
     await prisma.shop.update({
@@ -64,6 +65,7 @@ const createPurchase = async (buyerId, count, shopId) => {
       data: {
         cardId: newCard.id,
         userId: buyerId,
+        shopId: shopId,
       },
     });
 

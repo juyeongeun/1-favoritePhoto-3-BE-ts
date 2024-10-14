@@ -2,12 +2,14 @@ import express from "express"; // express 모듈 임포트
 import * as cardService from "../services/cardService.js"; // 서비스 임포트
 import asyncHandle from "../utils/error/asyncHandle.js";
 import passport from "../config/passportConfig.js";
+import cardValidation from "../middlewares/card/cardValidation.js";
 
 const router = express.Router(); // express 라우터 생성
 
 // 카드 등록(생성)
 router.post(
   "/",
+  cardValidation,
   passport.authenticate("access-token", { session: false }),
   asyncHandle(async (req, res, next) => {
     try {
