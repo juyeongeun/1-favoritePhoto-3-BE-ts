@@ -1,3 +1,5 @@
+import notificationRepository from "../../repositorys/notificationRepository.js";
+
 const switchingType = (type, exchange) => {
   const { user: consumer, userId: consumerId, shop } = exchange;
 
@@ -32,7 +34,7 @@ const switchingTypeForShop = (type, shop) => {
       return {
         userId,
         type: "등록완료",
-        content: `[${card.grade} | ${card.name}]가 성공적으로 등록되었습니다.`,
+        content: `[${card.grade} | ${card.name}]이 성공적으로 등록되었습니다.`,
       };
     case 5: // 포토카드 판매 취소시, 사용자에게
       return {
