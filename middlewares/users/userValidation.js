@@ -1,8 +1,7 @@
 const userValidation = (req, res, next) => {
   const emailPattern = /^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-za-z0-9\-]+/;
-  //비밀번호 패턴 특수문자 + 영문 + 숫자 개발 단계에서는 확인 안 함
-  //   const passwordPattern =
-  //     /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,15}$/;
+  const passwordPattern =
+    /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,15}$/;
 
   const { email, nickname, password } = req.body;
 
@@ -26,14 +25,14 @@ const userValidation = (req, res, next) => {
     });
   }
 
-  //   if (!passwordPattern.test(password)) {
-  //     res.status(400).send({
-  //       message: "비밀번호는 영문 + 특수문자 + 숫자의 조합이 필요합니다.",
-  //       data: {
-  //         password,
-  //       },
-  //     });
-  //   }
+  if (!passwordPattern.test(password)) {
+    res.status(400).send({
+      message: "비밀번호는 영문 + 특수문자 + 숫자의 조합이 필요합니다.",
+      data: {
+        password,
+      },
+    });
+  }
 
   if (
     typeof nickname !== "string" ||

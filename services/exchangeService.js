@@ -1,4 +1,5 @@
 import exchangeRepository from "../repositorys/exchangeRepository.js";
+import createNotificationFromType from "../utils/notification/createByType.js";
 
 const whereConditions = (userId, keyword) => {
   const where = { userId };
@@ -27,6 +28,7 @@ const createExchange = async (data) => {
     const exchange = await exchangeRepository.create(data);
     return exchange;
   } catch (error) {
+    console.log(error);
     error.status = 500;
     error.data = {
       message: "교환신청에 실패 했습니다.",
@@ -36,15 +38,15 @@ const createExchange = async (data) => {
 };
 
 //요구사항에 없음 일단 제작
-const updateExchange = async ({ id, data }) => {
-  const exchange = await exchangeRepository.update({ id, data });
+const updateExchange = async ({ exchangeId, data }) => {
+  const exchange = await exchangeRepository.update({ exchangeId, data });
 
   return exchange;
 };
 
-const deleteExchange = async (id, userId) => {
+const deleteExchange = async (exchangeId, userId) => {
   try {
-    const exchange = await exchangeRepository.deleteExchange(id);
+    const exchange = await exchangeRepository.deleteExchange(exchangeId);
     if (exchange.userId !== userId) {
       const error = new Error("Unauthorized");
       error.status = 401;
@@ -56,6 +58,7 @@ const deleteExchange = async (id, userId) => {
     //알림생성필요
     return exchange;
   } catch (error) {
+    console.log(error);
     error.status = 500;
     error.data = {
       message: "교환제안 취소의 실패 했습니다.",
@@ -64,20 +67,9 @@ const deleteExchange = async (id, userId) => {
   }
 };
 
-const acceptExchange = async (id, userId) => {
+const acceptExchange = async (exchangeId) => {
   try {
-  } catch (error) {
-    error.status = 500;
-    error.data = {
-      message: "교환거절에 실패 했습니다.",
-    };
-    throw error;
-  }
-};
-
-const refuseExchange = async (id, userId) => {
-  try {
-    const exchange = await exchangeRepository.getById(id);
+    const exchange = await exchangeRepository.getById(exchangeId);
     if (!exchange) {
       const error = new Error("Not Found");
       error.status = 404;
@@ -87,7 +79,49 @@ const refuseExchange = async (id, userId) => {
       throw error;
     }
 
-    if (exchange.Shop.userId !== userId) {
+    if (exchange.shop.remainingCount <= 0) {
+      const error = new Error("Unprocessable Entity");
+      error.status = 422;
+      error.data = {
+        message: "거래가능한 수량이 없습니다.",
+      };
+      throw error;
+    }
+
+    const { updateShopItem, ownerCard } =
+      await exchangeRepository.acceptExchange(exchange);
+
+    if (ownerCard && updateShopItem) {
+      if (updateShopItem.remainingCount <= 0) {
+        //모든 교환 신청자데이터
+        const allExchangeUsers = await getByShopId(updateShopItem.id);
+        //교환이 승인된 신청자를 제와한 사람들에게 품절 안내
+        const notificationUsers = allExchangeUsers.filter(
+          (item) => item.id !== exchangeId
+        );
+        notificationUsers.map((item) => createNotificationFromType(6, item));
+      }
+      //await exchangeRepository.deleteExchange(exchangeId);
+    }
+    return ownerCard;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+const refuseExchange = async (exchangeId, userId) => {
+  try {
+    const exchange = await exchangeRepository.getById(exchangeId);
+    if (!exchange) {
+      const error = new Error("Not Found");
+      error.status = 404;
+      error.data = {
+        message: "교환내역을 찾지 못했습니다.",
+      };
+      throw error;
+    }
+    if (exchange.shop.userId !== userId) {
       const error = new Error("Unauthorized");
       error.status = 401;
       error.data = {
@@ -95,11 +129,12 @@ const refuseExchange = async (id, userId) => {
       };
       throw error;
     }
-    await exchangeRepository.deleteExchange(id);
+    await exchangeRepository.deleteExchange(exchangeId);
 
     //알림 생성 필요
     return true;
   } catch (error) {
+    console.log(error);
     error.status = 500;
     error.data = {
       message: "교환거절에 실패 했습니다.",
@@ -154,4 +189,5 @@ export default {
   refuseExchange,
   getByUserId,
   getByShopId,
+  acceptExchange,
 };
