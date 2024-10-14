@@ -14,10 +14,6 @@ router.post(
       const { count } = req.body;
       const shopId = parseInt(req.params.shopId);
 
-      if (isNaN(shopId)) {
-        throw new Error("Invalid shopId parameter");
-      }
-
       const purchase = await purchaseService.createPurchase(
         buyerId,
         count,

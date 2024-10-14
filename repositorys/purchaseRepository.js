@@ -2,11 +2,11 @@ import prismaClient from "../utils/prismaClient.js";
 
 // 사용자 구매
 const createPurchase = async (buyerId, count, shopId) => {
-  console.log(shopId);
   // 상점 정보 및 재고 확인
   const shopInfo = await prismaClient.shop.findUnique({
     where: {
       id: shopId,
+      remainingCount: { gt: 0 },
     },
     include: { card: true, user: true },
   });
