@@ -77,7 +77,9 @@ const updateNotification = async (id, data) => {
 
 const deleteNotification = async (id) => {
   try {
-    const notification = await notificationRepository.getNotificationById(id);
+    const notification = await notificationRepository.getNotificationById(
+      parseInt(id, 10)
+    );
     if (!notification) {
       const error = new Error("알림을 찾을 수 없습니다.");
       error.status = 404; // 404 상태 코드 설정

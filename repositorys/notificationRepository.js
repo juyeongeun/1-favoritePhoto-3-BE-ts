@@ -34,8 +34,9 @@ const updateNotification = ({ id, data }) => {
   });
 };
 
+/* 알림 삭제 */
 const deleteNotification = (id) => {
-  return prismaClient.notification.delete({ where: { id } });
+  return prismaClient.notification.delete({ where: { id: parseInt(id, 10) } });
 };
 
 export default {

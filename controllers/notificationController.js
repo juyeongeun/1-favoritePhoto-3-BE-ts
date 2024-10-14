@@ -67,15 +67,19 @@ router.put(
 );
 
 // 알림 삭제
-router.delete("/:id", async (req, res, next) => {
-  try {
-    await notificationService.deleteNotification(req.params.id);
-    res
-      .status(200)
-      .send({ success: true, message: "알림이 성공적으로 삭제되었습니다." });
-  } catch (error) {
-    next(error);
+router.delete(
+  "/:id",
+  passport.authenticate("access-token", { session: false }),
+  async (req, res, next) => {
+    try {
+      await notificationService.deleteNotification(req.params.id);
+      res
+        .status(200)
+        .send({ success: true, message: "알림이 성공적으로 삭제되었습니다." });
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
 export default router;
