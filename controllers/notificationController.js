@@ -1,5 +1,3 @@
-//controllers\notificationController.js
-
 import express from "express";
 import notificationService from "../services/notificationService.js";
 import passport from "passport"; // passport 가져오기
@@ -16,7 +14,7 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-// 전체 알림 조회
+// 현재까지 온 알림 조회(전체)
 router.get(
   "/",
   passport.authenticate("access-token", { session: false }),
@@ -32,24 +30,7 @@ router.get(
   }
 );
 
-// 특정 알림 조회(교환 관련 or 구매 관련 등)
-router.get(
-  "/type/:type",
-  passport.authenticate("access-token", { session: false }),
-  async (req, res, next) => {
-    try {
-      const notifications = await notificationService.getNotificationsByType(
-        req.user.id, // 로그인 된 사용자 ID
-        req.params.type // 조회할 알림의 타입
-      );
-      res.status(200).send({ success: true, notifications });
-    } catch (error) {
-      next(error);
-    }
-  }
-);
-
-// 알림 업데이트 (읽음 상태 변경 등)
+// 알림 업데이트 (읽음 상태 변경)
 router.put(
   "/:id",
   passport.authenticate("access-token", { session: false }),

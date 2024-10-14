@@ -2,25 +2,21 @@
 
 import prismaClient from "../utils/prismaClient.js";
 
+/* 알림 생성 */
 const createNotification = (data) => {
   return prismaClient.notification.create({ data });
 };
 
+/* 주어진 ID로 알림을 조회 */
 const getNotificationById = (id) => {
   return prismaClient.notification.findUnique({ where: { id } });
 };
 
+/* (현재) 알림 조회 */
 const getAllNotifications = (userId) => {
   return prismaClient.notification.findMany({
     where: { userId },
     orderBy: { createAt: "desc" }, // 최신 알림 맨 위 상단에 위치
-  });
-};
-
-const getNotificationsByType = (userId, type) => {
-  return prismaClient.notification.findMany({
-    where: { userId, type },
-    orderBy: { createAt: "desc" },
   });
 };
 
@@ -42,7 +38,6 @@ const deleteNotification = (id) => {
 export default {
   createNotification,
   getAllNotifications,
-  getNotificationsByType,
   updateNotification,
   deleteNotification,
   getNotificationById,

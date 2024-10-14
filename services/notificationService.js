@@ -40,7 +40,7 @@ const createNotification = async (data) => {
   }
 };
 
-/* 전체 알림 조회 */
+/* 현재까지 온 (전체) 알림 조회 */
 const getAllNotifications = async (userId) => {
   try {
     const notifications = await notificationRepository.getAllNotifications(
@@ -57,21 +57,6 @@ const getAllNotifications = async (userId) => {
     serviceError.data = {
       originalError: error.message,
       userId, // 사용자 ID 포함
-    };
-    throw serviceError;
-  }
-};
-
-const getNotificationsByType = async (userId, type) => {
-  try {
-    return await notificationRepository.getNotificationsByType(userId, type);
-  } catch (error) {
-    const serviceError = new Error("알림 조회 중 오류 발생");
-    serviceError.status = 500;
-    serviceError.data = {
-      originalError: error.message,
-      userId,
-      type, // 알림 타입 포함
     };
     throw serviceError;
   }
@@ -107,6 +92,7 @@ const updateNotification = async (id, data) => {
   }
 };
 
+/* 알림 삭제 */
 const deleteNotification = async (id) => {
   try {
     const notification = await notificationRepository.getNotificationById(
@@ -137,5 +123,4 @@ export default {
   deleteNotification,
   getAllNotifications,
   updateNotification,
-  getNotificationsByType,
 };
