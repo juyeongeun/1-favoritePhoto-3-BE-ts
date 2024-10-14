@@ -4,6 +4,7 @@ import userValidation from "../middlewares/users/userValidation.js";
 import asyncHandle from "../utils/error/asyncHandle.js";
 import cookiesConfig from "../config/cookiesConfig.js";
 import passport from "../config/passportConfig.js";
+import exchangeService from "../services/exchangeService.js";
 
 const router = express.Router();
 
@@ -212,6 +213,15 @@ router.get(
   asyncHandle(async (req, res, next) => {
     try {
       const { id: userId } = req.user;
+      const { keyword = "", limit = 10, cursor = "" } = req.query;
+
+      const exchanges = await exchangeService.getByUserId(userId, {
+        keyword,
+        limit,
+        cursor,
+      });
+
+      res.status(200).send(exchanges);
       //교환 서비스함수 호출 필요
     } catch (error) {
       next(error);

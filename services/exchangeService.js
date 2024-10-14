@@ -1,4 +1,4 @@
-import exchangeRepository from "../repositorys/exchangeRepository";
+import exchangeRepository from "../repositorys/exchangeRepository.js";
 
 const whereConditions = (userId, keyword) => {
   const where = { userId };
@@ -42,17 +42,77 @@ const updateExchange = async ({ id, data }) => {
   return exchange;
 };
 
-const deleteExchange = async (id) => {
-  const exchange = await exchangeRepository.deleteExchange(id);
-
-  return exchange;
+const deleteExchange = async (id, userId) => {
+  try {
+    const exchange = await exchangeRepository.deleteExchange(id);
+    if (exchange.userId !== userId) {
+      const error = new Error("Unauthorized");
+      error.status = 401;
+      error.data = {
+        message: "본인의 교환제안만 취소 할 수 있습니다.",
+      };
+      throw error;
+    }
+    //알림생성필요
+    return exchange;
+  } catch (error) {
+    error.status = 500;
+    error.data = {
+      message: "교환제안 취소의 실패 했습니다.",
+    };
+    throw error;
+  }
 };
 
-const getByUserId = async ({ userId, data }) => {
-  const { limit = 5, cursor = "", keyword = "" } = data;
-  const wheres = whereConditions(userId, keyword);
+const acceptExchange = async (id, userId) => {
+  try {
+  } catch (error) {
+    error.status = 500;
+    error.data = {
+      message: "교환거절에 실패 했습니다.",
+    };
+    throw error;
+  }
+};
+
+const refuseExchange = async (id, userId) => {
+  try {
+    const exchange = await exchangeRepository.getById(id);
+    if (!exchange) {
+      const error = new Error("Not Found");
+      error.status = 404;
+      error.data = {
+        message: "교환내역을 찾지 못했습니다.",
+      };
+      throw error;
+    }
+
+    if (exchange.Shop.userId !== userId) {
+      const error = new Error("Unauthorized");
+      error.status = 401;
+      error.data = {
+        message: "판매자만 교환거절을 할 수 있습니다.",
+      };
+      throw error;
+    }
+    await exchangeRepository.deleteExchange(id);
+
+    //알림 생성 필요
+    return true;
+  } catch (error) {
+    error.status = 500;
+    error.data = {
+      message: "교환거절에 실패 했습니다.",
+    };
+    throw error;
+  }
+};
+
+const getByUserId = async (userId, { data }) => {
+  const { limit, cursor, keyword } = data;
+  const where = whereConditions(userId, keyword);
   const exchanges = await exchangeRepository.getByUserId({
-    wheres,
+    where,
     limit,
     cursor,
   });
@@ -91,6 +151,7 @@ export default {
   createExchange,
   updateExchange,
   deleteExchange,
+  refuseExchange,
   getByUserId,
   getByShopId,
 };
