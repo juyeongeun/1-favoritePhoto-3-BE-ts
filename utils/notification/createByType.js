@@ -1,5 +1,6 @@
 const switchingType = (type, exchange) => {
   const { user: consumer, userId: consumerId, shop } = exchange;
+
   switch (type) {
     case 1: //교환제안 판매자에게
       return {
@@ -19,38 +20,71 @@ const switchingType = (type, exchange) => {
         type: "교환거절",
         content: `${shop.user.nickname}님과의 [${shop.card.grade} | ${shop.card.name}]의 포토 카드 교환이 거절되었습니다.`,
       };
-    case 4: // 판매성사 시, 구매자에게
+  }
+};
+
+/* 상점 관련 알림 */
+const switchingTypeForShop = (type, shop) => {
+  const { userId, card } = shop; // userId는 판매자 ID, card는 카드 정보
+
+  switch (type) {
+    case 4: // 포토카드 판매 등록시, 사용자에게
       return {
-        type: "구매완료",
-        content: `[${shop.card.grade} | ${shop.card.name}] (구매한 개수)장을 성공적으로 구매했습니다.`,
-      };
-    case 5: // 판매성사 시, 판매자에게
-      return {
-        type: "판매완료",
-        content: `(구매자)님이 [${shop.card.grade} | ${shop.card.name}]을 (구매한 개수)장 구매했습니다.`,
-      };
-    case 6: // 포토 카드 품절
-      return {
-        type: "품절",
-        content: `[${shop.card.grade} | ${shop.card.name}]이 품절되었습니다.`,
-      };
-    case 7: // 포토카드 판매 등록시, 사용자에게
-      return {
+        userId,
         type: "등록완료",
         content: `[${card.grade} | ${card.name}]가 성공적으로 등록되었습니다.`,
       };
-    case 7: // 포토카드 판매 취소시, 사용자에게
+    case 5: // 포토카드 판매 취소시, 사용자에게
       return {
-        type: "등록완료",
-        content: `[${shop.card.grade} | ${shop.card.name}]의 판매가 성공적으로 취소되었습니다.`,
+        userId,
+        type: "판매취소",
+        content: `[${card.grade} | ${card.name}]의 판매가 취소되었습니다.`,
+      };
+    case 6: // 판매중인 포토카드 수정, 사용자에게
+      return {
+        userId,
+        type: "카드수정",
+        content: `[${card.grade} | ${card.name}]이 수정되었습니다.`,
+      };
+    case 7: // 포토 카드 품절시, 판매자에게 > 이거 구매쪽에서 가져다 알림 추가하시면 될거같아요!
+      return {
+        userId,
+        type: "품절",
+        content: `[${card.grade} | ${card.name}]가 모두 판매되어 품절되었습니다.`,
       };
   }
 };
 
-const createNotificationFromType = async (type, exchange) => {
+// 판매성사 시, 구매자에게
+//  case 4:
+// return {
+//   userId: consumerId,
+//   type: "구매완료",
+//   content: `[${shop.card.grade} | ${shop.card.name}] (구매한 개수)장을 성공적으로 구매했습니다.`,
+// };
+// // 판매성사 시, 판매자에게
+// case 5:
+// return {
+//   userId: shop.userId,
+//   type: "판매완료",
+//   content: `(구매자)님이 [${shop.card.grade} | ${shop.card.name}]을 (구매한 개수)장 구매했습니다.`,
+// };
+
+const createNotificationFromType = async (type, data) => {
   try {
-    const data = switchingType(type, exchange);
-    const notification = await notificationRepository.createNotification(data);
+    var notificationData;
+
+    if (data.exchange) {
+      // 교환 관련 알림 처리
+      notificationData = switchingType(type, data.exchange);
+    } else {
+      // 상점 관련 알림 처리
+      notificationData = switchingTypeForShop(type, data.shop);
+    }
+
+    const notification = await notificationRepository.createNotification(
+      notificationData
+    );
     return notification;
   } catch (error) {
     error.status = 500;
