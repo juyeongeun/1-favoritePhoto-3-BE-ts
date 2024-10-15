@@ -158,7 +158,7 @@ const refuseExchange = async (exchangeId, userId) => {
   }
 };
 
-const getByUserId = async (userId, { data }) => {
+const getByUserId = async (userId, data) => {
   const { limit, cursor, keyword } = data;
   const where = whereConditions(userId, keyword);
   const exchanges = await exchangeRepository.getByUserId({
@@ -170,7 +170,7 @@ const getByUserId = async (userId, { data }) => {
   if (!exchanges) {
     const error = new Error("Not Found");
     error.status = 404;
-    error.message = "카드를 찾지 못했습니다.";
+    error.message = "신청내역을 찾을 수 없습니다.";
     throw error;
   }
   //추가적인 데이터가 있는지 확인
@@ -190,7 +190,7 @@ const getByShopId = async (shopId) => {
   if (!exchanges) {
     const error = new Error("Not Found");
     error.status = 404;
-    error.message = "카드를 찾지 못했습니다.";
+    error.message = "신청내역을 찾을 수 없습니다.";
     throw error;
   }
 
