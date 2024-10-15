@@ -8,6 +8,7 @@ import cardRouter from "./controllers/cardController.js";
 import purchaseRouter from "./controllers/purchaseController.js";
 import notificationRouter from "./controllers/notificationController.js";
 import exchangeRouter from "./controllers/exchangeController.js";
+import pointRouter from "./controllers/pointController.js";
 
 const app = express();
 app.use(express.json());
@@ -19,6 +20,7 @@ app.use("/cards", cardRouter);
 app.use("/purchases", purchaseRouter);
 app.use("/exchange", exchangeRouter);
 app.use("/notifications", notificationRouter);
+app.use("/point", pointRouter);
 
 app.use(errorHandler);
 
