@@ -159,19 +159,14 @@ const getAllShop = async () => {
   const shopCards = await shopRepository.getAllShop();
 
   return shopCards.map((shopCard) => ({
-    id: shopCard.id,
-    createAt: shopCard.createAt,
-    updateAt: shopCard.updateAt,
-    userId: shopCard.userId,
-    cardId: shopCard.cardId,
-    price: shopCard.price,
-    totalCount: shopCard.totalCount,
-    remainingCount: shopCard.remainingCount,
-    exchangeDescription: shopCard.exchangeDescription,
-    exchangeGrade: shopCard.exchangeGrade,
-    exchangeGenre: shopCard.exchangeGenre,
-    sellerNickname: shopCard.user.nickname,
-    imageUrl: shopCard.card.imageURL,
+    imageUrl: shopCard.card.imageURL, // 이미지 URL
+    cardName: shopCard.card.name, // 포토카드 이름
+    genre: shopCard.exchangeGenre, // 장르
+    grade: shopCard.exchangeGrade, // 등급
+    sellerNickname: shopCard.user.nickname, // 유저 닉네임
+    price: shopCard.price, // 가격
+    remainingCount: shopCard.remainingCount, // 잔여 개수
+    totalCount: shopCard.totalCount, // 전체 개수
   }));
 };
 
