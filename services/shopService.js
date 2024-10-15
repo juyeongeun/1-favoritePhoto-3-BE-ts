@@ -154,4 +154,31 @@ const deleteShopCard = async (shopId, userId, cardId) => {
   return await shopRepository.deleteShopCard(shopId, userId, cardId);
 };
 
-export { createShopCard, getShopByShopId, updateShopCard, deleteShopCard };
+/* 모든 판매중인 포토카드 조회 */
+const getAllShop = async () => {
+  const shopCards = await shopRepository.getAllShop();
+
+  return shopCards.map((shopCard) => ({
+    id: shopCard.id,
+    createAt: shopCard.createAt,
+    updateAt: shopCard.updateAt,
+    userId: shopCard.userId,
+    cardId: shopCard.cardId,
+    price: shopCard.price,
+    totalCount: shopCard.totalCount,
+    remainingCount: shopCard.remainingCount,
+    exchangeDescription: shopCard.exchangeDescription,
+    exchangeGrade: shopCard.exchangeGrade,
+    exchangeGenre: shopCard.exchangeGenre,
+    sellerNickname: shopCard.user.nickname,
+    imageUrl: shopCard.card.imageURL,
+  }));
+};
+
+export {
+  createShopCard,
+  getShopByShopId,
+  updateShopCard,
+  deleteShopCard,
+  getAllShop,
+};
