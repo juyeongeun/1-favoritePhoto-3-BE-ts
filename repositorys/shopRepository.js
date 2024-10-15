@@ -43,6 +43,14 @@ const updateShopRemainingCount = async (id, decrement) => {
   });
 };
 
+const getShopItem = async (id) => {
+  return prismaClient.shop.findFirst({
+    where: {
+      id,
+    },
+  });
+};
+
 // 상점 카드 상세 정보 조회
 const getShopById = async (shopId, cardId) => {
   const shopDetails = await prismaClient.shop.findUnique({
@@ -131,6 +139,7 @@ const deleteShopCard = async (shopId, userId, cardId) => {
 };
 
 export {
+  getShopItem,
   getCheckCardById,
   createShopCard,
   getShopById,
