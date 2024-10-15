@@ -54,11 +54,28 @@ const switchingTypeForShop = (type, shop) => {
         type: "카드수정",
         content: `[${card.grade} | ${card.name}]이 수정되었습니다.`,
       };
-    case 7: // 포토 카드 품절시, 판매자에게 > 이거 구매쪽에서 가져다 알림 추가하시면 될거같아요!
+  }
+};
+
+const switchingTypeForPurchase = (type, purchase) => {
+  switch (type) {
+    case 7: // 포토카드 판매 완료시, 구매자에게
       return {
-        userId,
+        userId: purchase.userId,
+        type: "구매 완료",
+        content: `[${purchase.card.grade} | ${purchase.card.name}] ${purchase.count}장을 성공적으로 구매했습니다.`,
+      };
+    case 8: //포토카드 판매 완료시, 판매자에게
+      return {
+        userId: purchase.userId,
+        type: "판매 완료",
+        content: `${purchase.consumer}님이 [${purchase.card.grade} | ${purchase.card.name}]을 ${purchase.count}장 구매했습니다.`,
+      };
+    case 9: // 품절시, 구매자+판매자에게
+      return {
+        userId: purchase.userId,
         type: "품절",
-        content: `[${card.grade} | ${card.name}]가 모두 판매되어 품절되었습니다.`,
+        content: `[${purchase.card.grade} | ${purchase.card.name}]이 품절되었습니다.`,
       };
   }
 };
@@ -72,32 +89,20 @@ const createPointNotification = (userId, nickname, point) => {
   };
 };
 
-// 판매성사 시, 구매자에게
-//  case 4:
-// return {
-//   userId: consumerId,
-//   type: "구매완료",
-//   content: `[${shop.card.grade} | ${shop.card.name}] (구매한 개수)장을 성공적으로 구매했습니다.`,
-// };
-// // 판매성사 시, 판매자에게
-// case 5:
-// return {
-//   userId: shop.userId,
-//   type: "판매완료",
-//   content: `(구매자)님이 [${shop.card.grade} | ${shop.card.name}]을 (구매한 개수)장 구매했습니다.`,
-// };
-
 const createNotificationFromType = async (type, data) => {
   try {
     var notificationData;
     if (data.exchange) {
       // 교환 관련 알림 처리
       notificationData = switchingType(type, data.exchange);
+    } else if (data.shop) {
+      // 상점 관련 알림 처리
+      notificationData = switchingTypeForShop(type, data.shop);
     } else if (type === "포인트획득") {
       const { userId, nickname, point } = data;
-      notificationData = createPointNotification(userId, nickname, point);
+      notificationData = createPointNotification(userId, nickname, point);      
     } else {
-      notificationData = switchingTypeForShop(type, data.shop);
+      notificationData = switchingTypeForPurchase(type, data.purchase);
     }
     const notification = await notificationRepository.createNotification(
       notificationData
