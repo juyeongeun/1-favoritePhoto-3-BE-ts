@@ -21,16 +21,23 @@ const createShopCard = async (data) => {
     error.status = 400;
     throw error;
   }
+  // 카드 정보를 가져와서 이미지 URL을 저장
+  const originalCard = await prismaClient.card.findUnique({
+    where: { id: data.cardId },
+  });
+
+  if (!originalCard) {
+    const error = new Error("Card not found");
+    error.status = 404;
+    throw error;
+  }
+
   const newCard = await prismaClient.$transaction(async (prisma) => {
     const card = await prisma.shop.findFirst({
       where: { userId: data.userId, cardId: data.cardId },
     });
 
     // 판매하려는 수량이 원래 카드의 총 개수 보다 큰지 확인
-    const originalCard = await prisma.card.findUnique({
-      where: { id: data.cardId },
-    });
-
     if (data.totalCount > originalCard.totalCount) {
       const error = new Error(
         `Cannot sell more than the total count of ${originalCard.totalCount}`
@@ -46,7 +53,7 @@ const createShopCard = async (data) => {
       throw error; // 중복 카드가 있을 경우 에러 던짐
     }
 
-    // 카드 등록시, 남은 개수를 판매 등록 수량만큼 감소
+    // 카드 등록 시, 남은 개수를 판매 등록 수량만큼 감소
     await shopRepository.updateCardRemainingCount(data.cardId, data.totalCount);
 
     // 포토카드 판매 등록
@@ -63,16 +70,11 @@ const createShopCard = async (data) => {
       },
     });
 
-    // 카드 정보를 가져와 알림 생성
-    const cardInfo = await prisma.card.findUnique({
-      where: { id: data.cardId },
-    });
-
-    // 알림 생성(등록한 사용자에게 알림)
+    // 알림 생성 (등록한 사용자에게 알림)
     await createNotificationFromType(4, {
       shop: {
         userId: data.userId,
-        card: cardInfo, // 카드 정보 포함
+        card: originalCard, // 카드 정보 포함
       },
     });
 
@@ -85,9 +87,16 @@ const createShopCard = async (data) => {
 /* 상점에 등록한 포토 카드 상세 조회 */
 const getShopByShopId = async (shopId, cardId) => {
   const shopDetails = await shopRepository.getShopById(shopId, cardId);
+
+  // 카드 정보를 가져와서 이미지 URL 포함
+  const cardInfo = await prismaClient.card.findUnique({
+    where: { id: shopDetails.cardId },
+  });
+
   return {
     ...shopDetails,
     sellerNickname: shopDetails.user.nickname,
+    imageUrl: cardInfo.imageUrl, // 카드 테이블에서 이미지 URL 가져옴
   };
 };
 
@@ -145,4 +154,31 @@ const deleteShopCard = async (shopId, userId, cardId) => {
   return await shopRepository.deleteShopCard(shopId, userId, cardId);
 };
 
-export { createShopCard, getShopByShopId, updateShopCard, deleteShopCard };
+/* 모든 판매중인 포토카드 조회 */
+const getAllShop = async () => {
+  const shopCards = await shopRepository.getAllShop();
+
+  return shopCards.map((shopCard) => ({
+    id: shopCard.id,
+    createAt: shopCard.createAt,
+    updateAt: shopCard.updateAt,
+    userId: shopCard.userId,
+    cardId: shopCard.cardId,
+    price: shopCard.price,
+    totalCount: shopCard.totalCount,
+    remainingCount: shopCard.remainingCount,
+    exchangeDescription: shopCard.exchangeDescription,
+    exchangeGrade: shopCard.exchangeGrade,
+    exchangeGenre: shopCard.exchangeGenre,
+    sellerNickname: shopCard.user.nickname,
+    imageUrl: shopCard.card.imageURL,
+  }));
+};
+
+export {
+  createShopCard,
+  getShopByShopId,
+  updateShopCard,
+  deleteShopCard,
+  getAllShop,
+};
