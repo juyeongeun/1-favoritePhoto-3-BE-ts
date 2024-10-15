@@ -118,10 +118,9 @@ const acceptExchange = async (exchangeId) => {
         notificationUsers.map((exchange) =>
           createNotificationFromType(4, { exchange })
         );
-      } else {
-        //품절이 아니라면 신청자에게 성사 알림생성
-        createNotificationFromType(2, { exchange });
       }
+      //승인된 싱청자에게 성사 알림생성
+      createNotificationFromType(2, { exchange });
       //해당 상품의 모든 교환제안을 삭제해야 하는지 의문...
       await exchangeRepository.deleteExchange(exchangeId);
     }
