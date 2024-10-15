@@ -57,6 +57,15 @@ const switchingTypeForShop = (type, shop) => {
   }
 };
 
+/* 포인트 알림 */
+const createPointNotification = (userId, nickname, point) => {
+  return {
+    userId: userId, // 사용자의 ID
+    type: "포인트획득",
+    content: `${nickname}님이 ${point} 포인트를 획득하였습니다.`,
+  };
+};
+
 // 판매성사 시, 구매자에게
 //  case 4:
 // return {
@@ -79,14 +88,16 @@ const createNotificationFromType = async (type, data) => {
     if (data.exchange) {
       // 교환 관련 알림 처리
       notificationData = switchingType(type, data.exchange);
+    } else if (type === "포인트획득") {
+      const { userId, nickname, point } = data;
+      notificationData = createPointNotification(userId, nickname, point);
     } else {
-      // 상점 관련 알림 처리
       notificationData = switchingTypeForShop(type, data.shop);
     }
-
     const notification = await notificationRepository.createNotification(
       notificationData
     );
+
     return notification;
   } catch (error) {
     error.status = 500;
