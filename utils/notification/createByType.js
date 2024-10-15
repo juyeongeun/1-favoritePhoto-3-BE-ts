@@ -22,6 +22,12 @@ const switchingType = (type, exchange) => {
         type: "교환거절",
         content: `${shop.user.nickname}님과의 [${shop.card.grade} | ${shop.card.name}]의 포토 카드 교환이 거절되었습니다.`,
       };
+    case 4: //교환승인후 품절이라면 교환을 제안한 모든 사람에게
+      return {
+        userId: consumerId,
+        type: "품절",
+        content: `${shop.user.nickname}님과의 [${shop.card.grade} | ${shop.card.name}]의 포토 카드 교환이 거절되었습니다.(품절)`,
+      };
   }
 };
 
@@ -74,23 +80,34 @@ const switchingTypeForPurchase = (type, purchase) => {
   }
 };
 
+/* 포인트 알림 */
+const createPointNotification = (userId, nickname, point) => {
+  return {
+    userId: userId, // 사용자의 ID
+    type: "포인트획득",
+    content: `${nickname}님이 ${point} 포인트를 획득하였습니다.`,
+  };
+};
+
 const createNotificationFromType = async (type, data) => {
   try {
     var notificationData;
-
     if (data.exchange) {
       // 교환 관련 알림 처리
       notificationData = switchingType(type, data.exchange);
     } else if (data.shop) {
       // 상점 관련 알림 처리
       notificationData = switchingTypeForShop(type, data.shop);
+    } else if (type === "포인트획득") {
+      const { userId, nickname, point } = data;
+      notificationData = createPointNotification(userId, nickname, point);      
     } else {
       notificationData = switchingTypeForPurchase(type, data.purchase);
     }
-
     const notification = await notificationRepository.createNotification(
       notificationData
     );
+
     return notification;
   } catch (error) {
     error.status = 500;

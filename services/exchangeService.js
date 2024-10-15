@@ -94,18 +94,23 @@ const acceptExchange = async (exchangeId) => {
     if (ownerCard && updateShopItem) {
       if (updateShopItem.remainingCount <= 0) {
         //모든 교환 신청자데이터
-        const allExchangeUsers = await getByShopId(updateShopItem.id);
-        //교환이 승인된 신청자를 제와한 사람들에게 품절 안내
+        const allExchangeUsers = await exchangeRepository.getByShopId(
+          updateShopItem.id
+        );
+        //교환이 승인된 신청자를 제와
         const notificationUsers = allExchangeUsers.filter(
           (item) => item.id !== exchangeId
         );
-        notificationUsers.map((item) => createNotificationFromType(6, item));
+        //성사된 제안자를 제외한 리스트의 모든 유저에게 알림생성
+        notificationUsers.map((exchange) =>
+          createNotificationFromType(4, { exchange })
+        );
       }
-      //await exchangeRepository.deleteExchange(exchangeId);
+      //해당 상품의 모든 교환제안을 삭제해야 하는지 의문...
+      await exchangeRepository.deleteExchange(exchangeId);
     }
     return ownerCard;
   } catch (error) {
-    console.log(error);
     throw error;
   }
 };
@@ -134,11 +139,6 @@ const refuseExchange = async (exchangeId, userId) => {
     //알림 생성 필요
     return true;
   } catch (error) {
-    console.log(error);
-    error.status = 500;
-    error.data = {
-      message: "교환거절에 실패 했습니다.",
-    };
     throw error;
   }
 };
