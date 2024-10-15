@@ -3,7 +3,7 @@ import prismaClient from "../utils/prismaClient.js";
 // 사용자 구매
 const createPurchase = async (buyerId, count, shopId) => {
   // 상점 정보 및 재고 확인
-  const shopInfo = await prismaClient.shop.findFirst({
+  const shopInfo = await prismaClient.shop.findUnique({
     where: {
       id: shopId,
       remainingCount: { gt: 0 },
@@ -35,7 +35,7 @@ const createPurchase = async (buyerId, count, shopId) => {
 
     // 판매자 포인트 증가
     await prisma.user.update({
-      where: { id: shopInfo.user.id },
+      where: { id: shopInfo.userId },
       data: { point: { increment: totalPrice } },
     });
 
