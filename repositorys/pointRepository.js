@@ -1,4 +1,3 @@
-// repositorys/pointRepository.js
 import prismaClient from "../utils/prismaClient.js";
 
 // 포인트 뽑기(랜덤으로 뽑은 포인트 추가)

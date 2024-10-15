@@ -1,4 +1,3 @@
-// services/pointService.js
 import pointRepository from "../repositorys/pointRepository.js";
 import { getRandomPoint } from "../utils/random/random.js"; // 랜덤 유틸리티 가져옴
 import createNotificationFromType from "../utils/notification/createByType.js";

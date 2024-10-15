@@ -1,4 +1,3 @@
-// controllers/pointController.js
 import express from "express";
 import pointService from "../services/pointService.js";
 import passport from "../config/passportConfig.js";
