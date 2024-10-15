@@ -82,6 +82,7 @@ const getShopById = async (shopId, cardId) => {
     user: {
       nickname: shopDetails.user.nickname,
     },
+    imageUrl: card.imageUrl, // 카드 테이블에서 이미지 URL 가져옴
   };
 };
 
