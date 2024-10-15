@@ -22,7 +22,6 @@ const getUserById = async (userId) => {
 };
 
 export default {
-  createPoints,
   drawPoints,
   getUserById,
 };
