@@ -1,3 +1,3 @@
 export function getRandomPoint() {
-  return Math.floor(Math.random() * 100) + 1; // 1~100 사이의 랜덤 포인트
+  return Math.floor(Math.random() * 10) + 1; // 1~10 사이의 랜덤 포인트
 }
