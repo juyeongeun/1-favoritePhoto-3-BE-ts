@@ -7,7 +7,7 @@ const whereConditions = (userId, keyword) => {
   if (keyword) {
     where.OR = [
       {
-        Shop: {
+        shop: {
           card: {
             name: { contains: keyword, mode: "insensitive" },
           },

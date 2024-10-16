@@ -2,6 +2,20 @@ import shopRepository from "../repositorys/shopRepository.js";
 import prismaClient from "../utils/prismaClient.js";
 import createNotificationFromType from "../utils/notification/createByType.js"; // 알림 생성 유틸리티 임포트
 
+const whereConditions = (userId, keyword) => {
+  const where = { userId };
+  if (keyword) {
+    where.OR = [
+      {
+        card: {
+          name: { contains: keyword, mode: "insensitive" },
+        },
+      },
+    ];
+  }
+  return where;
+};
+
 /* 카드 존재 여부 확인 */
 const checkCardExists = async (shopId, cardId) => {
   const shopDetails = await shopRepository.getShopById(shopId, cardId);
@@ -100,6 +114,32 @@ const getShopByShopId = async (shopId, cardId) => {
   };
 };
 
+const getByUserId = async (userId, data) => {
+  const { limit, cursor, keyword } = data;
+  const where = whereConditions(userId, keyword);
+  const shops = await shopRepository.getByUserId({
+    where,
+    limit,
+    cursor,
+  });
+
+  if (!shops) {
+    const error = new Error("Not Found");
+    error.status = 404;
+    error.message = "판매내역을 찾을 수 없습니다.";
+    throw error;
+  }
+  //추가적인 데이터가 있는지 확인
+  const nextShops = shops.length > limit;
+  //추가 데이터가 있다면 커서값을 주고 데이터에서 리미트에 맞춰 돌려준다
+  const nextCursor = nextShops ? shops[limit - 1].id : "";
+
+  return {
+    list: shops.slice(0, limit),
+    nextCursor,
+  };
+};
+
 /* 판매중인 포토카드 수정 */
 const updateShopCard = async (data) => {
   const card = await checkCardExists(data.shopId, data.cardId);
@@ -157,6 +197,7 @@ const deleteShopCard = async (shopId, userId, cardId) => {
 export default {
   createShopCard,
   getShopByShopId,
+  getByUserId,
   updateShopCard,
   deleteShopCard,
 };
