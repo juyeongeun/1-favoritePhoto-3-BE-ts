@@ -5,6 +5,8 @@ import asyncHandle from "../utils/error/asyncHandle.js";
 import cookiesConfig from "../config/cookiesConfig.js";
 import passport from "../config/passportConfig.js";
 import exchangeService from "../services/exchangeService.js";
+import cardService from "../services/cardService.js";
+import shopService from "../services/shopService.js";
 
 const router = express.Router();
 
@@ -55,7 +57,6 @@ router.post(
 
 router.delete(
   "/logout",
-  passport.authenticate("access-token", { session: false }),
   asyncHandle(async (req, res, next) => {
     try {
       const { id: userId } = req.user;
@@ -200,7 +201,15 @@ router.get(
   asyncHandle(async (req, res, next) => {
     try {
       const { id: userId } = req.user;
-      //카드 서비스함수 호출 필요
+      const { keyword = "", limit = 10, cursor = "" } = req.query;
+
+      const cards = await cardService.getByUserId(userId, {
+        keyword,
+        limit: parseInt(limit),
+        cursor: parseInt(cursor),
+      });
+
+      res.status(200).send(cards);
     } catch (error) {
       next(error);
     }
@@ -217,8 +226,8 @@ router.get(
 
       const exchanges = await exchangeService.getByUserId(userId, {
         keyword,
-        limit,
-        cursor,
+        limit: parseInt(limit),
+        cursor: parseInt(cursor),
       });
 
       res.status(200).send(exchanges);
@@ -235,7 +244,16 @@ router.get(
   asyncHandle(async (req, res, next) => {
     try {
       const { id: userId } = req.user;
-      //판매 서비스함수 호출 필요
+
+      const { keyword = "", limit = 10, cursor = "" } = req.query;
+
+      const shops = await shopService.getByUserId(userId, {
+        keyword,
+        limit: parseInt(limit),
+        cursor: parseInt(cursor),
+      });
+
+      res.status(200).send(shops);
     } catch (error) {
       next(error);
     }

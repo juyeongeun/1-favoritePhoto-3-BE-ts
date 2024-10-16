@@ -1,5 +1,5 @@
 import express from "express"; // express 모듈 임포트
-import * as cardService from "../services/cardService.js"; // 서비스 임포트
+import cardService from "../services/cardService.js"; // 서비스 임포트
 import asyncHandle from "../utils/error/asyncHandle.js";
 import passport from "../config/passportConfig.js";
 import cardValidation from "../middlewares/card/cardValidation.js";

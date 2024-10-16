@@ -99,20 +99,51 @@ const getById = async (id) => {
 
 const getByUserId = async (data) => {
   const { where, limit, cursor } = data;
-  return prismaClient.exchange.findFirst({
+  return prismaClient.exchange.findMany({
     where,
     take: limit + 1, //추가적인 데이터가 있는지 확인을 위함
-    skip: cursor ? { id: cursor } : undefined,
+    skip: cursor ? 1 : undefined,
+    cursor: cursor ? { id: cursor } : undefined,
     include: {
       user: {
         select: {
           nickname: true,
         },
       },
-      card: true,
+      card: {
+        select: {
+          name: true,
+          purchasePrice: true,
+          grade: true,
+          genre: true,
+          description: true,
+          imageURL: true,
+        },
+      },
       shop: {
-        include: {
-          card: true,
+        select: {
+          price: true,
+          remainingCount: true,
+          exchangeDescription: true,
+          exchangeGenre: true,
+          exchangeGenre: true,
+          card: {
+            select: {
+              id: true,
+              name: true,
+              purchasePrice: true,
+              grade: true,
+              genre: true,
+              description: true,
+              imageURL: true,
+            },
+          },
+          user: {
+            select: {
+              id: true,
+              nickname: true,
+            },
+          },
         },
       },
     },

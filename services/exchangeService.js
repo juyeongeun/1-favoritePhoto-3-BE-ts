@@ -1,4 +1,5 @@
 import exchangeRepository from "../repositorys/exchangeRepository.js";
+import getShopItem from "../repositorys/shopRepository.js";
 import createNotificationFromType from "../utils/notification/createByType.js";
 
 const whereConditions = (userId, keyword) => {
@@ -6,7 +7,7 @@ const whereConditions = (userId, keyword) => {
   if (keyword) {
     where.OR = [
       {
-        Shop: {
+        shop: {
           card: {
             name: { contains: keyword, mode: "insensitive" },
           },
@@ -23,16 +24,22 @@ const whereConditions = (userId, keyword) => {
 };
 
 const createExchange = async (data) => {
-  //판매의 남아있는 카드 수량을 검사하는 로직 필요
   try {
+    //판매의 남아있는 카드 수량을 검사하는 로직 필요
+    const checkShop = await getShopItem(data.shopId);
+    if (checkShop.remainingCount <= 0) {
+      const error = new Error("Unprocessable Entity");
+      error.status = 422;
+      error.data = {
+        message: "거래가능한 수량이 없습니다.",
+      };
+      throw error;
+    }
     const exchange = await exchangeRepository.create(data);
+    //판매자에게 교환제안 알림생성
+    createNotificationFromType(1, { exchange });
     return exchange;
   } catch (error) {
-    console.log(error);
-    error.status = 500;
-    error.data = {
-      message: "교환신청에 실패 했습니다.",
-    };
     throw error;
   }
 };
@@ -46,7 +53,16 @@ const updateExchange = async ({ exchangeId, data }) => {
 
 const deleteExchange = async (exchangeId, userId) => {
   try {
-    const exchange = await exchangeRepository.deleteExchange(exchangeId);
+    const exchange = await exchangeRepository.getById(exchangeId);
+    if (!exchange) {
+      const error = new Error("Not Found");
+      error.status = 404;
+      error.data = {
+        message: "교환신청 내역을 찾을수 없습니다.",
+      };
+      throw error;
+    }
+
     if (exchange.userId !== userId) {
       const error = new Error("Unauthorized");
       error.status = 401;
@@ -55,14 +71,11 @@ const deleteExchange = async (exchangeId, userId) => {
       };
       throw error;
     }
-    //알림생성필요
-    return exchange;
+    //판매자에게 교환제안취소 알림생성
+    createNotificationFromType(5, { exchange });
+    const deleteExchange = await exchangeRepository.deleteExchange(exchangeId);
+    return deleteExchange;
   } catch (error) {
-    console.log(error);
-    error.status = 500;
-    error.data = {
-      message: "교환제안 취소의 실패 했습니다.",
-    };
     throw error;
   }
 };
@@ -97,7 +110,7 @@ const acceptExchange = async (exchangeId) => {
         const allExchangeUsers = await exchangeRepository.getByShopId(
           updateShopItem.id
         );
-        //교환이 승인된 신청자를 제와
+        //교환이 승인된 신청자를 제외
         const notificationUsers = allExchangeUsers.filter(
           (item) => item.id !== exchangeId
         );
@@ -106,6 +119,8 @@ const acceptExchange = async (exchangeId) => {
           createNotificationFromType(4, { exchange })
         );
       }
+      //승인된 싱청자에게 성사 알림생성
+      createNotificationFromType(2, { exchange });
       //해당 상품의 모든 교환제안을 삭제해야 하는지 의문...
       await exchangeRepository.deleteExchange(exchangeId);
     }
@@ -134,16 +149,16 @@ const refuseExchange = async (exchangeId, userId) => {
       };
       throw error;
     }
+    //신청자에게 교환거절 알림생성
+    createNotificationFromType(3, { exchange });
     await exchangeRepository.deleteExchange(exchangeId);
-
-    //알림 생성 필요
     return true;
   } catch (error) {
     throw error;
   }
 };
 
-const getByUserId = async (userId, { data }) => {
+const getByUserId = async (userId, data) => {
   const { limit, cursor, keyword } = data;
   const where = whereConditions(userId, keyword);
   const exchanges = await exchangeRepository.getByUserId({
@@ -155,7 +170,7 @@ const getByUserId = async (userId, { data }) => {
   if (!exchanges) {
     const error = new Error("Not Found");
     error.status = 404;
-    error.message = "카드를 찾지 못했습니다.";
+    error.message = "신청내역을 찾을 수 없습니다.";
     throw error;
   }
   //추가적인 데이터가 있는지 확인
@@ -175,7 +190,7 @@ const getByShopId = async (shopId) => {
   if (!exchanges) {
     const error = new Error("Not Found");
     error.status = 404;
-    error.message = "카드를 찾지 못했습니다.";
+    error.message = "신청내역을 찾을 수 없습니다.";
     throw error;
   }
 

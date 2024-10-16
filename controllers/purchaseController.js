@@ -1,5 +1,5 @@
 import express from "express";
-import * as purchaseService from "../services/purchaseService.js";
+import purchaseService from "../services/purchaseService.js";
 import asyncHandle from "../utils/error/asyncHandle.js";
 import passport from "../config/passportConfig.js";
 
