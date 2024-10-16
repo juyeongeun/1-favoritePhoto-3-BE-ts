@@ -147,6 +147,33 @@ const getAllShop = async () => {
   });
 };
 
+const getByUserId = async (data) => {
+  const { where, limit, cursor } = data;
+  return prismaClient.shop.findMany({
+    where,
+    take: limit + 1, //추가적인 데이터가 있는지 확인을 위함
+    skip: cursor ? 1 : undefined,
+    cursor: cursor ? { id: cursor } : undefined,
+    include: {
+      user: {
+        select: {
+          nickname: true,
+        },
+      },
+      card: {
+        select: {
+          name: true,
+          purchasePrice: true,
+          grade: true,
+          genre: true,
+          description: true,
+          imageURL: true,
+        },
+      },
+    },
+  });
+};
+
 export default {
   getShopItem,
   getCheckCardById,
@@ -157,4 +184,5 @@ export default {
   updateCardRemainingCount,
   updateShopRemainingCount,
   getAllShop,
+  getByUserId,
 };
