@@ -1,5 +1,3 @@
-//controllers\shopController.js
-
 import express from "express";
 import * as shopService from "../services/shopService.js";
 import asyncHandle from "../utils/error/asyncHandle.js";
@@ -38,6 +36,16 @@ router.post(
       exchangeDescription,
     });
     return res.status(201).json(newCard);
+  })
+);
+
+// 모든 판매중인 포토 카드 조회
+router.get(
+  "/cards",
+  passport.authenticate("access-token", { session: false }),
+  asyncHandle(async (req, res) => {
+    const shopCards = await shopService.getAllShop();
+    return res.status(200).json(shopCards);
   })
 );
 
