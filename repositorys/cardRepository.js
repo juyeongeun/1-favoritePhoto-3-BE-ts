@@ -16,4 +16,4 @@ const createCard = async (data) => {
   });
 };
 
-export { createCard };
+export default { createCard };

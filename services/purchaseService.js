@@ -1,4 +1,4 @@
-import * as purchaseRepository from "../repositorys/purchaseRepository.js";
+import purchaseRepository from "../repositorys/purchaseRepository.js";
 import createNotificationFromType from "../utils/notification/createByType.js";
 import prismaClient from "../utils/prismaClient.js";
 
@@ -71,4 +71,4 @@ const createPurchase = async (buyerId, count, shopId) => {
   return { purchase };
 };
 
-export { createPurchase };
+export default { createPurchase };

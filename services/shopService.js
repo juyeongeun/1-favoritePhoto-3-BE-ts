@@ -1,4 +1,4 @@
-import * as shopRepository from "../repositorys/shopRepository.js";
+import shopRepository from "../repositorys/shopRepository.js";
 import prismaClient from "../utils/prismaClient.js";
 import createNotificationFromType from "../utils/notification/createByType.js"; // 알림 생성 유틸리티 임포트
 
@@ -145,4 +145,9 @@ const deleteShopCard = async (shopId, userId, cardId) => {
   return await shopRepository.deleteShopCard(shopId, userId, cardId);
 };
 
-export { createShopCard, getShopByShopId, updateShopCard, deleteShopCard };
+export default {
+  createShopCard,
+  getShopByShopId,
+  updateShopCard,
+  deleteShopCard,
+};

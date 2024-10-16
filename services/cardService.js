@@ -1,4 +1,4 @@
-import * as cardRepository from "../repositorys/cardRepository.js";
+import cardRepository from "../repositorys/cardRepository.js";
 
 // 카드 생성
 const createCard = async (data) => {
@@ -9,4 +9,4 @@ const createCard = async (data) => {
   }
 };
 
-export { createCard };
+export default { createCard };

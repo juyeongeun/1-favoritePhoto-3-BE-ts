@@ -130,7 +130,7 @@ const deleteShopCard = async (shopId, userId, cardId) => {
   });
 };
 
-export {
+export default {
   getCheckCardById,
   createShopCard,
   getShopById,
