@@ -41,14 +41,6 @@ const updateShopRemainingCount = async (id, decrement) => {
   });
 };
 
-const getShopItem = async (id) => {
-  return prismaClient.shop.findFirst({
-    where: {
-      id,
-    },
-  });
-};
-
 // 상점 카드 상세 정보 조회
 const getShopById = async (shopId, cardId) => {
   const shopDetails = await prismaClient.shop.findUnique({
@@ -75,8 +67,6 @@ const getShopById = async (shopId, cardId) => {
 
   return {
     id: shopDetails.id,
-    createAt: shopDetails.createAt,
-    updateAt: shopDetails.updateAt,
     userId: shopDetails.userId,
     cardId: shopDetails.cardId,
     price: shopDetails.price,
@@ -99,6 +89,7 @@ const updateShopCard = async (data) => {
     data: {
       price: data.price,
       totalCount: data.totalCount,
+      remainingCount: data.remainingCount,
       exchangeGrade: data.exchangeGrade,
       exchangeGenre: data.exchangeGenre,
       exchangeDescription: data.exchangeDescription,
@@ -147,35 +138,7 @@ const getAllShop = async () => {
   });
 };
 
-const getByUserId = async (data) => {
-  const { where, limit, cursor } = data;
-  return prismaClient.shop.findMany({
-    where,
-    take: limit + 1, //추가적인 데이터가 있는지 확인을 위함
-    skip: cursor ? 1 : undefined,
-    cursor: cursor ? { id: cursor } : undefined,
-    include: {
-      user: {
-        select: {
-          nickname: true,
-        },
-      },
-      card: {
-        select: {
-          name: true,
-          purchasePrice: true,
-          grade: true,
-          genre: true,
-          description: true,
-          imageURL: true,
-        },
-      },
-    },
-  });
-};
-
 export default {
-  getShopItem,
   getCheckCardById,
   createShopCard,
   getShopById,
@@ -184,5 +147,4 @@ export default {
   updateCardRemainingCount,
   updateShopRemainingCount,
   getAllShop,
-  getByUserId,
 };
