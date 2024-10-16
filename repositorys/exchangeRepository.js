@@ -102,7 +102,8 @@ const getByUserId = async (data) => {
   return prismaClient.exchange.findMany({
     where,
     take: limit + 1, //추가적인 데이터가 있는지 확인을 위함
-    skip: cursor ? { id: cursor } : undefined,
+    skip: cursor ? 1 : undefined,
+    cursor: cursor ? { id: cursor } : undefined,
     include: {
       user: {
         select: {
