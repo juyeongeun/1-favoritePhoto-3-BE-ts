@@ -245,15 +245,24 @@ router.get(
     try {
       const { id: userId } = req.user;
 
-      const { keyword = "", limit = 10, cursor = "" } = req.query;
+      const { limit = 10, cursor = "" } = req.query;
+      const {
+        grade = "",
+        genre = "",
+        salesType = "",
+        isSoldOut = "false",
+      } = req.query;
 
-      const shops = await shopService.getByUserId(userId, {
-        keyword,
+      const sales = await userService.getMySales(userId, {
         limit: parseInt(limit),
         cursor: parseInt(cursor),
+        grade,
+        genre,
+        salesType,
+        isSoldOut,
       });
 
-      res.status(200).send(shops);
+      res.status(200).send(sales);
     } catch (error) {
       next(error);
     }
