@@ -1,4 +1,4 @@
-import * as shopRepository from "../repositorys/shopRepository.js";
+import shopRepository from "../repositorys/shopRepository.js";
 import prismaClient from "../utils/prismaClient.js";
 import createNotificationFromType from "../utils/notification/createByType.js"; // 알림 생성 유틸리티 임포트
 
@@ -154,31 +154,9 @@ const deleteShopCard = async (shopId, userId, cardId) => {
   return await shopRepository.deleteShopCard(shopId, userId, cardId);
 };
 
-/* 모든 판매중인 포토카드 조회 */
-const getAllShop = async () => {
-  const shopCards = await shopRepository.getAllShop();
-
-  return shopCards.map((shopCard) => ({
-    id: shopCard.id,
-    createAt: shopCard.createAt,
-    updateAt: shopCard.updateAt,
-    userId: shopCard.userId,
-    cardId: shopCard.cardId,
-    price: shopCard.price,
-    totalCount: shopCard.totalCount,
-    remainingCount: shopCard.remainingCount,
-    exchangeDescription: shopCard.exchangeDescription,
-    exchangeGrade: shopCard.exchangeGrade,
-    exchangeGenre: shopCard.exchangeGenre,
-    sellerNickname: shopCard.user.nickname,
-    imageUrl: shopCard.card.imageURL,
-  }));
-};
-
-export {
+export default {
   createShopCard,
   getShopByShopId,
   updateShopCard,
   deleteShopCard,
-  getAllShop,
 };

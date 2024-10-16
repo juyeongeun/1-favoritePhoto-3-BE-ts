@@ -91,4 +91,4 @@ const createPurchase = async (buyerId, count, shopId) => {
   return updatedShopInfo;
 };
 
-export { createPurchase };
+export default { createPurchase };

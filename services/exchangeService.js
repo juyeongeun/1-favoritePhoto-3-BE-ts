@@ -1,5 +1,5 @@
 import exchangeRepository from "../repositorys/exchangeRepository.js";
-import { getShopItem } from "../repositorys/shopRepository.js";
+import getShopItem from "../repositorys/shopRepository.js";
 import createNotificationFromType from "../utils/notification/createByType.js";
 
 const whereConditions = (userId, keyword) => {

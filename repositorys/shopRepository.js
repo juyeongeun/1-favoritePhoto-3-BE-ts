@@ -147,7 +147,7 @@ const getAllShop = async () => {
   });
 };
 
-export {
+export default {
   getShopItem,
   getCheckCardById,
   createShopCard,
