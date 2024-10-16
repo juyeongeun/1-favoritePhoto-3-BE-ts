@@ -28,6 +28,12 @@ const switchingType = (type, exchange) => {
         type: "품절",
         content: `${shop.user.nickname}님과의 [${shop.card.grade} | ${shop.card.name}]의 포토 카드 교환이 거절되었습니다.(품절)`,
       };
+    case 5: //교환신청자의 취소후 판매자에게
+      return {
+        userId: shop.userId,
+        type: "취소",
+        content: `${consumer.nickname}님과의 [${shop.card.grade} | ${shop.card.name}]의 포토 카드 교환제안이 취소되었습니다.`,
+      };
   }
 };
 
@@ -100,7 +106,7 @@ const createNotificationFromType = async (type, data) => {
       notificationData = switchingTypeForShop(type, data.shop);
     } else if (type === "포인트획득") {
       const { userId, nickname, point } = data;
-      notificationData = createPointNotification(userId, nickname, point);      
+      notificationData = createPointNotification(userId, nickname, point);
     } else {
       notificationData = switchingTypeForPurchase(type, data.purchase);
     }

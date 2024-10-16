@@ -1,5 +1,3 @@
-//repositorys\shopRepository.js
-
 import prismaClient from "../utils/prismaClient.js";
 
 // 사용자가 포토카드를 이미 상점에 등록했는지 확인
@@ -43,6 +41,14 @@ const updateShopRemainingCount = async (id, decrement) => {
   });
 };
 
+const getShopItem = async (id) => {
+  return prismaClient.shop.findFirst({
+    where: {
+      id,
+    },
+  });
+};
+
 // 상점 카드 상세 정보 조회
 const getShopById = async (shopId, cardId) => {
   const shopDetails = await prismaClient.shop.findUnique({
@@ -82,6 +88,7 @@ const getShopById = async (shopId, cardId) => {
     user: {
       nickname: shopDetails.user.nickname,
     },
+    imageUrl: card.imageUrl, // 카드 테이블에서 이미지 URL 가져옴
   };
 };
 
@@ -130,7 +137,19 @@ const deleteShopCard = async (shopId, userId, cardId) => {
   });
 };
 
+export {
+// 모든 판매중인 카드 조회
+const getAllShop = async () => {
+  return await prismaClient.shop.findMany({
+    include: {
+      card: true, // 카드 정보도 포함
+      user: { select: { nickname: true } }, // 판매자의 닉네임 정보 포함
+    },
+  });
+};
+
 export default {
+  getShopItem,
   getCheckCardById,
   createShopCard,
   getShopById,
@@ -138,4 +157,5 @@ export default {
   deleteShopCard,
   updateCardRemainingCount,
   updateShopRemainingCount,
+  getAllShop,
 };
