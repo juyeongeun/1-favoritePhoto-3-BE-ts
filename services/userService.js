@@ -2,6 +2,49 @@ import userRepository from "../repositorys/userRepository.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
+const whereConditions = ({ userId, grade, genre, salesType, isSoldOut }) => {
+  const where = {
+    userId,
+  };
+  if (genre) {
+    where.genre = genre;
+  }
+
+  if (grade) {
+    where.grade = grade;
+  }
+  let salesTypeWhere = { ...where };
+  if (isSoldOut === "true") {
+    salesTypeWhere.shop = {
+      some: {
+        userId,
+        remainingCount: {
+          lte: 0, // remainingCount가 0 이하인 경우
+        },
+      },
+    };
+  } else {
+    switch (salesType) {
+      case "sales":
+        salesTypeWhere.shop = {
+          some: {}, // Shop과 관계가 있는 카드
+        };
+        break;
+      case "exchange":
+        salesTypeWhere.exchange = {
+          some: {}, // Exchange와 관계가 있는 카드
+        };
+        break;
+      default:
+        salesTypeWhere.OR = [
+          { shop: { some: {} } },
+          { exchange: { some: {} } },
+        ];
+    }
+  }
+  return salesTypeWhere;
+};
+
 const createToken = (user, type) => {
   const payload = { userId: user.id, email: user.email }; //jwt 토근 정도에 사용자의 id, email 정보를 담는다.
   const options = { expiresIn: type ? "1w" : "1h" }; //refresh 토큰의 경우 1주일, access 토근은 1시간의 유효성을 둔다
@@ -79,6 +122,53 @@ const refreshToken = async (userId, refreshToken) => {
   return true;
 };
 
+const getMySales = async (userId, data) => {
+  const { limit, cursor, grade, genre, salesType, isSoldOut } = data;
+  const where = whereConditions({
+    userId,
+    grade,
+    genre,
+    salesType,
+    isSoldOut,
+  });
+  const sales = await userRepository.getMySales({ where, limit, cursor });
+  if (!sales) {
+    const error = new Error("Mot found");
+    error.status = 404;
+    error.data = {
+      message: "나의 판매목록을 찾을 수 없습니다.",
+    };
+    throw error;
+  }
+  //추가적인 데이터가 있는지 확인
+  const nextSales = sales.length > limit;
+  //추가 데이터가 있다면 커서값을 주고 데이터에서 리미트에 맞춰 돌려준다
+  const nextCursor = nextSales ? sales[limit - 1].id : "";
+
+  const returnSales = sales.map((item) => {
+    let salesType = null;
+    let isSoldOut = false;
+
+    if (item.shop.length > 0) {
+      salesType = "sales";
+      isSoldOut = item.shop.some((shop) => shop.remainingCount <= 0);
+    } else if (item.exchange.length > 0) {
+      salesType = "exchange";
+    }
+
+    return {
+      ...item,
+      salesType,
+      isSoldOut,
+    };
+  });
+
+  return {
+    list: returnSales.slice(0, limit),
+    nextCursor,
+  };
+};
+
 const create = async (data) => {
   const userByEmail = await userRepository.getByEmail(data.email);
   if (userByEmail) {
@@ -153,6 +243,7 @@ export default {
   getUserByEmail,
   getUserById,
   getUserByNickname,
+  getMySales,
   refreshToken,
   create,
   updateUser,

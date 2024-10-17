@@ -144,17 +144,128 @@ const getByUserId = async (userId, data) => {
 const updateShopCard = async (data) => {
   const card = await checkCardExists(data.shopId, data.cardId);
 
-  // 수정 요청을 보내는 사용자 ID와 카드의 소유자 ID 일치 여부 확인
+  // 수정 요청을 보낸 사용자 ID와 카드의 소유자 ID 일치 여부 확인
   if (card.userId !== data.userId) {
     const error = new Error("Unauthorized access to this card");
     error.status = 403;
     throw error;
   }
 
-  // 카드 정보를 가져와 알림 생성
+  // 카드 정보를 가져와서 남은 수량 확인
   const cardInfo = await prismaClient.card.findUnique({
     where: { id: card.cardId },
   });
+
+  // 카드 정보가 없는 경우 예외 처리
+  if (!cardInfo) {
+    throw new Error("Card not found");
+  }
+
+  // 새로 추가할 판매 수량
+  const newTotalCount = data.totalCount; // 요청한 총 수량
+
+  // 현재 상점 카드의 남은 수량
+  const currentRemainingCount = card.remainingCount;
+
+  // 카드테이블에서 잔여수량 감소시
+  const decreaseCount = newTotalCount - card.totalCount;
+
+  // 카드테이블에서 잔여수량 추가시
+  const additionalCount = card.totalCount - newTotalCount;
+
+  // * 상점의 잔여수량 0인 품절일 때, 수량 추가해서 추가 판매
+  if (currentRemainingCount === 0 && cardInfo.remainingCount > 0) {
+    // 추가 판매 수량이 카드의 남은 수량을 초과하지 않도록 체크
+    if (newTotalCount > cardInfo.remainingCount) {
+      throw new Error("최대 기존 카드의 잔여수량만큼만 추가로 팔 수 있습니다.");
+    }
+
+    // 카드 테이블의 남은 수량 업데이트
+    await prismaClient.card.update({
+      where: { id: card.cardId },
+      data: { remainingCount: cardInfo.remainingCount - newTotalCount },
+    });
+
+    // 상점 카드 정보 업데이트
+    await shopRepository.updateShopCard({
+      shopId: data.shopId,
+      price: data.price,
+      totalCount: newTotalCount,
+      remainingCount: newTotalCount, // 남은 수량을 총 수량과 동일하게 설정
+      exchangeGrade: data.exchangeGrade,
+      exchangeGenre: data.exchangeGenre,
+      exchangeDescription: data.exchangeDescription,
+    });
+  } else if (currentRemainingCount !== 0 && newTotalCount > card.totalCount) {
+    // * 기존 판매수량에서 추가로 판매하고 싶은 경우
+
+    // 카드 테이블의 잔여수량이 0인 경우
+    if (cardInfo.remainingCount === 0) {
+      throw new Error("No additional stock is available for sale.");
+    }
+
+    // 판매하려는 수량이 기존의 카드 총 수량보다 큰 경우
+    if (newTotalCount > cardInfo.totalCount) {
+      throw new Error(
+        "The maximum quantity that can be registered for sale is the total quantity of the existing card."
+      );
+    }
+
+    // 카드 테이블의 남은 수량 감소
+    await prismaClient.card.update({
+      where: { id: card.cardId },
+      data: { remainingCount: cardInfo.remainingCount - decreaseCount },
+    });
+
+    // 상점 카드 정보 업데이트
+    await shopRepository.updateShopCard({
+      shopId: data.shopId,
+      price: data.price,
+      totalCount: newTotalCount,
+      remainingCount: card.remainingCount + decreaseCount, // 기존 남은 수량에 추가판매할 수량만큼 더함
+      exchangeGrade: data.exchangeGrade,
+      exchangeGenre: data.exchangeGenre,
+      exchangeDescription: data.exchangeDescription,
+    });
+  } else if (currentRemainingCount !== 0 && newTotalCount < card.totalCount) {
+    // * 판매등록한 카드에서 몇개 안 팔고 싶은 경우
+
+    // 판매수량을 1로 설정한 경우
+    if (newTotalCount === 1) {
+      // 카드 테이블의 남은 수량 증가(창고로 돌아옴)
+      await prismaClient.card.update({
+        where: { id: card.cardId },
+        data: { remainingCount: cardInfo.remainingCount + additionalCount },
+      });
+      // 상점 카드 정보 업데이트
+      await shopRepository.updateShopCard({
+        shopId: data.shopId,
+        price: data.price,
+        totalCount: newTotalCount,
+        remainingCount: newTotalCount, // 기존 남은 수량 1로 수정
+        exchangeGrade: data.exchangeGrade,
+        exchangeGenre: data.exchangeGenre,
+        exchangeDescription: data.exchangeDescription,
+      });
+    } else {
+      // 카드 테이블의 남은 수량 증가(창고로 돌아옴)
+      await prismaClient.card.update({
+        where: { id: card.cardId },
+        data: { remainingCount: cardInfo.remainingCount + additionalCount },
+      });
+
+      // 상점 카드 정보 업데이트
+      await shopRepository.updateShopCard({
+        shopId: data.shopId,
+        price: data.price,
+        totalCount: newTotalCount,
+        remainingCount: card.remainingCount, // 기존 남은 수량 변화 없음
+        exchangeGrade: data.exchangeGrade,
+        exchangeGenre: data.exchangeGenre,
+        exchangeDescription: data.exchangeDescription,
+      });
+    }
+  }
 
   // 알림 생성
   await createNotificationFromType(6, {
@@ -194,10 +305,38 @@ const deleteShopCard = async (shopId, userId, cardId) => {
   return await shopRepository.deleteShopCard(shopId, userId, cardId);
 };
 
+/* 모든 판매중인 포토카드 조회 */
+const getAllShop = async () => {
+  const shopCards = await prismaClient.shop.findMany({
+    include: {
+      card: true, // 카드 정보도 포함
+      user: { select: { nickname: true } }, // 판매자의 닉네임 정보 포함
+    },
+  });
+
+  return shopCards.map((shopCard) => ({
+    id: shopCard.id,
+    userId: shopCard.userId,
+    cardId: shopCard.cardId,
+    price: shopCard.price,
+    totalCount: shopCard.totalCount,
+    remainingCount: shopCard.remainingCount,
+    exchangeDescription: shopCard.exchangeDescription,
+    exchangeGrade: shopCard.exchangeGrade,
+    exchangeGenre: shopCard.exchangeGenre,
+    user: {
+      nickname: shopCard.user.nickname,
+    },
+    imageUrl: shopCard.card.imageURL, // 카드 테이블에서 이미지 URL 가져옴
+    isSoldOut: shopCard.remainingCount === 0 ? "true" : "false", // 품절 상태 추가
+  }));
+};
+
 export default {
   createShopCard,
   getShopByShopId,
   getByUserId,
   updateShopCard,
   deleteShopCard,
+  getAllShop,
 };
