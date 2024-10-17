@@ -12,19 +12,11 @@ import pointRouter from "./controllers/pointController.js";
 
 const app = express();
 app.use(express.json());
-const allowedOrigins = ["http://localhost:3000", "https://localhost:3000"];
 
 app.use(
   cors({
     credentials: true,
-    origin: function (origin, callback) {
-      // origin이 undefined이면 (로컬 개발 환경에서 Postman 사용 시)
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, origin); // 허용
-      } else {
-        callback(new Error("Not allowed by CORS")); // 허용하지 않음
-      }
-    },
+    origin: "http://localhost:3000", // 프론트엔드 URL
     exposedHeaders: ["set-cookie"],
   })
 );
