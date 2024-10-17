@@ -1,24 +1,20 @@
 export const user = [
   {
-    id: 1,
     email: "codeit1@codeit.co.kr",
     nickname: "james93",
     password: "f8u3j9q2",
   },
   {
-    id: 2,
     email: "codeit2@codeit.co.kr",
     nickname: "sara88",
     password: "h5w8t7v1",
   },
   {
-    id: 3,
     email: "codeit3@codeit.co.kr",
     nickname: "michael77",
     password: "p2k4f1r9",
   },
   {
-    id: 4,
     email: "codeit4@codeit.co.kr",
     nickname: "lily10",
     password: "a3s6d5f2",
