@@ -4,8 +4,15 @@ import { JWT_SECRET } from "../../env.js";
 
 const accessExtractor = function (req) {
   var token = null;
-  if (req && req.cookies) {
-    token = req.cookies["access-token"];
+  const cookieString = req.headers.cookie;
+
+  const accessToken = cookieString
+    .split("; ")
+    .find((cookie) => cookie.startsWith("access-token="))
+    .split("=")[1];
+
+  if (req && accessToken) {
+    token = accessToken;
   } else {
     token = req.headers.authorization;
   }
@@ -15,9 +22,14 @@ const accessExtractor = function (req) {
 
 const refreshExtractor = function (req) {
   var token = null;
-  console.log(req.cookies);
-  if (req && req.cookies) {
-    token = req.cookies["refresh-token"];
+  const cookieString = req.headers.cookie;
+
+  const refreshToken = cookieString
+    .split("; ")
+    .find((cookie) => cookie.startsWith("access-token="))
+    .split("=")[1];
+  if (req && refreshToken) {
+    token = refreshToken;
   } else {
     token = req.headers.refreshtoken;
   }
