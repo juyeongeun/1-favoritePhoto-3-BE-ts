@@ -99,13 +99,21 @@ const createShopCard = async (data) => {
 };
 
 /* 상점에 등록한 포토 카드 상세 조회 */
-const getShopByShopId = async (shopId, cardId) => {
-  const shopDetails = await shopRepository.getShopById(shopId, cardId);
+const getShopByShopId = async (shopId) => {
+  const shopDetails = await shopRepository.getShopById(shopId);
+
+  if (!shopDetails) {
+    throw new Error(`Shop with ID ${shopId} not found.`);
+  }
 
   // 카드 정보를 가져와서 이미지 URL 포함
   const cardInfo = await prismaClient.card.findUnique({
     where: { id: shopDetails.cardId },
   });
+
+  if (!cardInfo) {
+    throw new Error(`Card with ID ${shopDetails.cardId} not found.`);
+  }
 
   return {
     ...shopDetails,
@@ -279,8 +287,8 @@ const updateShopCard = async (data) => {
 };
 
 /* 판매 중인 포토 카드 취소 */
-const deleteShopCard = async (shopId, userId, cardId) => {
-  const card = await checkCardExists(shopId, cardId);
+const deleteShopCard = async (shopId, userId) => {
+  const card = await checkCardExists(shopId);
 
   // 삭제 요청을 보낸 사용자 ID와 카드의 소유자 ID 일치 여부 확인
   if (card.userId !== userId) {
@@ -302,7 +310,7 @@ const deleteShopCard = async (shopId, userId, cardId) => {
     },
   });
 
-  return await shopRepository.deleteShopCard(shopId, userId, cardId);
+  return await shopRepository.deleteShopCard(shopId, userId, card.cardId);
 };
 
 /* 모든 판매중인 포토카드 조회 */
