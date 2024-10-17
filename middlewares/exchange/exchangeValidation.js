@@ -3,7 +3,7 @@ const exchangeValidation = (req, res, next) => {
 
   if (!myCardId || !description || !count) {
     return res.status(400).send({
-      message: "이메일, 닉네임, 비밀번호는 필수 값입니다.",
+      message: "신청할 카드와 카드설명 교환 카드수를 입력해 주세요.",
       data: {
         myCardId,
         description,
@@ -26,7 +26,7 @@ const exchangeValidation = (req, res, next) => {
     description.length > 20
   ) {
     return res.status(400).send({
-      message: "닉네임은 1자 이상 20자 미만 입니다.",
+      message: "카드 설명은 1자 이상 20자 미만 입니다.",
       data: {
         description,
       },
