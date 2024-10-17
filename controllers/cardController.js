@@ -1,12 +1,11 @@
-import express from "express"; // express 모듈 임포트
-import cardService from "../services/cardService.js"; // 서비스 임포트
+import express from "express";
+import cardService from "../services/cardService.js";
 import asyncHandle from "../utils/error/asyncHandle.js";
 import passport from "../config/passportConfig.js";
 import cardValidation from "../middlewares/card/cardValidation.js";
 import imageUpload from "../middlewares/card/imageUpload.js";
 
-const router = express.Router(); // express 라우터 생성
-
+const router = express.Router();
 // 카드 등록(생성)
 router.post(
   "/",
@@ -30,7 +29,7 @@ router.post(
         genre,
         description,
         totalCount: parseInt(totalCount),
-        remainingCount: parseInt(totalCount), // 초기 남은 카드 수는 totalCount 수와 같게 설정
+        remainingCount: parseInt(totalCount),
         imageURL,
         userId: parseInt(userId),
       });
@@ -41,10 +40,9 @@ router.post(
         card: newCard,
       });
     } catch (error) {
-      next(error); // 에러를 next로 전달
+      next(error);
     }
   })
 );
 
-// 라우터 내보내기
 export default router;
