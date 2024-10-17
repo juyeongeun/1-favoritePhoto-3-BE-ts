@@ -5,6 +5,15 @@ import { JWT_SECRET } from "../../env.js";
 const accessExtractor = function (req) {
   var token = null;
   const cookieString = req.headers.cookie;
+  if (cookieString) {
+    const error = new Error("Unauthorized");
+    error.status = 401;
+    error.data = {
+      message: "유효하지 않은 토큰입니다.",
+      token: cookieString,
+    };
+    throw error;
+  }
   const accessToken = cookieString
     .split("; ")
     .find((cookie) => cookie.startsWith("access-token="))
@@ -22,7 +31,15 @@ const accessExtractor = function (req) {
 const refreshExtractor = function (req) {
   var token = null;
   const cookieString = req.headers.cookie;
-
+  if (cookieString) {
+    const error = new Error("Unauthorized");
+    error.status = 401;
+    error.data = {
+      message: "유효하지 않은 토큰입니다.",
+      token: cookieString,
+    };
+    throw error;
+  }
   const refreshToken = cookieString
     .split("; ")
     .find((cookie) => cookie.startsWith("refresh-token="))
