@@ -98,7 +98,7 @@ const updateShopCard = async (data) => {
 };
 
 // 상점 카드 삭제 및 관련 정보 업데이트
-const deleteShopCard = async (shopId, userId, cardId) => {
+const deleteShopCard = async (shopId, userId) => {
   return await prismaClient.$transaction(async (prisma) => {
     const shopCard = await prisma.shop.findUnique({
       where: { id: shopId },
