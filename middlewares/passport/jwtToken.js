@@ -5,8 +5,8 @@ import { JWT_SECRET } from "../../env.js";
 const accessExtractor = function (req) {
   var token = null;
   const cookieString = req.headers.cookie;
-  console.log(cookieString);
-  console.log(req.cookies);
+  console.log("헤더 토큰" + cookieString);
+  console.log("쿠키 토큰" + req.cookies);
   const accessToken = cookieString
     .split("; ")
     .find((cookie) => cookie.startsWith("access-token="))
