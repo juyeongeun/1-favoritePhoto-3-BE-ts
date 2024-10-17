@@ -50,14 +50,11 @@ router.get(
 
 // 판매중인 포토 카드 상세 조회
 router.get(
-  "/cards/:shopId/:cardId",
+  "/cards/:shopId",
   passport.authenticate("access-token", { session: false }),
   asyncHandle(async (req, res) => {
-    const { shopId, cardId } = req.params;
-    const cardDetails = await shopService.getShopByShopId(
-      parseInt(shopId, 10), // shopId로 상점 확인
-      parseInt(cardId, 10) // cardId로 카드 확인
-    );
+    const { shopId } = req.params;
+    const cardDetails = await shopService.getShopByShopId(parseInt(shopId, 10));
     return res.status(200).json(cardDetails);
   })
 );
@@ -94,18 +91,17 @@ router.patch(
 
 // 판매중인 카드 판매 취소(판매 내리기)
 router.delete(
-  "/cards/:shopId/:cardId",
+  "/cards/:shopId",
   passport.authenticate("access-token", { session: false }),
   asyncHandle(async (req, res) => {
-    const { shopId, cardId } = req.params;
-    const userId = req.user.id; // JWT로부터 사용자 ID 가져오기
+    const { shopId } = req.params;
+    const userId = req.user.id;
 
     await shopService.deleteShopCard(
       parseInt(shopId, 10),
-      userId, // userId를 함께 전달
-      parseInt(cardId, 10)
+      userId // userId를 함께 전달
     );
-    return res.status(200).json({ message: "삭제되었습니다." });
+    return res.status(200).json({ message: "카드의 판매가 취소되었습니다." });
   })
 );
 
