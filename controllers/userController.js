@@ -6,7 +6,6 @@ import cookiesConfig from "../config/cookiesConfig.js";
 import passport from "../config/passportConfig.js";
 import exchangeService from "../services/exchangeService.js";
 import cardService from "../services/cardService.js";
-import shopService from "../services/shopService.js";
 
 const router = express.Router();
 
@@ -57,6 +56,7 @@ router.post(
 
 router.delete(
   "/logout",
+  passport.authenticate("access-token", { session: false }),
   asyncHandle(async (req, res, next) => {
     try {
       const { id: userId } = req.user;
