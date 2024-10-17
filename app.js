@@ -19,6 +19,13 @@ app.use(
     exposedHeaders: ["set-cookie"],
   })
 );
+app.use(
+  cors({
+    credentials: true,
+    origin: "https://localhost:3000",
+    exposedHeaders: ["set-cookie"],
+  })
+);
 
 app.use("/users", userRouter); // 2개여서 1개 삭제함
 app.use("/shop", shopRouter);
