@@ -5,7 +5,7 @@ import { JWT_SECRET } from "../../env.js";
 const accessExtractor = function (req) {
   var token = null;
   const cookieString = req.headers.cookie;
-  if (cookieString) {
+  if (!cookieString) {
     const error = new Error("Unauthorized");
     error.status = 401;
     error.data = {
@@ -31,7 +31,7 @@ const accessExtractor = function (req) {
 const refreshExtractor = function (req) {
   var token = null;
   const cookieString = req.headers.cookie;
-  if (cookieString) {
+  if (!cookieString) {
     const error = new Error("Unauthorized");
     error.status = 401;
     error.data = {
