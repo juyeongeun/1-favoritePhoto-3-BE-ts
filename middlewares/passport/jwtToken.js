@@ -4,6 +4,7 @@ import { JWT_SECRET } from "../../env.js";
 
 const accessExtractor = function (req) {
   var token = null;
+  const cookieString = req.headers.cookie;
   const accessToken = cookieString
     .split("; ")
     .find((cookie) => cookie.startsWith("access-token="))
@@ -24,7 +25,7 @@ const refreshExtractor = function (req) {
 
   const refreshToken = cookieString
     .split("; ")
-    .find((cookie) => cookie.startsWith("access-token="))
+    .find((cookie) => cookie.startsWith("refresh-token="))
     .split("=")[1];
   if (req && refreshToken) {
     token = refreshToken;
