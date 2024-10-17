@@ -159,11 +159,15 @@ router.get(
   asyncHandle(async (req, res, next) => {
     try {
       const { id: userId } = req.user;
-      let refreshToken = null;
-      if (req.cookies) {
-        refreshToken = req.cookies["refresh-token"];
-      } else {
-        refreshToken = req.headers.refreshtoken;
+      const cookieString = req.headers.cookie;
+
+      const refreshToken = cookieString
+        .split("; ")
+        .find((cookie) => cookie.startsWith("refresh-token="))
+        .split("=")[1];
+
+      if (!refreshToken) {
+        return res.status(403).send({ message: "리프레쉬 토큰이 없습니다." });
       }
       const validationToken = await userService.refreshToken(
         userId,
