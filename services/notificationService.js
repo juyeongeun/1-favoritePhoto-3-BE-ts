@@ -1,5 +1,3 @@
-//services\notificationService.js
-
 import notificationRepository from "../repositorys/notificationRepository.js";
 
 /* 알림 경과시간 계산 */
@@ -76,9 +74,16 @@ const updateNotification = async (id, data) => {
       };
       throw error;
     }
+
+    // 'read' 필드만 업데이트하도록 필터링
+    const updateData = {};
+    if (data.read !== undefined) {
+      updateData.read = data.read;
+    }
+
     return await notificationRepository.updateNotification({
       id: parseInt(id, 10), // id 객체로 전달
-      data,
+      data: updateData,
     });
   } catch (error) {
     const serviceError = new Error("알림 업데이트 중 오류 발생");
