@@ -92,7 +92,11 @@ const createShopCard = async (data) => {
       },
     });
 
-    return newShopCard;
+    // 응답에 카드 이미지 URL 포함
+    return {
+      ...newShopCard,
+      imageUrl: originalCard.imageURL, // 카드 테이블에서 이미지 URL 추가
+    };
   });
 
   return newCard;
@@ -118,7 +122,7 @@ const getShopByShopId = async (shopId) => {
   return {
     ...shopDetails,
     sellerNickname: shopDetails.user.nickname,
-    imageUrl: cardInfo.imageUrl, // 카드 테이블에서 이미지 URL 가져옴
+    imageUrl: cardInfo.imageURL, // 카드 테이블에서 이미지 URL 가져옴
   };
 };
 
@@ -185,7 +189,9 @@ const updateShopCard = async (data) => {
   if (currentRemainingCount === 0 && cardInfo.remainingCount > 0) {
     // 추가 판매 수량이 카드의 남은 수량을 초과하지 않도록 체크
     if (newTotalCount > cardInfo.remainingCount) {
-      throw new Error("최대 기존 카드의 잔여수량만큼만 추가로 팔 수 있습니다.");
+      throw new Error(
+        "The maximum quantity that can be registered for sale is the total quantity of the existing card."
+      );
     }
 
     // 카드 테이블의 남은 수량 업데이트
@@ -283,7 +289,11 @@ const updateShopCard = async (data) => {
     },
   });
 
-  return await shopRepository.updateShopCard(data);
+  // 응답에 카드 이미지 URL 포함
+  return {
+    ...(await shopRepository.updateShopCard(data)),
+    imageUrl: cardInfo.imageURL, // 카드 테이블에서 이미지 URL 추가
+  };
 };
 
 /* 판매 중인 포토 카드 취소 */

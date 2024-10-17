@@ -47,6 +47,7 @@ const getShopById = async (shopId) => {
     where: { id: shopId },
     include: {
       user: { select: { nickname: true } }, // 판매자의 닉네임 정보 포함
+      card: true, // 카드 정보도 포함
     },
   });
 
@@ -78,7 +79,7 @@ const getShopById = async (shopId) => {
     user: {
       nickname: shopDetails.user.nickname,
     },
-    imageUrl: card.imageUrl, // 카드 테이블에서 이미지 URL 가져옴
+    imageUrl: shopDetails.card.imageURL, // 카드 테이블에서 이미지 URL 가져옴
   };
 };
 
