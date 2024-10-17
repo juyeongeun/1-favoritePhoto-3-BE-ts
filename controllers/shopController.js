@@ -39,10 +39,9 @@ router.post(
   })
 );
 
-// 모든 판매중인 포토 카드 조회
+// 모든 판매중인 포토 카드 조회(로그인 없이 가능)
 router.get(
   "/cards",
-  passport.authenticate("access-token", { session: false }),
   asyncHandle(async (req, res) => {
     const shopCards = await shopService.getAllShop();
     return res.status(200).json(shopCards);
