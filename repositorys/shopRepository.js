@@ -42,7 +42,7 @@ const updateShopRemainingCount = async (id, decrement) => {
 };
 
 // 상점 카드 상세 정보 조회
-const getShopById = async (shopId, cardId) => {
+const getShopById = async (shopId) => {
   const shopDetails = await prismaClient.shop.findUnique({
     where: { id: shopId },
     include: {
@@ -57,12 +57,12 @@ const getShopById = async (shopId, cardId) => {
 
   // 카드 정보 조회
   const card = await prismaClient.card.findUnique({
-    where: { id: cardId },
+    where: { id: shopDetails.cardId },
   });
 
   // 카드가 없는 경우 에러 발생
   if (!card) {
-    throw new Error(`Card with ID ${cardId} not found.`);
+    throw new Error(`Card with ID  ${shopDetails.cardId} not found.`);
   }
 
   return {
@@ -98,7 +98,7 @@ const updateShopCard = async (data) => {
 };
 
 // 상점 카드 삭제 및 관련 정보 업데이트
-const deleteShopCard = async (shopId, userId, cardId) => {
+const deleteShopCard = async (shopId, userId) => {
   return await prismaClient.$transaction(async (prisma) => {
     const shopCard = await prisma.shop.findUnique({
       where: { id: shopId },
