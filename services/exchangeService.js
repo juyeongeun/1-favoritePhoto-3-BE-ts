@@ -1,4 +1,5 @@
 import exchangeRepository from "../repositorys/exchangeRepository.js";
+import shopRepository from "../repositorys/shopRepository.js";
 import getShopItem from "../repositorys/shopRepository.js";
 import createNotificationFromType from "../utils/notification/createByType.js";
 
@@ -26,7 +27,7 @@ const whereConditions = (userId, keyword) => {
 const createExchange = async (data) => {
   try {
     //판매의 남아있는 카드 수량을 검사하는 로직 필요
-    const checkShop = await getShopItem(data.shopId);
+    const checkShop = await shopRepository.getShopItem(data.shopId);
     if (checkShop.remainingCount <= 0) {
       const error = new Error("Unprocessable Entity");
       error.status = 422;
