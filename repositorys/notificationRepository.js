@@ -1,5 +1,3 @@
-//repositorys\notificationRepository.js
-
 import prismaClient from "../utils/prismaClient.js";
 
 /* 알림 생성 */
