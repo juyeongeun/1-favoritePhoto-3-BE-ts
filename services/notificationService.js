@@ -50,7 +50,12 @@ const getNotificationById = async (id) => {
     error.status = 404;
     throw error;
   }
-  return notification;
+
+  // 경과 시간 추가
+  return {
+    ...notification,
+    timeAgo: calculateTime(notification.createAt),
+  };
 };
 
 /* 알림 업데이트 */
