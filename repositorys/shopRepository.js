@@ -51,44 +51,20 @@ const getShopItem = async (id) => {
 
 // 상점 카드 상세 정보 조회
 const getShopById = async (shopId) => {
-  const shopDetails = await prismaClient.shop.findUnique({
+  return await prismaClient.shop.findUnique({
     where: { id: shopId },
     include: {
       user: { select: { nickname: true } }, // 판매자의 닉네임 정보 포함
-      card: true, // 카드 정보도 포함
+      card: {
+        select: {
+          name: true, // 카드 이름
+          genre: true, // 카드 장르
+          grade: true, // 카드 등급
+          imageURL: true, // 카드 이미지 URL
+        },
+      },
     },
   });
-
-  // 상점이 없는 경우 에러 발생
-  if (!shopDetails) {
-    throw new Error(`Shop with ID ${shopId} not found.`);
-  }
-
-  // 카드 정보 조회
-  const card = await prismaClient.card.findUnique({
-    where: { id: shopDetails.cardId },
-  });
-
-  // 카드가 없는 경우 에러 발생
-  if (!card) {
-    throw new Error(`Card with ID  ${shopDetails.cardId} not found.`);
-  }
-
-  return {
-    id: shopDetails.id,
-    userId: shopDetails.userId,
-    cardId: shopDetails.cardId,
-    price: shopDetails.price,
-    totalCount: shopDetails.totalCount,
-    remainingCount: shopDetails.remainingCount,
-    exchangeDescription: shopDetails.exchangeDescription,
-    exchangeGrade: shopDetails.exchangeGrade,
-    exchangeGenre: shopDetails.exchangeGenre,
-    user: {
-      nickname: shopDetails.user.nickname,
-    },
-    imageUrl: shopDetails.card.imageURL, // 카드 테이블에서 이미지 URL 가져옴
-  };
 };
 
 // 상점 카드 정보 업데이트

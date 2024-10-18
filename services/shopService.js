@@ -110,19 +110,8 @@ const getShopByShopId = async (shopId) => {
     throw new Error(`Shop with ID ${shopId} not found.`);
   }
 
-  // 카드 정보를 가져와서 이미지 URL 포함
-  const cardInfo = await prismaClient.card.findUnique({
-    where: { id: shopDetails.cardId },
-  });
-
-  if (!cardInfo) {
-    throw new Error(`Card with ID ${shopDetails.cardId} not found.`);
-  }
-
   return {
     ...shopDetails,
-    sellerNickname: shopDetails.user.nickname,
-    imageUrl: cardInfo.imageURL, // 카드 테이블에서 이미지 URL 가져옴
   };
 };
 
