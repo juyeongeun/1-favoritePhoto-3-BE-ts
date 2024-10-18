@@ -123,7 +123,7 @@ const getAllShop = async (
   }
   if (isSoldOut !== undefined) {
     whereConditions.push({
-      remainingCount: isSoldOut === "false" ? { gt: 0 } : 0,
+      remainingCount: isSoldOut === "true" ? 0 : { gt: 0 },
     });
   }
 

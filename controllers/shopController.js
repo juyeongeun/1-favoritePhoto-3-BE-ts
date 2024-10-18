@@ -50,19 +50,16 @@ router.get(
       grade,
       genre,
       isSoldOut,
+      sortOrder = "createAt_DESC", // 기본값 설정
     } = req.query;
 
-    try {
-      const shopCards = await shopService.getAllShop(
-        { search, grade, genre, isSoldOut }, // 필터를 전달
-        "createAt_DESC",
-        cursor,
-        parseInt(pageSize)
-      );
-      return res.status(200).json(shopCards);
-    } catch (error) {
-      return res.status(404).json({ message: error.message });
-    }
+    const shopCards = await shopService.getAllShop(
+      { search, grade, genre, isSoldOut }, // 필터를 전달
+      sortOrder,
+      cursor,
+      parseInt(pageSize)
+    );
+    return res.status(200).json(shopCards);
   })
 );
 
