@@ -313,12 +313,18 @@ const deleteShopCard = async (shopId, userId) => {
 };
 
 /* 모든 판매중인 포토카드 조회 */
-const getAllShop = async () => {
-  const shopCards = await shopRepository.getAllShop();
+const getAllShop = async (filters = {}, sortOrder = "createAt_DESC") => {
+  // 가장 최근에 생성된 항목 기준
+  const shopCards = await shopRepository.getAllShop(filters, sortOrder);
+
+  // 검색에 해당하는 포토카드 찾을 수 없을 때
+  if (shopCards.length === 0) {
+    throw new Error("입력하신 조건에 맞는 카드를 찾을 수 없습니다.");
+  }
 
   return shopCards.map((shopCard) => ({
     ...shopCard,
-    isSoldOut: shopCard.remainingCount === 0, // 품절 상태 추가
+    isSoldOut: shopCard.remainingCount === 0,
   }));
 };
 

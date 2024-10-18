@@ -101,21 +101,63 @@ const deleteShopCard = async (shopId, userId) => {
   });
 };
 
-// 모든 판매중인 카드 조회
-const getAllShop = async () => {
-  return await prismaClient.shop.findMany({
+/* 모든 상점 카드 조회 */
+const getAllShop = async (
+  filters = {},
+  sortOrder = "createAt_DESC",
+  cursor = null,
+  pageSize = 10
+) => {
+  const { search, grade, genre, isSoldOut } = filters;
+
+  const whereConditions = [];
+
+  if (search) {
+    whereConditions.push({ card: { name: { contains: search } } });
+  }
+  if (grade) {
+    whereConditions.push({ card: { grade } });
+  }
+  if (genre) {
+    whereConditions.push({ card: { genre } });
+  }
+  if (isSoldOut !== undefined) {
+    whereConditions.push({
+      remainingCount: isSoldOut === "false" ? { gt: 0 } : 0,
+    });
+  }
+
+  const shopCards = await prismaClient.shop.findMany({
+    where: {
+      AND: whereConditions,
+    },
+    orderBy: {
+      [sortOrder.split("_")[0]]: sortOrder.endsWith("_DESC") ? "desc" : "asc",
+    },
+    take: pageSize + 1, // 추가적인 데이터가 있는지 확인을 위한 설정
+    skip: cursor ? 1 : undefined, // 커서가 있을 경우, 첫 번째 데이터 건너뛰기
+    cursor: cursor ? { id: cursor } : undefined, // 커서 사용
     include: {
       card: {
         select: {
-          name: true, // 카드 이름
-          genre: true, // 카드 장르
-          grade: true, // 카드 등급
-          imageURL: true, // 카드 이미지 URL
+          name: true,
+          genre: true,
+          grade: true,
+          imageURL: true,
         },
       },
-      user: { select: { nickname: true } }, // 판매자의 닉네임 정보 포함
+      user: {
+        select: {
+          nickname: true,
+        },
+      },
     },
   });
+
+  return shopCards.map((shopCard) => ({
+    ...shopCard,
+    isSoldOut: shopCard.remainingCount === 0,
+  }));
 };
 
 export default {
