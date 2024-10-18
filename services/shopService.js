@@ -92,7 +92,11 @@ const createShopCard = async (data) => {
       },
     });
 
-    return newShopCard;
+    // 응답에 카드 이미지 URL 포함
+    return {
+      ...newShopCard,
+      imageUrl: originalCard.imageURL, // 카드 테이블에서 이미지 URL 추가
+    };
   });
 
   return newCard;
@@ -106,19 +110,8 @@ const getShopByShopId = async (shopId) => {
     throw new Error(`Shop with ID ${shopId} not found.`);
   }
 
-  // 카드 정보를 가져와서 이미지 URL 포함
-  const cardInfo = await prismaClient.card.findUnique({
-    where: { id: shopDetails.cardId },
-  });
-
-  if (!cardInfo) {
-    throw new Error(`Card with ID ${shopDetails.cardId} not found.`);
-  }
-
   return {
     ...shopDetails,
-    sellerNickname: shopDetails.user.nickname,
-    imageUrl: cardInfo.imageUrl, // 카드 테이블에서 이미지 URL 가져옴
   };
 };
 
@@ -185,7 +178,9 @@ const updateShopCard = async (data) => {
   if (currentRemainingCount === 0 && cardInfo.remainingCount > 0) {
     // 추가 판매 수량이 카드의 남은 수량을 초과하지 않도록 체크
     if (newTotalCount > cardInfo.remainingCount) {
-      throw new Error("최대 기존 카드의 잔여수량만큼만 추가로 팔 수 있습니다.");
+      throw new Error(
+        "The maximum quantity that can be registered for sale is the total quantity of the existing card."
+      );
     }
 
     // 카드 테이블의 남은 수량 업데이트
@@ -283,7 +278,11 @@ const updateShopCard = async (data) => {
     },
   });
 
-  return await shopRepository.updateShopCard(data);
+  // 응답에 카드 이미지 URL 포함
+  return {
+    ...(await shopRepository.updateShopCard(data)),
+    imageUrl: cardInfo.imageURL, // 카드 테이블에서 이미지 URL 추가
+  };
 };
 
 /* 판매 중인 포토 카드 취소 */
@@ -314,29 +313,18 @@ const deleteShopCard = async (shopId, userId) => {
 };
 
 /* 모든 판매중인 포토카드 조회 */
-const getAllShop = async () => {
-  const shopCards = await prismaClient.shop.findMany({
-    include: {
-      card: true, // 카드 정보도 포함
-      user: { select: { nickname: true } }, // 판매자의 닉네임 정보 포함
-    },
-  });
+const getAllShop = async (filters = {}, sortOrder = "createAt_DESC") => {
+  // 가장 최근에 생성된 항목 기준
+  const shopCards = await shopRepository.getAllShop(filters, sortOrder);
+
+  // 검색에 해당하는 포토카드 찾을 수 없을 때
+  if (shopCards.length === 0) {
+    throw new Error("입력하신 조건에 맞는 카드를 찾을 수 없습니다.");
+  }
 
   return shopCards.map((shopCard) => ({
-    id: shopCard.id,
-    userId: shopCard.userId,
-    cardId: shopCard.cardId,
-    price: shopCard.price,
-    totalCount: shopCard.totalCount,
-    remainingCount: shopCard.remainingCount,
-    exchangeDescription: shopCard.exchangeDescription,
-    exchangeGrade: shopCard.exchangeGrade,
-    exchangeGenre: shopCard.exchangeGenre,
-    user: {
-      nickname: shopCard.user.nickname,
-    },
-    imageUrl: shopCard.card.imageURL, // 카드 테이블에서 이미지 URL 가져옴
-    isSoldOut: shopCard.remainingCount === 0 ? "true" : "false", // 품절 상태 추가
+    ...shopCard,
+    isSoldOut: shopCard.remainingCount === 0,
   }));
 };
 

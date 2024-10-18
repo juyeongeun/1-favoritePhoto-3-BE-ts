@@ -43,7 +43,22 @@ router.post(
 router.get(
   "/cards",
   asyncHandle(async (req, res) => {
-    const shopCards = await shopService.getAllShop();
+    const {
+      pageSize = 10,
+      cursor = null,
+      search,
+      grade,
+      genre,
+      isSoldOut,
+      sortOrder = "createAt_DESC", // 기본값 설정
+    } = req.query;
+
+    const shopCards = await shopService.getAllShop(
+      { search, grade, genre, isSoldOut }, // 필터를 전달
+      sortOrder,
+      cursor,
+      parseInt(pageSize)
+    );
     return res.status(200).json(shopCards);
   })
 );
