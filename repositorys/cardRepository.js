@@ -1,7 +1,7 @@
 import prismaClient from "../utils/prismaClient.js";
 
-const createCard = async (data) => {
-  return await prismaClient.card.create({
+const createCard = (data) => {
+  return prismaClient.card.create({
     data,
     include: {
       user: {
@@ -16,7 +16,7 @@ const createCard = async (data) => {
   });
 };
 
-const getByUserId = async (data) => {
+const getByUserId = (data) => {
   const { where, limit, cursor } = data;
   return prismaClient.card.findMany({
     where,
