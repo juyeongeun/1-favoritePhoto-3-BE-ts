@@ -169,6 +169,19 @@ const getMySales = async (userId, data) => {
   };
 };
 
+const getByUserCardsCount = async (userId) => {
+  const userCardCount = await userRepository.getMyCardCount(userId);
+  if (!userCardCount) {
+    const error = new Error("Not Found");
+    error.status = 404;
+    error.data = {
+      message: "카드정보를 찾을수 없습니다.",
+    };
+    throw error;
+  }
+  return userCardCount;
+};
+
 const create = async (data) => {
   const userByEmail = await userRepository.getByEmail(data.email);
   if (userByEmail) {
@@ -245,6 +258,7 @@ export default {
   getUserByNickname,
   getMySales,
   refreshToken,
+  getByUserCardsCount,
   create,
   updateUser,
   deleteUser,
