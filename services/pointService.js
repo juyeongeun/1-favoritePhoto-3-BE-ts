@@ -23,7 +23,13 @@ const drawPoints = async (userId) => {
     point: drawResult, // 획득한 포인트
   });
 
-  return updatedUser;
+  return filterSensitiveUserData(updatedUser);
+};
+
+const filterSensitiveUserData = (user) => {
+  //리스폰스의 민감한 정보를 빼고 보낸다
+  const { password, refreshToken, ...rest } = user;
+  return rest;
 };
 
 export default {
