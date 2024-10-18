@@ -65,7 +65,7 @@ export const card = [
     description: "아침 안개에 가려진 신비로운 숲의 풍경.",
     totalCount: 3,
     remainingCount: 3,
-    userId: 3,
+    userId: 1,
     imageURL:
       "https://favoritephoto.s3.ap-northeast-2.amazonaws.com/red-sunset-between-layers-of-clouds-picjumbo-com.jpg",
   },
@@ -76,7 +76,7 @@ export const card = [
     description: "풀밭에서 놀고 있는 강아지의 귀여운 모습.",
     totalCount: 5,
     remainingCount: 5,
-    userId: 13,
+    userId: 2,
     imageURL:
       "https://favoritephoto.s3.ap-northeast-2.amazonaws.com/KakaoTalk_Photo_2024-10-17-16-27-26.png",
   },
@@ -87,7 +87,7 @@ export const card = [
     description: "맑은 날씨에 반사되는 푸른 호수의 아름다움.",
     totalCount: 2,
     remainingCount: 2,
-    userId: 5,
+    userId: 3,
     imageURL:
       "https://favoritephoto.s3.ap-northeast-2.amazonaws.com/camping-on-a-mountain-peak-picjumbo-com.jpg",
   },
@@ -98,7 +98,7 @@ export const card = [
     description: "판타지 세계에서 펼쳐지는 유니콘의 신비한 모습.",
     totalCount: 4,
     remainingCount: 4,
-    userId: 6,
+    userId: 4,
     imageURL:
       "https://favoritephoto.s3.ap-northeast-2.amazonaws.com/cat-551554_640.jpg",
   },
@@ -109,7 +109,7 @@ export const card = [
     description: "저녁 노을이 비치는 바다의 황홀한 풍경.",
     totalCount: 3,
     remainingCount: 3,
-    userId: 7,
+    userId: 5,
     imageURL:
       "https://favoritephoto.s3.ap-northeast-2.amazonaws.com/halloween-pumpkins-picjumbo-com.jpg",
   },
@@ -120,7 +120,7 @@ export const card = [
     description: "깊은 산속에 숨겨진 조용한 계곡의 모습.",
     totalCount: 1,
     remainingCount: 1,
-    userId: 8,
+    userId: 6,
     imageURL:
       "https://favoritephoto.s3.ap-northeast-2.amazonaws.com/cats-8096304_640.jpg",
   },
@@ -131,7 +131,7 @@ export const card = [
     description: "사파리에서 힘차게 걸어가는 사자의 모습.",
     totalCount: 6,
     remainingCount: 6,
-    userId: 9,
+    userId: 7,
     imageURL:
       "https://favoritephoto.s3.ap-northeast-2.amazonaws.com/maine-coon-694730_640.jpg",
   },
@@ -142,7 +142,7 @@ export const card = [
     description: "어두운 숲 속에서 은은하게 빛나는 불빛.",
     totalCount: 3,
     remainingCount: 3,
-    userId: 10,
+    userId: 8,
     imageURL:
       "https://favoritephoto.s3.ap-northeast-2.amazonaws.com/cat-323262_640.jpg",
   },
@@ -153,7 +153,7 @@ export const card = [
     description: "별빛이 가득한 밤하늘 아래의 고요한 풍경.",
     totalCount: 4,
     remainingCount: 4,
-    userId: 11,
+    userId: 9,
     imageURL:
       "https://favoritephoto.s3.ap-northeast-2.amazonaws.com/KakaoTalk_Photo_2024-10-17-16-27-15.png",
   },
@@ -164,7 +164,117 @@ export const card = [
     description: "파란 꽃이 만발한 화려한 꽃밭의 모습.",
     totalCount: 2,
     remainingCount: 2,
-    userId: 12,
+    userId: 1,
+    imageURL:
+      "https://favoritephoto.s3.ap-northeast-2.amazonaws.com/KakaoTalk_Photo_2024-10-17-16-27-20.png",
+  },
+  {
+    name: "별빛의 정원",
+    grade: "LEGENDARY",
+    genre: "풍경",
+    description: "별들이 쏟아지는 환상적인 정원의 모습.",
+    totalCount: 3,
+    remainingCount: 3,
+    userId: 1,
+    imageURL:
+      "https://favoritephoto.s3.ap-northeast-2.amazonaws.com/red-sunset-between-layers-of-clouds-picjumbo-com.jpg",
+  },
+  {
+    name: "호수의 여신",
+    grade: "SUPER RARE",
+    genre: "사물",
+    description: "호수 위에 비치는 신비로운 여신의 모습.",
+    totalCount: 4,
+    remainingCount: 4,
+    userId: 2,
+    imageURL:
+      "https://favoritephoto.s3.ap-northeast-2.amazonaws.com/KakaoTalk_Photo_2024-10-17-16-27-26.png",
+  },
+  {
+    name: "정원의 고양이",
+    grade: "COMMON",
+    genre: "동물",
+    description: "꽃밭에서 놀고 있는 귀여운 고양이의 모습.",
+    totalCount: 5,
+    remainingCount: 5,
+    userId: 3,
+    imageURL:
+      "https://favoritephoto.s3.ap-northeast-2.amazonaws.com/camping-on-a-mountain-peak-picjumbo-com.jpg",
+  },
+  {
+    name: "구름 속의 성",
+    grade: "RARE",
+    genre: "풍경",
+    description: "구름 사이로 보이는 신비로운 성의 모습.",
+    totalCount: 2,
+    remainingCount: 2,
+    userId: 4,
+    imageURL:
+      "https://favoritephoto.s3.ap-northeast-2.amazonaws.com/cat-551554_640.jpg",
+  },
+  {
+    name: "사파리의 저녁",
+    grade: "RARE",
+    genre: "동물",
+    description: "저녁 노을 속에서 뛰노는 사파리 동물들.",
+    totalCount: 3,
+    remainingCount: 3,
+    userId: 5,
+    imageURL:
+      "https://favoritephoto.s3.ap-northeast-2.amazonaws.com/halloween-pumpkins-picjumbo-com.jpg",
+  },
+  {
+    name: "신비로운 계곡",
+    grade: "SUPER RARE",
+    genre: "풍경",
+    description: "안개로 뒤덮인 신비로운 계곡의 풍경.",
+    totalCount: 1,
+    remainingCount: 1,
+    userId: 6,
+    imageURL:
+      "https://favoritephoto.s3.ap-northeast-2.amazonaws.com/cats-8096304_640.jpg",
+  },
+  {
+    name: "사막의 별",
+    grade: "LEGENDARY",
+    genre: "풍경",
+    description: "사막의 밤하늘을 수놓는 무수한 별들.",
+    totalCount: 6,
+    remainingCount: 6,
+    userId: 7,
+    imageURL:
+      "https://favoritephoto.s3.ap-northeast-2.amazonaws.com/maine-coon-694730_640.jpg",
+  },
+  {
+    name: "가을의 정취",
+    grade: "COMMON",
+    genre: "풍경",
+    description: "단풍이 물든 가을의 고요한 풍경.",
+    totalCount: 4,
+    remainingCount: 4,
+    userId: 8,
+    imageURL:
+      "https://favoritephoto.s3.ap-northeast-2.amazonaws.com/cat-323262_640.jpg",
+  },
+  {
+    name: "초원의 친구들",
+    grade: "SUPER RARE",
+    genre: "동물",
+    description: "푸른 초원에서 뛰노는 동물들의 모습.",
+    totalCount: 3,
+    remainingCount: 3,
+    userId: 9,
+    imageURL:
+      "https://favoritephoto.s3.ap-northeast-2.amazonaws.com/KakaoTalk_Photo_2024-10-17-16-27-15.png",
+  },
+  {
+    name: "봄의 꽃길",
+    grade: "RARE",
+    genre: "사물",
+    description: "봄을 알리는 형형색색의 꽃길.",
+    totalCount: 2,
+    remainingCount: 2,
+    userId: 1,
     imageURL:
       "https://favoritephoto.s3.ap-northeast-2.amazonaws.com/KakaoTalk_Photo_2024-10-17-16-27-20.png",
   },
