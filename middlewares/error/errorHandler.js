@@ -9,7 +9,7 @@ function errorHandler(err, req, res, next) {
     date: new Date(),
   };
   console.log(error);
-  return res.status(status).json(error);
+  return res.status(status).send(error);
 }
 
 export default errorHandler;
