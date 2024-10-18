@@ -30,6 +30,22 @@ router.get(
   }
 );
 
+// 특정 알림 조회
+router.get(
+  "/:id",
+  passport.authenticate("access-token", { session: false }),
+  async (req, res, next) => {
+    try {
+      const notification = await notificationService.getNotificationById(
+        req.params.id
+      );
+      res.status(200).send({ notification });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 // 알림 업데이트 (읽음 상태 변경)
 router.patch(
   "/:id",

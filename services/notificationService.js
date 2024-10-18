@@ -40,6 +40,19 @@ const getAllNotifications = async (userId) => {
   }));
 };
 
+/* 특정 알림 조회 */
+const getNotificationById = async (id) => {
+  const notification = await notificationRepository.getNotificationById(
+    parseInt(id, 10)
+  );
+  if (!notification) {
+    const error = new Error("알림을 찾을 수 없습니다.");
+    error.status = 404;
+    throw error;
+  }
+  return notification;
+};
+
 /* 알림 업데이트 */
 const updateNotification = async (id, data) => {
   const notification = await notificationRepository.getNotificationById(
@@ -90,4 +103,5 @@ export default {
   deleteNotification,
   getAllNotifications,
   updateNotification,
+  getNotificationById,
 };
