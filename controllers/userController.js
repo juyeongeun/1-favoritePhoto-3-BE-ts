@@ -221,6 +221,22 @@ router.get(
 );
 
 router.get(
+  "/my-cards-count",
+  passport.authenticate("access-token", { session: false }),
+  asyncHandle(async (req, res, next) => {
+    try {
+      const { id: userId } = req.user;
+
+      const counts = await userService.getByUserCardsCount(userId);
+
+      res.status(200).send(counts);
+    } catch (error) {
+      next(error);
+    }
+  })
+);
+
+router.get(
   "/my-exchange",
   passport.authenticate("access-token", { session: false }),
   asyncHandle(async (req, res, next) => {

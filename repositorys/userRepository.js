@@ -23,6 +23,34 @@ const getMySales = (data) => {
   });
 };
 
+const getMyCardCount = async (userId) => {
+  //사용자의 id로 등록된 총 카드의 수
+  const totalCount = await prismaClient.card.count({
+    where: {
+      userId,
+    },
+  });
+  //각 등급의 수를 그룹화
+  const gradeCounts = await prismaClient.card.groupBy({
+    where: {
+      userId,
+    },
+    by: ["grade"],
+    _count: {
+      id: true,
+    },
+  });
+  // 그룹화한 등금을 원하는 JSON 형태로 변환
+  const formattedGradeCounts = gradeCounts.reduce((acc, curr) => {
+    acc[curr.grade] = curr._count.id;
+    return acc;
+  }, {});
+  return {
+    totalCount,
+    formattedGradeCounts,
+  };
+};
+
 const getByEmail = (email) => {
   return prismaClient.user.findUnique({
     where: {
@@ -77,6 +105,7 @@ export default {
   getMySales,
   getByEmail,
   getByNickname,
+  getMyCardCount,
   getById,
   create,
   update,
