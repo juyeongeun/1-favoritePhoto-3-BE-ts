@@ -314,28 +314,11 @@ const deleteShopCard = async (shopId, userId) => {
 
 /* 모든 판매중인 포토카드 조회 */
 const getAllShop = async () => {
-  const shopCards = await prismaClient.shop.findMany({
-    include: {
-      card: true, // 카드 정보도 포함
-      user: { select: { nickname: true } }, // 판매자의 닉네임 정보 포함
-    },
-  });
+  const shopCards = await shopRepository.getAllShop();
 
   return shopCards.map((shopCard) => ({
-    id: shopCard.id,
-    userId: shopCard.userId,
-    cardId: shopCard.cardId,
-    price: shopCard.price,
-    totalCount: shopCard.totalCount,
-    remainingCount: shopCard.remainingCount,
-    exchangeDescription: shopCard.exchangeDescription,
-    exchangeGrade: shopCard.exchangeGrade,
-    exchangeGenre: shopCard.exchangeGenre,
-    user: {
-      nickname: shopCard.user.nickname,
-    },
-    imageUrl: shopCard.card.imageURL, // 카드 테이블에서 이미지 URL 가져옴
-    isSoldOut: shopCard.remainingCount === 0 ? "true" : "false", // 품절 상태 추가
+    ...shopCard,
+    isSoldOut: shopCard.remainingCount === 0, // 품절 상태 추가
   }));
 };
 

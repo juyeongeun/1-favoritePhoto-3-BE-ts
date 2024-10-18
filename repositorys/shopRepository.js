@@ -105,7 +105,14 @@ const deleteShopCard = async (shopId, userId) => {
 const getAllShop = async () => {
   return await prismaClient.shop.findMany({
     include: {
-      card: true, // 카드 정보도 포함
+      card: {
+        select: {
+          name: true, // 카드 이름
+          genre: true, // 카드 장르
+          grade: true, // 카드 등급
+          imageURL: true, // 카드 이미지 URL
+        },
+      },
       user: { select: { nickname: true } }, // 판매자의 닉네임 정보 포함
     },
   });
