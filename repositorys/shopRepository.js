@@ -29,18 +29,6 @@ const updateCardRemainingCount = async (cardId, decrement) => {
   });
 };
 
-// 상점 잔여 개수 업데이트
-const updateShopRemainingCount = async (id, decrement) => {
-  return await prismaClient.shop.update({
-    where: {
-      id,
-    },
-    data: {
-      remainingCount: { decrement },
-    },
-  });
-};
-
 const getShopItem = async (id) => {
   return prismaClient.shop.findFirst({
     where: {
@@ -131,6 +119,5 @@ export default {
   updateShopCard,
   deleteShopCard,
   updateCardRemainingCount,
-  updateShopRemainingCount,
   getAllShop,
 };
