@@ -271,6 +271,7 @@ router.get(
         genre = "",
         salesType = "",
         isSoldOut = "false",
+        keyword = "",
       } = req.query;
 
       const sales = await userService.getMySales(userId, {
@@ -280,6 +281,7 @@ router.get(
         genre,
         salesType,
         isSoldOut,
+        keyword,
       });
 
       res.status(200).send(sales);
