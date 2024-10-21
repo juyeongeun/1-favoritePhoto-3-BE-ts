@@ -187,7 +187,7 @@ router.get(
         );
         res.cookie(
           "refresh-token",
-          refreshToken,
+          newRefreshToken,
           cookiesConfig.refreshTokenOption
         );
 
