@@ -121,7 +121,7 @@ const refreshToken = async (userId, refreshToken) => {
 
   if (refreshToken !== user.refreshToken) {
     const error = new Error("Unauthorized");
-    error.status = 401;
+    error.status = 403;
     error.data = {
       message: "리프레쉬 토큰이 유효하지 않습니다.",
     };
