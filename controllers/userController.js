@@ -63,8 +63,8 @@ router.delete(
       await userService.updateUser(userId, {
         refreshToken: "",
       });
-      res.cookie("access-token", null, cookiesConfig.accessTokenOption);
-      res.cookie("refresh-token", null, cookiesConfig.accessTokenOption);
+      res.clearCookie("access-token", { path: "/" });
+      res.clearCookie("refresh-token", { path: "/" });
       res.status(200).send({ message: "로그아웃 되었습니다" });
     } catch (error) {
       next(error);
