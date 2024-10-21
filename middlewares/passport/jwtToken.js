@@ -9,7 +9,7 @@ const accessExtractor = function (req) {
     const error = new Error("Unauthorized");
     error.status = 401;
     error.data = {
-      message: "유효하지 않은 토큰입니다.",
+      message: "유효하지 않은 액세스 토큰입니다.",
       // requestURL: req.originalUrl,
       "access-token": cookieString.startsWith("access-token="),
     };
@@ -33,10 +33,10 @@ const refreshExtractor = function (req) {
   var token = null;
   const cookieString = req.headers.cookie;
   if (!cookieString || !cookieString.startsWith("refresh-token=")) {
-    const error = new Error("Unauthorized");
-    error.status = 401;
+    const error = new Error("Forbidden");
+    error.status = 403;
     error.data = {
-      message: "유효하지 않은 토큰입니다.",
+      message: "유효하지 않은 리플레쉬 토큰입니다.",
       // requestURL: req.originalUrl,
       "refresh-token": cookieString.startsWith("refresh-token="),
     };
