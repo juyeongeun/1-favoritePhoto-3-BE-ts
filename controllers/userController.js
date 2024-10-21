@@ -173,7 +173,6 @@ router.get(
         userId,
         refreshToken
       );
-      console.log(validationToken);
       if (validationToken) {
         const accessToken = userService.createToken(req.user);
         const newRefreshToken = userService.createToken(req.user, "refresh");
