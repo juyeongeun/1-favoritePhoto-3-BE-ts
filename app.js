@@ -12,7 +12,11 @@ import pointRouter from "./controllers/pointController.js";
 
 const app = express();
 app.use(express.json());
-const allowedOrigins = ["http://localhost:3000", "https://localhost:3000"];
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://localhost:3000",
+  "https://willowy-gingersnap-13564c.netlify.app",
+];
 
 app.use(
   cors({
