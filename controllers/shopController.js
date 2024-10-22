@@ -44,8 +44,8 @@ router.get(
   "/cards",
   asyncHandle(async (req, res) => {
     const {
-      pageSize = 10,
-      cursor = null,
+      page = 1, // 페이지 번호
+      pageSize = 10, // 페이지당 포토카드 10개
       search,
       grade,
       genre,
@@ -56,9 +56,10 @@ router.get(
     const shopCards = await shopService.getAllShop(
       { search, grade, genre, isSoldOut }, // 필터를 전달
       sortOrder,
-      cursor,
-      parseInt(pageSize)
+      parseInt(page), // 페이지 번호
+      parseInt(pageSize) // 페이지 사이즈
     );
+
     return res.status(200).json(shopCards);
   })
 );

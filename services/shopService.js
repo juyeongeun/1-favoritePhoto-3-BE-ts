@@ -313,9 +313,18 @@ const deleteShopCard = async (shopId, userId) => {
 };
 
 /* 모든 판매중인 포토카드 조회 */
-const getAllShop = async (filters = {}, sortOrder = "createAt_DESC") => {
-  // 가장 최근에 생성된 항목 기준
-  const shopCards = await shopRepository.getAllShop(filters, sortOrder);
+const getAllShop = async (
+  filters = {},
+  sortOrder = "createAt_DESC",
+  page = 1,
+  pageSize = 10
+) => {
+  const shopCards = await shopRepository.getAllShop(
+    filters,
+    sortOrder,
+    page,
+    pageSize
+  );
 
   // 검색에 해당하는 포토카드 찾을 수 없을 때
   if (shopCards.length === 0) {

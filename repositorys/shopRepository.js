@@ -105,7 +105,7 @@ const deleteShopCard = async (shopId, userId) => {
 const getAllShop = async (
   filters = {},
   sortOrder = "createAt_DESC",
-  cursor = null,
+  page = 1, // 페이지 번호
   pageSize = 10
 ) => {
   const { search, grade, genre, isSoldOut } = filters;
@@ -134,9 +134,8 @@ const getAllShop = async (
     orderBy: {
       [sortOrder.split("_")[0]]: sortOrder.endsWith("_DESC") ? "desc" : "asc",
     },
-    take: pageSize + 1, // 추가적인 데이터가 있는지 확인을 위한 설정
-    skip: cursor ? 1 : undefined, // 커서가 있을 경우, 첫 번째 데이터 건너뛰기
-    cursor: cursor ? { id: cursor } : undefined, // 커서 사용
+    take: pageSize, // 페이지당 가져올 데이터 수
+    skip: (page - 1) * pageSize, // 페이지에 따라 건너뛰기
     include: {
       card: {
         select: {
