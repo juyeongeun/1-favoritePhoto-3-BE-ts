@@ -75,6 +75,21 @@ router.get(
   })
 );
 
+// 판매중인 포토 카드 상세 조회 사용자 교환신청 조회 (구매쟈)
+router.get(
+  "/cards/:shopId/exchange",
+  passport.authenticate("access-token", { session: false }),
+  asyncHandle(async (req, res) => {
+    const { shopId } = req.params;
+    const { id: userId } = req.user;
+    const cardDetailsExchanges = await shopService.getExchangeByUserId(
+      parseInt(shopId),
+      parseInt(userId)
+    );
+    return res.status(200).json(cardDetailsExchanges);
+  })
+);
+
 // 판매 중인 카드 수정하기
 router.patch(
   "/cards/:shopId/:cardId",
