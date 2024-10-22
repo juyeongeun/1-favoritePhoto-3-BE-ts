@@ -49,6 +49,7 @@ const getShopById = async (shopId) => {
           genre: true, // 카드 장르
           grade: true, // 카드 등급
           imageURL: true, // 카드 이미지 URL
+          description: true, // 카드 설명
         },
       },
     },
