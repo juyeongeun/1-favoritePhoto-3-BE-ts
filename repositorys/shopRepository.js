@@ -51,6 +51,11 @@ const getShopById = async (shopId) => {
           imageURL: true, // 카드 이미지 URL
         },
       },
+      exchange: {
+        include: {
+          card: true,
+        },
+      },
     },
   });
 };
@@ -105,38 +110,34 @@ const deleteShopCard = async (shopId, userId) => {
 const getAllShop = async (
   filters = {},
   sortOrder = "createAt_DESC",
-  cursor = null,
+  page = 1, // 페이지 번호
   pageSize = 10
 ) => {
   const { search, grade, genre, isSoldOut } = filters;
 
-  const whereConditions = [];
-
-  if (search) {
-    whereConditions.push({ card: { name: { contains: search } } });
-  }
-  if (grade) {
-    whereConditions.push({ card: { grade } });
-  }
-  if (genre) {
-    whereConditions.push({ card: { genre } });
-  }
-  if (isSoldOut !== undefined) {
-    whereConditions.push({
+  // 기본 where 조건 객체 생성
+  const where = {
+    ...(search && { card: { name: { contains: search } } }),
+    ...(grade && { card: { grade } }),
+    ...(genre && { card: { genre } }),
+    ...(isSoldOut !== undefined && {
       remainingCount: isSoldOut === "true" ? 0 : { gt: 0 },
-    });
-  }
+    }),
+  };
 
+  // 전체 상점 카드 수를 조회
+  const totalCardsCount = await prismaClient.shop.count({
+    where: Object.keys(where).length > 0 ? where : {},
+  });
+
+  // 페이지네이션에 따라 카드 조회
   const shopCards = await prismaClient.shop.findMany({
-    where: {
-      AND: whereConditions,
-    },
+    where: Object.keys(where).length > 0 ? where : {}, // 필터링 조건에 따라 카드 조회
     orderBy: {
       [sortOrder.split("_")[0]]: sortOrder.endsWith("_DESC") ? "desc" : "asc",
     },
-    take: pageSize + 1, // 추가적인 데이터가 있는지 확인을 위한 설정
-    skip: cursor ? 1 : undefined, // 커서가 있을 경우, 첫 번째 데이터 건너뛰기
-    cursor: cursor ? { id: cursor } : undefined, // 커서 사용
+    take: pageSize, // 페이지당 가져올 데이터 수
+    skip: (page - 1) * pageSize, // 페이지에 따라 건너뛰기
     include: {
       card: {
         select: {
@@ -154,10 +155,16 @@ const getAllShop = async (
     },
   });
 
-  return shopCards.map((shopCard) => ({
-    ...shopCard,
-    isSoldOut: shopCard.remainingCount === 0,
-  }));
+  // 현재 페이지의 카드 개수를 기준으로 반환
+  return {
+    totalCards: totalCardsCount,
+    currentPage: page,
+    totalPages: Math.ceil(totalCardsCount / pageSize),
+    cards: shopCards.map((shopCard) => ({
+      ...shopCard,
+      isSoldOut: shopCard.remainingCount === 0,
+    })),
+  };
 };
 
 export default {
