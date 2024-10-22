@@ -319,12 +319,20 @@ const getAllShop = async (
   page,
   pageSize
 ) => {
-  const { cards } = await shopRepository.getAllShop(
+  //테이블 전체 카운트
+  const { cards, totalCards } = await shopRepository.getAllShop(
     filters,
     sortOrder,
     page,
     pageSize
   );
+
+  let hasMore = null;
+  if (totalCards > page * pageSize) {
+    hasMore = true;
+  } else {
+    hasMore = false;
+  }
 
   // 검색에 해당하는 포토카드 찾을 수 없을 때
   if (cards.length === 0) {
@@ -333,6 +341,7 @@ const getAllShop = async (
 
   return cards.map((shopCard) => ({
     ...shopCard,
+    hasMore,
     isSoldOut: shopCard.remainingCount === 0,
   }));
 };
