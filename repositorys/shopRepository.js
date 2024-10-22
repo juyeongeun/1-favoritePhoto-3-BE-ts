@@ -127,10 +127,11 @@ const getAllShop = async (
     });
   }
 
+  // where 조건 설정, 조건이 없으면 모든 카드 반환
+  const where = whereConditions.length > 0 ? { AND: whereConditions } : {};
+
   const shopCards = await prismaClient.shop.findMany({
-    where: {
-      AND: whereConditions,
-    },
+    where,
     orderBy: {
       [sortOrder.split("_")[0]]: sortOrder.endsWith("_DESC") ? "desc" : "asc",
     },
