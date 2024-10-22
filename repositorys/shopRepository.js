@@ -52,11 +52,6 @@ const getShopById = async (shopId) => {
           description: true, // 카드 설명
         },
       },
-      exchange: {
-        include: {
-          card: true,
-        },
-      },
     },
   });
 };
@@ -168,6 +163,25 @@ const getAllShop = async (
   };
 };
 
+const getExchangeByShopId = async (shopId) => {
+  const shopDetails = await prismaClient.exchange.findMany({
+    where: { shopId: shopId },
+    include: {
+      user: { select: { id: true, nickname: true } },
+      card: {
+        select: {
+          name: true,
+          genre: true,
+          grade: true,
+          imageURL: true,
+          purchasePrice: true,
+        },
+      },
+    },
+  });
+  return shopDetails;
+};
+
 export default {
   getCheckCardById,
   createShopCard,
@@ -177,4 +191,5 @@ export default {
   deleteShopCard,
   updateCardRemainingCount,
   getAllShop,
+  getExchangeByShopId,
 };

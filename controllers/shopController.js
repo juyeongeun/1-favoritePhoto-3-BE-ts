@@ -121,4 +121,16 @@ router.delete(
   })
 );
 
+router.get(
+  "/cards/:shopId/exchange",
+  passport.authenticate("access-token", { session: false }),
+  asyncHandle(async (req, res) => {
+    const { shopId } = req.params;
+    const shopDetails = await shopService.getExchangeByShopId(
+      parseInt(shopId, 10)
+    );
+    return res.status(200).json(shopDetails);
+  })
+);
+
 export default router;
