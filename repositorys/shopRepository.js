@@ -51,11 +51,6 @@ const getShopById = async (shopId) => {
           imageURL: true, // 카드 이미지 URL
         },
       },
-      exchange: {
-        include: {
-          card: true,
-        },
-      },
     },
   });
 };
