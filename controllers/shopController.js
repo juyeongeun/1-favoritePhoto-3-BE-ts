@@ -45,7 +45,7 @@ router.get(
   asyncHandle(async (req, res) => {
     const {
       page = 1, // 페이지 번호
-      pageSize = 10, // 페이지당 포토카드 10개
+      pageSize = 10, // 페이지당 포토카드 10개 수
       search,
       grade,
       genre,

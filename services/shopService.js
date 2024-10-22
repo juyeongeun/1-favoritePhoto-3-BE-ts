@@ -316,10 +316,10 @@ const deleteShopCard = async (shopId, userId) => {
 const getAllShop = async (
   filters = {},
   sortOrder = "createAt_DESC",
-  page = 1,
-  pageSize = 10
+  page,
+  pageSize
 ) => {
-  const shopCards = await shopRepository.getAllShop(
+  const { cards } = await shopRepository.getAllShop(
     filters,
     sortOrder,
     page,
@@ -327,11 +327,11 @@ const getAllShop = async (
   );
 
   // 검색에 해당하는 포토카드 찾을 수 없을 때
-  if (shopCards.length === 0) {
+  if (cards.length === 0) {
     throw new Error("입력하신 조건에 맞는 카드를 찾을 수 없습니다.");
   }
 
-  return shopCards.map((shopCard) => ({
+  return cards.map((shopCard) => ({
     ...shopCard,
     isSoldOut: shopCard.remainingCount === 0,
   }));

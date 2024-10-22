@@ -51,6 +51,11 @@ const getShopById = async (shopId) => {
           imageURL: true, // 카드 이미지 URL
         },
       },
+      exchange: {
+        include: {
+          card: true,
+        },
+      },
     },
   });
 };
@@ -110,28 +115,24 @@ const getAllShop = async (
 ) => {
   const { search, grade, genre, isSoldOut } = filters;
 
-  const whereConditions = [];
-
-  if (search) {
-    whereConditions.push({ card: { name: { contains: search } } });
-  }
-  if (grade) {
-    whereConditions.push({ card: { grade } });
-  }
-  if (genre) {
-    whereConditions.push({ card: { genre } });
-  }
-  if (isSoldOut !== undefined) {
-    whereConditions.push({
+  // 기본 where 조건 객체 생성
+  const where = {
+    ...(search && { card: { name: { contains: search } } }),
+    ...(grade && { card: { grade } }),
+    ...(genre && { card: { genre } }),
+    ...(isSoldOut !== undefined && {
       remainingCount: isSoldOut === "true" ? 0 : { gt: 0 },
-    });
-  }
+    }),
+  };
 
-  // where 조건 설정, 조건이 없으면 모든 카드 반환
-  const where = whereConditions.length > 0 ? { AND: whereConditions } : {};
+  // 전체 상점 카드 수를 조회
+  const totalCardsCount = await prismaClient.shop.count({
+    where: Object.keys(where).length > 0 ? where : {},
+  });
 
+  // 페이지네이션에 따라 카드 조회
   const shopCards = await prismaClient.shop.findMany({
-    where,
+    where: Object.keys(where).length > 0 ? where : {}, // 필터링 조건에 따라 카드 조회
     orderBy: {
       [sortOrder.split("_")[0]]: sortOrder.endsWith("_DESC") ? "desc" : "asc",
     },
@@ -154,10 +155,16 @@ const getAllShop = async (
     },
   });
 
-  return shopCards.map((shopCard) => ({
-    ...shopCard,
-    isSoldOut: shopCard.remainingCount === 0,
-  }));
+  // 현재 페이지의 카드 개수를 기준으로 반환
+  return {
+    totalCards: totalCardsCount,
+    currentPage: page,
+    totalPages: Math.ceil(totalCardsCount / pageSize),
+    cards: shopCards.map((shopCard) => ({
+      ...shopCard,
+      isSoldOut: shopCard.remainingCount === 0,
+    })),
+  };
 };
 
 export default {
