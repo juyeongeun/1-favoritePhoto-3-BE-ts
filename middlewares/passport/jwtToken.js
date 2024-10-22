@@ -3,56 +3,52 @@ import userService from "../../services/userService.js";
 import { JWT_SECRET } from "../../env.js";
 
 const accessExtractor = function (req) {
-  var token = null;
   const cookieString = req.headers.cookie;
-  if (!cookieString || !cookieString.startsWith("access-token=")) {
+  const accessToken = "";
+  if (cookieString) {
+    accessToken = cookieString
+      .split("; ")
+      .find((cookie) => cookie.startsWith("access-token="))
+      .split("=")[1];
+  }
+
+  if (!cookieString || !accessToken) {
     const error = new Error("Unauthorized");
     error.status = 401;
     error.data = {
       message: "유효하지 않은 액세스 토큰입니다.",
       // requestURL: req.originalUrl,
-      "access-token": cookieString.startsWith("access-token="),
+      "access-token": accessToken,
     };
     throw error;
   }
-  const accessToken = cookieString
-    .split("; ")
-    .find((cookie) => cookie.startsWith("access-token="))
-    .split("=")[1];
 
-  if (req && accessToken) {
-    token = accessToken;
-  } else {
-    token = req.headers.authorization;
-  }
   // console.log("엑세스" + token);
-  return token;
+  return accessToken;
 };
 
 const refreshExtractor = function (req) {
   var token = null;
   const cookieString = req.headers.cookie;
-  if (!cookieString || !cookieString.startsWith("refresh-token=")) {
+  const refreshToken = "";
+  if (cookieString) {
+    refreshToken = cookieString
+      .split("; ")
+      .find((cookie) => cookie.startsWith("refresh-token="))
+      .split("=")[1];
+  }
+  if (!cookieString || !refreshToken) {
     const error = new Error("Forbidden");
     error.status = 403;
     error.data = {
       message: "유효하지 않은 리플레쉬 토큰입니다.",
       // requestURL: req.originalUrl,
-      "refresh-token": cookieString.startsWith("refresh-token="),
+      "refresh-token": refreshToken,
     };
     throw error;
   }
-  const refreshToken = cookieString
-    .split("; ")
-    .find((cookie) => cookie.startsWith("refresh-token="))
-    .split("=")[1];
-  if (req && refreshToken) {
-    token = refreshToken;
-  } else {
-    token = req.headers.refreshtoken;
-  }
   // console.log("리프레쉬" + token);
-  return token;
+  return refreshToken;
 };
 
 const accessTokenOptions = {
