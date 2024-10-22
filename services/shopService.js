@@ -328,6 +328,11 @@ const getAllShop = async (filters = {}, sortOrder = "createAt_DESC") => {
   }));
 };
 
+const getExchangeByShopId = async (shopId) => {
+  const shopDetails = await shopRepository.getExchangeByShopId(shopId);
+  return shopDetails;
+};
+
 export default {
   createShopCard,
   getShopByShopId,
@@ -335,4 +340,5 @@ export default {
   updateShopCard,
   deleteShopCard,
   getAllShop,
+  getExchangeByShopId,
 };
