@@ -338,12 +338,15 @@ const getAllShop = async (
   if (cards.length === 0) {
     throw new Error("입력하신 조건에 맞는 카드를 찾을 수 없습니다.");
   }
+  const returnData = {};
 
-  return cards.map((shopCard) => ({
+  returnData.list = cards.map((shopCard) => ({
     ...shopCard,
-    hasMore,
     isSoldOut: shopCard.remainingCount === 0,
   }));
+  returnData.hasMore = hasMore;
+
+  return returnData;
 };
 
 const getExchangeByShopId = async (shopId) => {
