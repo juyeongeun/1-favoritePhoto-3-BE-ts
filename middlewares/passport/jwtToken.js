@@ -6,10 +6,12 @@ const accessExtractor = function (req) {
   const cookieString = req.headers.cookie;
   let accessToken = "";
   if (cookieString) {
-    accessToken = cookieString
-      .split("; ")
-      .find((cookie) => cookie.startsWith("access-token="))
-      .split("=")[1];
+    if (cookieString.startsWith("access-token=")) {
+      accessToken = cookieString
+        .split("; ")
+        .find((cookie) => cookie.startsWith("access-token="))
+        .split("=")[1];
+    }
   }
 
   if (!cookieString || !accessToken) {
