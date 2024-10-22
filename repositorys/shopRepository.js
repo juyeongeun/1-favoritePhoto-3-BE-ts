@@ -102,6 +102,8 @@ const deleteShopCard = async (shopId, userId) => {
   });
 };
 
+//전체 카운트
+
 /* 모든 상점 카드 조회 */
 const getAllShop = async (
   filters = {},
