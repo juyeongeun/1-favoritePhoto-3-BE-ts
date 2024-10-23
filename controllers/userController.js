@@ -6,6 +6,7 @@ import cookiesConfig from "../config/cookiesConfig.js";
 import passport from "../config/passportConfig.js";
 import exchangeService from "../services/exchangeService.js";
 import cardService from "../services/cardService.js";
+import shopService from "../services/shopService.js";
 
 const router = express.Router();
 
@@ -288,6 +289,21 @@ router.get(
     } catch (error) {
       next(error);
     }
+  })
+);
+
+// 판매중인 포토 카드 상세 조회 사용자 교환신청 조회 (구매쟈)
+router.get(
+  "/:shopId/exchange",
+  passport.authenticate("access-token", { session: false }),
+  asyncHandle(async (req, res) => {
+    const { shopId } = req.params;
+    const { id: userId } = req.user;
+    const cardDetailsExchanges = await shopService.getExchangeByUserId(
+      parseInt(shopId),
+      parseInt(userId)
+    );
+    return res.status(200).json(cardDetailsExchanges);
   })
 );
 
