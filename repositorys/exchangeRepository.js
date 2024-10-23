@@ -178,6 +178,21 @@ const getByShopId = async (id) => {
   });
 };
 
+const getByShopIdAndUser = async ({ shopId, userId }) => {
+  return prismaClient.exchange.findMany({
+    where: {
+      shopId,
+      userId,
+    },
+    include: {
+      user: {
+        select: { nickname: true },
+      },
+      card: true,
+    },
+  });
+};
+
 const acceptExchange = async (exchange) => {
   const { price, card, userId: ownerId } = exchange.shop;
   const { card: exchangeCard } = exchange;
@@ -226,5 +241,6 @@ export default {
   getById,
   getByShopId,
   getByUserId,
+  getByShopIdAndUser,
   acceptExchange,
 };
