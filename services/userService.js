@@ -200,6 +200,7 @@ const create = async (data) => {
     error.data = {
       message: "사용중인 이메일입니다.",
       email: userByEmail.email,
+      column: "email",
     };
     throw error;
   }
@@ -211,6 +212,7 @@ const create = async (data) => {
     error.data = {
       message: "사용중인 닉네임입니다.",
       nickname: userByNickname.nickname,
+      column: "nickname",
     };
     throw error;
   }

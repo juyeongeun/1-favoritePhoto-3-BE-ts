@@ -1,4 +1,5 @@
 import shopRepository from "../repositorys/shopRepository.js";
+import exChangeRepository from "../repositorys/exchangeRepository.js";
 import prismaClient from "../utils/prismaClient.js";
 import createNotificationFromType from "../utils/notification/createByType.js"; // 알림 생성 유틸리티 임포트
 
@@ -113,6 +114,22 @@ const getShopByShopId = async (shopId) => {
   return {
     ...shopDetails,
   };
+};
+
+const getExchangeByUserId = async (shopId, userId) => {
+  const exchange = await exChangeRepository.getByShopIdAndUser({
+    shopId,
+    userId,
+  });
+
+  if (!exchange) {
+    const error = new Error("Not Found");
+    error.status = 404;
+    error.message = "신청한 교환 내역을 찾을 수 없습니다.";
+    throw error;
+  }
+
+  return exchange;
 };
 
 const getByUserId = async (userId, data) => {
@@ -362,4 +379,5 @@ export default {
   deleteShopCard,
   getAllShop,
   getExchangeByShopId,
+  getExchangeByUserId,
 };
