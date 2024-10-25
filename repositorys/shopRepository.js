@@ -105,7 +105,7 @@ const deleteShopCard = async (shopId, userId) => {
 //전체 카운트
 
 /* 모든 상점 카드 조회 */
-const getAllShop = async (
+const getAllShopCards = async (
   filters = {},
   sortOrder = "createAt_DESC",
   page = 1, // 페이지 번호
@@ -115,25 +115,32 @@ const getAllShop = async (
 
   // 기본 where 조건 객체 생성
   const where = {
-    ...(search && { card: { name: { contains: search } } }),
-    ...(grade && { card: { grade } }),
-    ...(genre && { card: { genre } }),
-    ...(isSoldOut !== undefined && {
-      remainingCount: isSoldOut === "true" ? 0 : { gt: 0 },
-    }),
+    AND: [
+      ...(search ? [{ card: { name: { contains: search } } }] : []),
+      ...(grade ? [{ card: { grade } }] : []),
+      ...(genre ? [{ card: { genre } }] : []),
+      ...(isSoldOut !== undefined
+        ? [
+            {
+              remainingCount: isSoldOut === "true" ? 0 : { gt: 0 },
+            },
+          ]
+        : []),
+    ],
   };
 
   // 전체 상점 카드 수를 조회
-  const totalCardsCount = await prismaClient.shop.count({
-    where: Object.keys(where).length > 0 ? where : {},
-  });
+  const totalCardsCount = await prismaClient.shop.count({ where });
 
   // 페이지네이션에 따라 카드 조회
   const shopCards = await prismaClient.shop.findMany({
-    where: Object.keys(where).length > 0 ? where : {}, // 필터링 조건에 따라 카드 조회
-    orderBy: {
-      [sortOrder.split("_")[0]]: sortOrder.endsWith("_DESC") ? "desc" : "asc",
-    },
+    where,
+    orderBy: [
+      ...(sortOrder === "price_DESC" ? [{ price: "desc" }] : []),
+      ...(sortOrder === "price_ASC" ? [{ price: "asc" }] : []),
+      ...(sortOrder === "createAt_DESC" ? [{ createAt: "desc" }] : []),
+      ...(sortOrder === "createAt_ASC" ? [{ createAt: "asc" }] : []),
+    ],
     take: pageSize, // 페이지당 가져올 데이터 수
     skip: (page - 1) * pageSize, // 페이지에 따라 건너뛰기
     include: {
@@ -192,6 +199,6 @@ export default {
   updateShopCard,
   deleteShopCard,
   updateCardRemainingCount,
-  getAllShop,
+  getAllShopCards,
   getExchangeByShopId,
 };
