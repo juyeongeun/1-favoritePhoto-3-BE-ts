@@ -337,7 +337,7 @@ const getAllShop = async (
   pageSize
 ) => {
   //테이블 전체 카운트
-  const { cards, totalCards } = await shopRepository.getAllShop(
+  const { cards, totalCards } = await shopRepository.getAllShopCards(
     filters,
     sortOrder,
     page,
