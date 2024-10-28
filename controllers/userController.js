@@ -7,6 +7,8 @@ import passport from "../config/passportConfig.js";
 import exchangeService from "../services/exchangeService.js";
 import cardService from "../services/cardService.js";
 import shopService from "../services/shopService.js";
+import { userSockets } from "../utils/socket/socket.js";
+import { io } from "../app.js";
 
 const router = express.Router();
 
@@ -309,6 +311,25 @@ router.get(
       parseInt(userId)
     );
     return res.status(200).json(cardDetailsExchanges);
+  })
+);
+
+router.post(
+  "/socket",
+  asyncHandle(async (req, res, next) => {
+    console.log("소켓 엔드포인트 인");
+    console.log(userSockets);
+    const { userId } = req.body;
+    console.log(userId);
+    const socketId = userSockets[userId];
+    if (socketId) {
+      io.to(socketId).emit("message", {
+        content: "서버에서 메시지를 보냅니다",
+      });
+      console.log(`Message sent to user ${userId}: 서버에서 메시지를 보냅니다`);
+    } else {
+      console.log(`User ${userId} is not connected.`);
+    }
   })
 );
 
