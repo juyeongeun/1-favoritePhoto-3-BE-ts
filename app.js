@@ -9,6 +9,9 @@ import purchaseRouter from "./controllers/purchaseController.js";
 import notificationRouter from "./controllers/notificationController.js";
 import exchangeRouter from "./controllers/exchangeController.js";
 import pointRouter from "./controllers/pointController.js";
+import { Server } from "socket.io";
+import http from "http";
+import { setupSocket } from "./utils/socket/socket.js";
 
 const app = express();
 app.use(express.json());
@@ -16,7 +19,10 @@ const allowedOrigins = [
   "http://localhost:3000",
   "https://localhost:3000",
   "https://willowy-gingersnap-13564c.netlify.app",
+  "https://favorite-photo-3.netlify.app/",
 ];
+
+const server = http.createServer(app);
 
 app.use(
   cors({
@@ -41,6 +47,14 @@ app.use("/exchange", exchangeRouter);
 app.use("/notifications", notificationRouter);
 app.use("/point", pointRouter);
 
+// socket.io 초기화
+export const io = new Server(server, {
+  cors: { origin: "http://localhost:3000" },
+});
+
+// socket.js에 io 객체 전달
+setupSocket(io);
+
 app.use(errorHandler);
 
-app.listen(PORT || 3000, () => console.log("SERVER START"));
+server.listen(PORT || 3000, () => console.log("SERVER START"));
