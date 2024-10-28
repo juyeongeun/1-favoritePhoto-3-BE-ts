@@ -15,7 +15,7 @@ router.post(
   cardValidation,
   asyncHandle(async (req, res, next) => {
     try {
-      const { name, grade, genre, description, totalCount } = req.body;
+      const { name, grade, genre, description, totalCount, price } = req.body;
       const userId = req.user?.id || "";
       const imageURL = req.file ? req.file.location : "";
       if (!imageURL) {
@@ -32,6 +32,7 @@ router.post(
         totalCount: parseInt(totalCount),
         remainingCount: parseInt(totalCount),
         imageURL,
+        purchasePrice: parseInt(price),
         userId: parseInt(userId),
       });
 
