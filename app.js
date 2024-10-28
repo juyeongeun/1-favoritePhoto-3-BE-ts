@@ -24,20 +24,29 @@ const allowedOrigins = [
 
 const server = http.createServer(app);
 
-app.use(
-  cors({
-    credentials: true,
-    origin: function (origin, callback) {
-      // origin이 undefined이면 (로컬 개발 환경에서 Postman 사용 시)
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, origin); // 허용
-      } else {
-        callback(new Error("Not allowed by CORS")); // 허용하지 않음
-      }
-    },
-    exposedHeaders: ["set-cookie"],
-  })
-);
+// CORS 설정
+const corsOptions = {
+  credentials: true,
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, origin); // 허용
+    } else {
+      callback(new Error("Not allowed by CORS")); // 허용하지 않음
+    }
+  },
+  exposedHeaders: ["set-cookie"],
+};
+
+// Express app에 CORS 적용
+app.use(cors(corsOptions));
+
+// Socket.IO 초기화 및 CORS 설정 적용
+const io = new Server(server, {
+  cors: {
+    origin: corsOptions.origin,
+    credentials: corsOptions.credentials,
+  },
+});
 
 app.use("/users", userRouter); // 2개여서 1개 삭제함
 app.use("/shop", shopRouter);
@@ -46,11 +55,6 @@ app.use("/purchases", purchaseRouter);
 app.use("/exchange", exchangeRouter);
 app.use("/notifications", notificationRouter);
 app.use("/point", pointRouter);
-
-// socket.io 초기화
-export const io = new Server(server, {
-  cors: { origin: "http://localhost:3000" },
-});
 
 // socket.js에 io 객체 전달
 setupSocket(io);
