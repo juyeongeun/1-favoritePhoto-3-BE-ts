@@ -41,7 +41,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // Socket.IO 초기화 및 CORS 설정 적용
-const io = new Server(server, {
+export const io = new Server(server, {
   cors: {
     origin: corsOptions.origin,
     credentials: corsOptions.credentials,
