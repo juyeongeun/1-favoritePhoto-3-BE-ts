@@ -19,7 +19,7 @@ const allowedOrigins = [
   "http://localhost:3000",
   "https://localhost:3000",
   "https://willowy-gingersnap-13564c.netlify.app",
-  "https://favorite-photo-3.netlify.app/",
+  "https://favorite-photo-3.netlify.app",
 ];
 
 const server = http.createServer(app);
@@ -61,4 +61,4 @@ setupSocket(io);
 
 app.use(errorHandler);
 
-app.listen(PORT || 3000, () => console.log("SERVER START"));
+server.listen(PORT || 3000, () => console.log("SERVER START"));
