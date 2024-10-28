@@ -206,12 +206,17 @@ router.get(
   asyncHandle(async (req, res, next) => {
     try {
       const { id: userId } = req.user;
+      //페이지네이션
       const { keyword = "", limit = 10, cursor = "" } = req.query;
+      //정렬기준
+      const { genre = "", grade = "" } = req.query;
 
       const cards = await cardService.getByUserId(userId, {
         keyword,
         limit: parseInt(limit),
         cursor: parseInt(cursor),
+        genre,
+        grade: grade.toUpperCase(),
       });
 
       res.status(200).send(cards);
