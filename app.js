@@ -61,4 +61,4 @@ setupSocket(io);
 
 app.use(errorHandler);
 
-server.listen(PORT || 3000, () => console.log("SERVER START"));
+app.listen(PORT || 3000, () => console.log("SERVER START"));
