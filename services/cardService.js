@@ -1,6 +1,6 @@
 import cardRepository from "../repositorys/cardRepository.js";
 
-const whereConditions = (userId, keyword) => {
+const whereConditions = (userId, { keyword, genre, grade }) => {
   const where = { userId };
   if (keyword) {
     where.OR = [
@@ -9,13 +9,19 @@ const whereConditions = (userId, keyword) => {
       },
     ];
   }
+  if (genre) {
+    where.genre = genre;
+  }
+  if (grade) {
+    where.grade = grade;
+  }
   return where;
 };
 
 //나의 카드조회
 const getByUserId = async (userId, data) => {
-  const { limit, cursor, keyword } = data;
-  const where = whereConditions(userId, keyword);
+  const { limit, cursor, keyword, genre, grade } = data;
+  const where = whereConditions(userId, { keyword, genre, grade });
   const cards = await cardRepository.getByUserId({
     where,
     limit,
