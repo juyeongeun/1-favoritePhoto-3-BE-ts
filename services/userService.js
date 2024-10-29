@@ -155,11 +155,13 @@ const getMySales = async (userId, data) => {
     let salesType = null;
     let isSoldOut = false;
 
-    if (item.shop.length > 0) {
-      salesType = "sales";
+    if (item.shop.length > 0 && item.exchange.length > 0) {
+      salesType = "sales/exchange";
       isSoldOut = item.shop.some((shop) => shop.remainingCount <= 0);
     } else if (item.exchange.length > 0) {
       salesType = "exchange";
+    } else {
+      salesType = "sales";
     }
 
     return {
