@@ -15,10 +15,19 @@ const getMySales = (data) => {
       },
       shop: {
         select: {
+          id: true,
+          cardId: true,
           remainingCount: true,
         },
       },
-      exchange: true,
+      exchange: {
+        select: {
+          id: true,
+          count: true,
+          shopId: true,
+          cardId: true,
+        },
+      },
     },
   });
 };

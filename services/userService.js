@@ -22,33 +22,30 @@ const whereConditions = ({
     where.grade = grade;
   }
   let salesTypeWhere = { ...where };
-  if (isSoldOut === "true") {
-    salesTypeWhere.shop = {
-      some: {
-        userId,
-        remainingCount: {
-          lte: 0, // remainingCount가 0 이하인 경우
-        },
-      },
-    };
-  } else {
-    switch (salesType) {
-      case "sales":
+  switch (salesType) {
+    case "sales":
+      if (isSoldOut !== "true") {
         salesTypeWhere.shop = {
           some: {}, // Shop과 관계가 있는 카드
         };
-        break;
-      case "exchange":
-        salesTypeWhere.exchange = {
-          some: {}, // Exchange와 관계가 있는 카드
+      } else {
+        salesTypeWhere.shop = {
+          some: {
+            remainingCount: {
+              lte: 0, // remainingCount가 0 이하인 경우
+            },
+          }, // Shop과 관계가 있는 카드
         };
-        break;
-      default:
-        salesTypeWhere.OR = [
-          { shop: { some: {} } },
-          { exchange: { some: {} } },
-        ];
-    }
+      }
+
+      break;
+    case "exchange":
+      salesTypeWhere.exchange = {
+        some: {}, // Exchange와 관계가 있는 카드
+      };
+      break;
+    default:
+      salesTypeWhere.OR = [{ shop: { some: {} } }, { exchange: { some: {} } }];
   }
   return salesTypeWhere;
 };
