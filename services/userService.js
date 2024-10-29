@@ -22,33 +22,30 @@ const whereConditions = ({
     where.grade = grade;
   }
   let salesTypeWhere = { ...where };
-  if (isSoldOut === "true") {
-    salesTypeWhere.shop = {
-      some: {
-        userId,
-        remainingCount: {
-          lte: 0, // remainingCount가 0 이하인 경우
-        },
-      },
-    };
-  } else {
-    switch (salesType) {
-      case "sales":
+  switch (salesType) {
+    case "sales":
+      if (isSoldOut !== "true") {
         salesTypeWhere.shop = {
           some: {}, // Shop과 관계가 있는 카드
         };
-        break;
-      case "exchange":
-        salesTypeWhere.exchange = {
-          some: {}, // Exchange와 관계가 있는 카드
+      } else {
+        salesTypeWhere.shop = {
+          some: {
+            remainingCount: {
+              lte: 0, // remainingCount가 0 이하인 경우
+            },
+          }, // Shop과 관계가 있는 카드
         };
-        break;
-      default:
-        salesTypeWhere.OR = [
-          { shop: { some: {} } },
-          { exchange: { some: {} } },
-        ];
-    }
+      }
+
+      break;
+    case "exchange":
+      salesTypeWhere.exchange = {
+        some: {}, // Exchange와 관계가 있는 카드
+      };
+      break;
+    default:
+      salesTypeWhere.OR = [{ shop: { some: {} } }, { exchange: { some: {} } }];
   }
   return salesTypeWhere;
 };
@@ -158,11 +155,13 @@ const getMySales = async (userId, data) => {
     let salesType = null;
     let isSoldOut = false;
 
-    if (item.shop.length > 0) {
-      salesType = "sales";
+    if (item.shop.length > 0 && item.exchange.length > 0) {
+      salesType = "sales/exchange";
       isSoldOut = item.shop.some((shop) => shop.remainingCount <= 0);
     } else if (item.exchange.length > 0) {
       salesType = "exchange";
+    } else {
+      salesType = "sales";
     }
 
     return {
@@ -176,6 +175,23 @@ const getMySales = async (userId, data) => {
     list: returnSales.slice(0, limit),
     nextCursor,
   };
+};
+
+const getMySalesCount = async (userId) => {
+  const where = whereConditions({
+    userId,
+  });
+  const sales = await userRepository.getMySalesCount({ where, userId });
+  if (!sales) {
+    const error = new Error("Mot found");
+    error.status = 404;
+    error.data = {
+      message: "나의 판매목록을 찾을 수 없습니다.",
+    };
+    throw error;
+  }
+
+  return sales;
 };
 
 const getByUserCardsCount = async (userId) => {
@@ -268,6 +284,7 @@ export default {
   getUserById,
   getUserByNickname,
   getMySales,
+  getMySalesCount,
   refreshToken,
   getByUserCardsCount,
   create,

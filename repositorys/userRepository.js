@@ -15,12 +15,96 @@ const getMySales = (data) => {
       },
       shop: {
         select: {
+          id: true,
+          cardId: true,
           remainingCount: true,
         },
       },
-      exchange: true,
+      exchange: {
+        select: {
+          id: true,
+          count: true,
+          shopId: true,
+          cardId: true,
+        },
+      },
     },
   });
+};
+
+const getMySalesCount = async (data) => {
+  const { where, userId } = data;
+  //각 등급의 수를 그룹화
+  const gradeCountsPromise = await prismaClient.card.groupBy({
+    where,
+    by: ["grade"],
+    _count: {
+      id: true,
+    },
+  });
+
+  //각 장르의 수를 그룹화
+  const genreCountsPromise = await prismaClient.card.groupBy({
+    where,
+    by: ["genre"],
+    _count: {
+      id: true,
+    },
+  });
+
+  //각 판매방법의 수를 그룹화
+  const exchangeTypeCountsPromise = await prismaClient.exchange.count({
+    where: {
+      userId,
+    },
+  });
+  const shopTypeCountsPromise = await prismaClient.shop.count({
+    where: {
+      userId,
+    },
+  });
+  const shopTypeSoldOutCountsPromise = await prismaClient.shop.count({
+    where: {
+      userId,
+      remainingCount: {
+        lte: 0, // remainingCount가 0 이하인 경우
+      },
+    },
+  });
+
+  const [gradeCounts, genreCounts, exchangeCounts, shopCounts, isSoldOut] =
+    await Promise.all([
+      gradeCountsPromise,
+      genreCountsPromise,
+      exchangeTypeCountsPromise,
+      shopTypeCountsPromise,
+      shopTypeSoldOutCountsPromise,
+    ]);
+
+  // 그룹화한 등금을 원하는 JSON 형태로 변환
+  const formattedGradeCounts = gradeCounts.reduce((acc, curr) => {
+    acc[curr.grade] = curr._count.id;
+    return acc;
+  }, {});
+
+  // 그룹화한 장르을 원하는 JSON 형태로 변환
+  const formattedGenreCounts = genreCounts.reduce((acc, curr) => {
+    acc[curr.genre] = curr._count.id;
+    return acc;
+  }, {});
+
+  return {
+    totalCount: shopCounts + exchangeCounts,
+    gradeCount: formattedGradeCounts,
+    genreCount: formattedGenreCounts,
+    typeCount: {
+      shop: {
+        count: shopCounts,
+        isSoldOut,
+      },
+      exchange: exchangeCounts,
+    },
+  };
 };
 
 const getMyCardCount = async (userId) => {
@@ -45,9 +129,27 @@ const getMyCardCount = async (userId) => {
     acc[curr.grade] = curr._count.id;
     return acc;
   }, {});
+
+  //각 장르의 수를 그룹화
+  const genreCounts = await prismaClient.card.groupBy({
+    where: {
+      userId,
+    },
+    by: ["genre"],
+    _count: {
+      id: true,
+    },
+  });
+  // 그룹화한 장르을 원하는 JSON 형태로 변환
+  const formattedGenreCounts = genreCounts.reduce((acc, curr) => {
+    acc[curr.genre] = curr._count.id;
+    return acc;
+  }, {});
+
   return {
     totalCount,
-    formattedGradeCounts,
+    gradeCount: formattedGradeCounts,
+    genreCount: formattedGenreCounts,
   };
 };
 
@@ -103,6 +205,7 @@ const deleteUser = (id) => {
 
 export default {
   getMySales,
+  getMySalesCount,
   getByEmail,
   getByNickname,
   getMyCardCount,
