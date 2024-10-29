@@ -371,6 +371,80 @@ const getExchangeByShopId = async (shopId) => {
   return shopDetails;
 };
 
+/* 필터별 카드 개수 조회 */
+/* 필터별 카드 개수 조회 */
+const getFilterCounts = async (filters = {}) => {
+  const { grade, genre, isSoldOut } = filters;
+
+  // 기본 where 조건 객체 생성
+  const where = {
+    AND: [
+      ...(isSoldOut !== undefined
+        ? [
+            {
+              remainingCount: isSoldOut === "true" ? 0 : { gt: 0 },
+            },
+          ]
+        : []),
+    ],
+  };
+
+  // 전체 카드 개수
+  const totalCardsCount = await prismaClient.shop.count({ where });
+
+  // 장르별 카드 개수
+  const genreCounts = await prismaClient.shop.findMany({
+    where,
+    include: {
+      card: {
+        select: {
+          genre: true,
+        },
+      },
+    },
+  });
+
+  // 등급별 카드 개수
+  const gradeCounts = await prismaClient.shop.findMany({
+    where,
+    include: {
+      card: {
+        select: {
+          grade: true,
+        },
+      },
+    },
+  });
+
+  // 매진 여부별 카드 개수
+  const soldOutCount = await prismaClient.shop.count({
+    where: {
+      ...where,
+      remainingCount: 0,
+    },
+  });
+
+  // 결과 처리
+  const gradeCount = gradeCounts.reduce((acc, item) => {
+    const grade = item.card.grade;
+    acc[grade] = (acc[grade] || 0) + 1; // 카운트 1씩 증가
+    return acc;
+  }, {});
+
+  const genreCount = genreCounts.reduce((acc, item) => {
+    const genre = item.card.genre;
+    acc[genre] = (acc[genre] || 0) + 1; // 카운트 1씩 증가
+    return acc;
+  }, {});
+
+  return {
+    totalCount: totalCardsCount,
+    gradeCount,
+    genreCount,
+    soldOutCount,
+  };
+};
+
 export default {
   createShopCard,
   getShopByShopId,
@@ -380,4 +454,5 @@ export default {
   getAllShop,
   getExchangeByShopId,
   getExchangeByUserId,
+  getFilterCounts,
 };
