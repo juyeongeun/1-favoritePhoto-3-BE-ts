@@ -371,6 +371,54 @@ const getExchangeByShopId = async (shopId) => {
   return shopDetails;
 };
 
+/* 필터별 카드 개수 조회 */
+const getFilterCounts = async (filters = {}) => {
+  const { grade, genre, isSoldOut } = filters;
+
+  // 기본 where 조건 객체 생성
+  const where = {
+    AND: [
+      ...(grade ? [{ card: { grade } }] : []),
+      ...(genre ? [{ card: { genre } }] : []),
+      ...(isSoldOut !== undefined
+        ? [
+            {
+              remainingCount: isSoldOut === "true" ? 0 : { gt: 0 },
+            },
+          ]
+        : []),
+    ],
+  };
+
+  // 전체 카드 개수
+  const totalCardsCount = await prismaClient.shop.count({ where });
+
+  // 필터별 카드 개수
+  const gradeCount = await prismaClient.shop.count({
+    where: { card: { grade } },
+  });
+
+  const genreCount = await prismaClient.shop.count({
+    where: { card: { genre } },
+  });
+
+  const soldOutCount = await prismaClient.shop.count({
+    where: { remainingCount: 0 },
+  });
+
+  const availableCount = await prismaClient.shop.count({
+    where: { remainingCount: { gt: 0 } },
+  });
+
+  return {
+    totalCardsCount,
+    gradeCount,
+    genreCount,
+    soldOutCount,
+    availableCount,
+  };
+};
+
 export default {
   createShopCard,
   getShopByShopId,
@@ -380,4 +428,5 @@ export default {
   getAllShop,
   getExchangeByShopId,
   getExchangeByUserId,
+  getFilterCounts,
 };

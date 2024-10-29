@@ -133,4 +133,20 @@ router.get(
   })
 );
 
+// 필터별 카드 개수 조회 API
+router.get(
+  "/counts",
+  asyncHandle(async (req, res) => {
+    const { grade, genre, isSoldOut } = req.query;
+
+    const counts = await shopService.getFilterCounts({
+      grade,
+      genre,
+      isSoldOut,
+    });
+
+    return res.status(200).json(counts);
+  })
+);
+
 export default router;
