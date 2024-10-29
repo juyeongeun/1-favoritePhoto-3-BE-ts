@@ -299,6 +299,23 @@ router.get(
   })
 );
 
+//내가 판매중인 상품/교환 목록조회
+router.get(
+  "/my-sales-count",
+  passport.authenticate("access-token", { session: false }),
+  asyncHandle(async (req, res, next) => {
+    try {
+      const { id: userId } = req.user;
+
+      const counts = await userService.getMySalesCount(userId);
+
+      res.status(200).send(counts);
+    } catch (error) {
+      next(error);
+    }
+  })
+);
+
 // 판매중인 포토 카드 상세 조회 사용자 교환신청 조회 (구매쟈)
 router.get(
   "/:shopId/exchange",

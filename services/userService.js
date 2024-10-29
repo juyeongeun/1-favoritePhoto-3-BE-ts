@@ -178,6 +178,23 @@ const getMySales = async (userId, data) => {
   };
 };
 
+const getMySalesCount = async (userId) => {
+  const where = whereConditions({
+    userId,
+  });
+  const sales = await userRepository.getMySalesCount({ where, userId });
+  if (!sales) {
+    const error = new Error("Mot found");
+    error.status = 404;
+    error.data = {
+      message: "나의 판매목록을 찾을 수 없습니다.",
+    };
+    throw error;
+  }
+
+  return sales;
+};
+
 const getByUserCardsCount = async (userId) => {
   const userCardCount = await userRepository.getMyCardCount(userId);
   if (!userCardCount) {
@@ -268,6 +285,7 @@ export default {
   getUserById,
   getUserByNickname,
   getMySales,
+  getMySalesCount,
   refreshToken,
   getByUserCardsCount,
   create,
