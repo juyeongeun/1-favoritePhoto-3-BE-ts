@@ -22,11 +22,16 @@ const whereConditions = ({
     where.grade = grade;
   }
   let salesTypeWhere = { ...where };
+
   switch (salesType) {
     case "sales":
       if (isSoldOut !== "true") {
         salesTypeWhere.shop = {
-          some: {}, // Shop과 관계가 있는 카드
+          some: {
+            remainingCount: {
+              gt: 0, // remainingCount가 0 이상인 경우
+            },
+          }, // Shop과 관계가 있는 카드
         };
       } else {
         salesTypeWhere.shop = {
@@ -45,7 +50,18 @@ const whereConditions = ({
       };
       break;
     default:
-      salesTypeWhere.OR = [{ shop: { some: {} } }, { exchange: { some: {} } }];
+      salesTypeWhere.OR = [
+        {
+          shop: {
+            some: {},
+          },
+        },
+        {
+          exchange: {
+            some: {},
+          },
+        },
+      ];
   }
   return salesTypeWhere;
 };
@@ -160,8 +176,9 @@ const getMySales = async (userId, data) => {
       isSoldOut = item.shop.some((shop) => shop.remainingCount <= 0);
     } else if (item.exchange.length > 0) {
       salesType = "exchange";
-    } else {
+    } else if (item.shop.length > 0) {
       salesType = "sales";
+      isSoldOut = item.shop.some((shop) => shop.remainingCount <= 0);
     }
 
     return {
