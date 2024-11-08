@@ -1,6 +1,6 @@
 import purchaseRepository from "../repositorys/purchaseRepository.js";
-import createNotificationFromType from "../utils/notification/createByType.js";
-import prismaClient from "../utils/prismaClient.js";
+import createNotificationFromType from "../../utils/notification/createByType.js";
+import prismaClient from "../../utils/prismaClient.js";
 
 const createPurchase = async (buyerId, count, shopId) => {
   // 구매 및 상점 업데이트 처리
