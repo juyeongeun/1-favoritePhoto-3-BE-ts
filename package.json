@@ -2,6 +2,8 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.670.0",
     "@prisma/client": "^5.20.0",
+    "@types/dotenv": "^8.2.3",
+    "@types/express": "^5.0.0",
     "aws-sdk": "^2.1691.0",
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.6",
@@ -24,11 +26,11 @@
     "swagger-autogen": "^2.23.7"
   },
   "devDependencies": {
-    "ts-node": "^10.9.2",
-    "typescript": "^5.6.3",
     "nodemon": "^3.1.7",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3"
   },
   "type": "module",
   "scripts": {
