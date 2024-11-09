@@ -1,6 +1,29 @@
-import notificationRepository from "../../repositorys/notificationRepository.js";
+import notificationRepository from "../../repositorys/notificationRepository";
+import { Exchange, Shop, Purchase, User, Card } from "@prisma/client";
 
-const switchingType = (type, exchange) => {
+interface ShopData extends Shop {
+  user: User;
+  card: Card;
+}
+
+interface ExchangeData extends Exchange {
+  shop: ShopData
+  user: User
+}
+
+interface PurchaseData extends Purchase {
+  count:number;
+  card: Card;
+  consumer: User;
+}
+
+interface NotificationType {
+  exchange? : ExchangeData;
+  shop?: ShopData;
+  purchase: PurchaseData;
+}
+
+const switchingType = (type: number, exchange: ExchangeData) => {
   const { user: consumer, userId: consumerId, shop } = exchange;
 
   switch (type) {
@@ -38,7 +61,7 @@ const switchingType = (type, exchange) => {
 };
 
 /* 상점 관련 알림 */
-const switchingTypeForShop = (type, shop) => {
+const switchingTypeForShop = (type: number, shop: ShopData) => {
   const { userId, card } = shop; // userId는 판매자 ID, card는 카드 정보
 
   switch (type) {
@@ -63,7 +86,7 @@ const switchingTypeForShop = (type, shop) => {
   }
 };
 
-const switchingTypeForPurchase = (type, purchase) => {
+const switchingTypeForPurchase = (type: number, purchase: PurchaseData) => {
   switch (type) {
     case 7: // 포토카드 판매 완료시, 구매자에게
       return {
@@ -87,7 +110,7 @@ const switchingTypeForPurchase = (type, purchase) => {
 };
 
 /* 포인트 알림 */
-const createPointNotification = (userId, nickname, point) => {
+const createPointNotification = (userId: number, nickname: string, point: number) => {
   return {
     userId: userId, // 사용자의 ID
     type: "포인트획득",
@@ -95,7 +118,7 @@ const createPointNotification = (userId, nickname, point) => {
   };
 };
 
-const createNotificationFromType = async (type, data) => {
+const createNotificationFromType = async (type: number, data: NotificationType) => {
   try {
     var notificationData;
     if (data.exchange) {
@@ -104,8 +127,8 @@ const createNotificationFromType = async (type, data) => {
     } else if (data.shop) {
       // 상점 관련 알림 처리
       notificationData = switchingTypeForShop(type, data.shop);
-    } else if (type === "포인트획득") {
-      const { userId, nickname, point } = data;
+    } else if (type === 10) {
+      const { userId, nickname, point } = data as unknown as {userId:number; nickname:string; point:number}; //고민이 좀 필요함 맞지않는 타입을 형 변환 하고 있음
       notificationData = createPointNotification(userId, nickname, point);
     } else {
       notificationData = switchingTypeForPurchase(type, data.purchase);
@@ -115,7 +138,8 @@ const createNotificationFromType = async (type, data) => {
     );
 
     return notification;
-  } catch (error) {
+  } catch (e) {
+    const error: CustomError = new Error('Internal Server Error')
     error.status = 500;
     error.data = {
       message: "알림 생성에 실패 했습니다.",

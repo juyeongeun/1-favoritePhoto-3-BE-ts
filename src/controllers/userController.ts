@@ -1,13 +1,13 @@
 import express from "express";
-import userService from "../services/userService.js";
-import userValidation from "../middlewares/users/userValidation.js";
-import asyncHandle from "../utils/error/asyncHandle.js";
-import cookiesConfig from "../config/cookiesConfig.js";
-import passport from "../config/passportConfig.js";
-import exchangeService from "../services/exchangeService.js";
-import cardService from "../services/cardService.js";
-import shopService from "../services/shopService.js";
-import { userSockets } from "../utils/socket/socket.js";
+import userService from "../services/userService";
+import userValidation from "../middlewares/users/userValidation";
+import asyncHandle from "../utils/error/asyncHandle";
+import cookiesConfig from "../config/cookiesConfig";
+import passport from "../config/passportConfig";
+import exchangeService from "../services/exchangeService";
+import cardService from "../services/cardService";
+import shopService from "../services/shopService";
+import { userSockets } from "../utils/socket/socket";
 import { io } from "../app.js";
 
 const router = express.Router();

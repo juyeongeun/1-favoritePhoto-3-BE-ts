@@ -1,33 +1,31 @@
-import { PORT } from "./env.js";
+import { PORT } from "./env";
 import express from "express";
-import cors from "cors";
-import errorHandler from "./middlewares/error/errorHandler.js";
-import userRouter from "./controllers/userController.js";
-import shopRouter from "./controllers/shopController.js";
-import cardRouter from "./controllers/cardController.js";
-import purchaseRouter from "./controllers/purchaseController.js";
-import notificationRouter from "./controllers/notificationController.js";
-import exchangeRouter from "./controllers/exchangeController.js";
-import pointRouter from "./controllers/pointController.js";
+import cors, { CorsOptions } from "cors";
 import { Server } from "socket.io";
 import http from "http";
-import { setupSocket } from "./utils/socket/socket.js";
+import errorHandler from "./middlewares/error/errorHandler";
+import userRouter from "./controllers/userController"
+import shopRouter from "./controllers/shopController";
+import cardRouter from "./controllers/cardController";
+import purchaseRouter from "./controllers/purchaseController";
+import notificationRouter from "./controllers/notificationController";
+import exchangeRouter from "./controllers/exchangeController";
+import pointRouter from "./controllers/pointController";
+import { setupSocket } from "./utils/socket/socket";
 
 const app = express();
 app.use(express.json());
-const allowedOrigins = [
+
+const allowedOrigins:  string[] = [
   "http://localhost:3000",
   "https://localhost:3000",
   "https://willowy-gingersnap-13564c.netlify.app",
   "https://favorite-photo-3.netlify.app",
 ];
-
-const server = http.createServer(app);
-
 // CORS 설정
-const corsOptions = {
+const corsOptions: CorsOptions = {
   credentials: true,
-  origin: function (origin, callback) {
+  origin: function (origin: string | undefined, callback:(err: Error | null, origin?:string) => void) {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, origin); // 허용
     } else {
@@ -40,6 +38,8 @@ const corsOptions = {
 // Express app에 CORS 적용
 app.use(cors(corsOptions));
 
+const server = http.createServer(app);
+
 // Socket.IO 초기화 및 CORS 설정 적용
 export const io = new Server(server, {
   cors: {
@@ -48,7 +48,7 @@ export const io = new Server(server, {
   },
 });
 
-app.use("/users", userRouter); // 2개여서 1개 삭제함
+app.use("/users", userRouter);
 app.use("/shop", shopRouter);
 app.use("/cards", cardRouter);
 app.use("/purchases", purchaseRouter);
@@ -56,7 +56,7 @@ app.use("/exchange", exchangeRouter);
 app.use("/notifications", notificationRouter);
 app.use("/point", pointRouter);
 
-// socket.js에 io 객체 전달
+// socket.ts에 io 객체 전달
 setupSocket(io);
 
 app.use(errorHandler);
