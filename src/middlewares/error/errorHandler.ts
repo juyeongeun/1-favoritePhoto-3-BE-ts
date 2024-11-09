@@ -1,4 +1,6 @@
-function errorHandler(err, req, res, next) {
+import { ErrorRequestHandler, Response } from "express";
+
+const errorHandler: ErrorRequestHandler = (err: CustomError, req, res, next) => {
   const status = err.status ?? 500;
 
   const error = {
@@ -9,7 +11,7 @@ function errorHandler(err, req, res, next) {
     date: new Date(),
   };
   console.log(error);
-  return res.status(status).send(error);
+  res.status(status).send(error);
 }
 
 export default errorHandler;
