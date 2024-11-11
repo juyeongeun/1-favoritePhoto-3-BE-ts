@@ -1,9 +1,9 @@
-import cardRepository from "../repositorys/cardRepository.js";
+import cardRepository from "../repositorys/cardRepository";
 import {
   CreateCardData,
   WhereConditionsParams,
   GetByUserIdParams,
-} from "../utils/interface/card/cardInterfaces.js";
+} from "../utils/interface/card/cardInterfaces";
 
 const whereConditions = (
   userId: number,

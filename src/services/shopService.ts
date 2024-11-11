@@ -1,7 +1,7 @@
-import shopRepository from "../repositorys/shopRepository.js";
-import exChangeRepository from "../repositorys/exchangeRepository.js";
-import prismaClient from "../utils/prismaClient.js";
-import createNotificationFromType from "../utils/notification/createByType.js"; // 알림 생성 유틸리티 임포트
+import shopRepository from "../repositorys/shopRepository";
+import exChangeRepository from "../repositorys/exchangeRepository";
+import prismaClient from "../utils/prismaClient";
+import createNotificationFromType from "../utils/notification/createByType";
 import {
   // WhereConditions,
   CreateShopCardData,
