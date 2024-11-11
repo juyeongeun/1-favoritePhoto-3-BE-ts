@@ -1,4 +1,4 @@
-import prismaClient from "../utils/prismaClient.js";
+import prismaClient from "../utils/prismaClient";
 
 interface SearchData {
   where: Object;
