@@ -24,18 +24,18 @@ const getAllNotifications = (userId: number) => {
 };
 
 /* 알림 상태 업데이트(읽음 여부) */
-const updateNotification = (id: number, data: NotificationData) => {
+const updateNotification = (id: number) => {
   return prismaClient.notification.update({
-    where: { id },
+    where: { id, read: false },
     data: {
-      ...data,
+      read: true,
     },
   });
 };
 
 /* 알림 삭제 */
 const deleteNotification = (id: number) => {
-  return prismaClient.notification.delete({ where: { id: parseInt(id, 10) } });
+  return prismaClient.notification.delete({ where: { id } });
 };
 
 export default {
