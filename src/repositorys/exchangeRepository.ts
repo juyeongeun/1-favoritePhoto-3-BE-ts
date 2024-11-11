@@ -1,6 +1,15 @@
-import prismaClient from "../utils/prismaClient.js";
+import { ResponseExchange } from "../utils/interface/exchange/exchageData";
+import { WhereConditions } from "../utils/interface/queryString";
+import prismaClient from "../utils/prismaClient";
 
-const create = async (data) => {
+interface ExchangeData {
+  userId: number;
+  cardId: number;
+  shopId: number;
+  count: number;
+}
+
+const create = async (data: ExchangeData) => {
   return prismaClient.exchange.create({
     data,
     include: {
@@ -14,6 +23,7 @@ const create = async (data) => {
         include: {
           user: {
             select: {
+              id: true,
               nickname: true,
             },
           },
@@ -29,7 +39,7 @@ const create = async (data) => {
   });
 };
 
-const update = async ({ id, data }) => {
+const update = async (id: number, data: ExchangeData) => {
   return prismaClient.exchange.update({
     where: {
       id,
@@ -38,16 +48,17 @@ const update = async ({ id, data }) => {
     include: {
       user: {
         select: {
+          id: true,
           nickname: true,
         },
       },
       card: true,
-      exchangeCard: true,
+      // exchangeCard: true,
     },
   });
 };
 
-const deleteExchange = async (id) => {
+const deleteExchange = async (id: number) => {
   return prismaClient.exchange.delete({
     where: {
       id,
@@ -55,7 +66,7 @@ const deleteExchange = async (id) => {
   });
 };
 
-const getById = async (id) => {
+const getById = async (id: number) => {
   return prismaClient.exchange.findFirst({
     where: {
       id,
@@ -63,6 +74,7 @@ const getById = async (id) => {
     include: {
       user: {
         select: {
+          id: true,
           nickname: true,
         },
       },
@@ -73,12 +85,14 @@ const getById = async (id) => {
           genre: true,
           description: true,
           imageURL: true,
+          purchasePrice: true,
         },
       },
       shop: {
         include: {
           user: {
             select: {
+              id: true,
               nickname: true,
             },
           },
@@ -89,6 +103,7 @@ const getById = async (id) => {
               genre: true,
               description: true,
               imageURL: true,
+              purchasePrice: true,
             },
           },
         },
@@ -97,8 +112,11 @@ const getById = async (id) => {
   });
 };
 
-const getByUserId = async (data) => {
-  const { where, limit, cursor } = data;
+const getByUserId = async (
+  cursor: number,
+  limit: number,
+  where: WhereConditions
+) => {
   return prismaClient.exchange.findMany({
     where,
     take: limit + 1, //추가적인 데이터가 있는지 확인을 위함
@@ -107,6 +125,7 @@ const getByUserId = async (data) => {
     include: {
       user: {
         select: {
+          id: true,
           nickname: true,
         },
       },
@@ -125,7 +144,6 @@ const getByUserId = async (data) => {
           price: true,
           remainingCount: true,
           exchangeDescription: true,
-          exchangeGenre: true,
           exchangeGenre: true,
           card: {
             select: {
@@ -150,20 +168,20 @@ const getByUserId = async (data) => {
   });
 };
 
-const getByShopId = async (id) => {
+const getByShopId = async (id: number) => {
   return prismaClient.exchange.findMany({
     where: {
       shopId: id,
     },
     include: {
       user: {
-        select: { nickname: true },
+        select: { id: true, nickname: true },
       },
       card: true,
       shop: {
         select: {
           user: {
-            select: { nickname: true },
+            select: { id: true, nickname: true },
           },
           card: {
             select: {
@@ -178,7 +196,7 @@ const getByShopId = async (id) => {
   });
 };
 
-const getByShopIdAndUser = async ({ shopId, userId }) => {
+const getByShopIdAndUser = async (shopId: number, userId: number) => {
   return prismaClient.exchange.findMany({
     where: {
       shopId,
@@ -186,14 +204,14 @@ const getByShopIdAndUser = async ({ shopId, userId }) => {
     },
     include: {
       user: {
-        select: { nickname: true },
+        select: { id: true, nickname: true },
       },
       card: true,
     },
   });
 };
 
-const acceptExchange = async (exchange) => {
+const acceptExchange = async (exchange: ResponseExchange) => {
   const { price, card, userId: ownerId } = exchange.shop;
   const { card: exchangeCard } = exchange;
   const [updateShopItem, consumerCard, ownerCard] =
@@ -217,6 +235,8 @@ const acceptExchange = async (exchange) => {
           totalCount: exchange.count,
           remainingCount: exchange.count,
           userId: exchange.userId,
+          genre: exchangeCard.genre,
+          description: exchangeCard.description,
         },
       }),
       //판매한 사람의 userId로 새로운 레코드생성

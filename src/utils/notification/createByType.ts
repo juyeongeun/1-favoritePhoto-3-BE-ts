@@ -2,14 +2,15 @@ import notificationRepository from "../../repositorys/notificationRepository";
 import { Exchange, Shop, Purchase, User, Card } from "@prisma/client";
 import { CustomError } from "../interface/customError";
 
-interface ShopData extends Shop {
-  user: User;
-  card: Card;
+interface ShopData {
+  user: { nickname: string; id: number };
+  card: { name: string; grade: string };
 }
 
 interface ExchangeData extends Exchange {
   shop: ShopData;
-  user: User;
+  user: { nickname: string };
+  card: { name: string; grade: string };
 }
 
 interface PurchaseData extends Purchase {
@@ -28,7 +29,7 @@ interface NotificationType {
   userId: number;
   exchange?: ExchangeData;
   shop?: ShopData;
-  purchase: PurchaseData;
+  purchase?: PurchaseData;
 }
 
 interface NotificationUser {
@@ -49,7 +50,7 @@ const switchingType = (type: number, exchange: ExchangeData) => {
   switch (type) {
     case 1: //교환제안 판매자에게
       return {
-        userId: shop.userId,
+        userId: shop.user.id,
         type: "교환제안",
         content: `${consumer.nickname}님이 [${shop.card.grade} | ${shop.card.name}]의 포토 카드 교환 제안을 했습니다.`,
       };
@@ -73,7 +74,7 @@ const switchingType = (type: number, exchange: ExchangeData) => {
       };
     case 5: //교환신청자의 취소후 판매자에게
       return {
-        userId: shop.userId,
+        userId: shop.user.id,
         type: "취소",
         content: `${consumer.nickname}님과의 [${shop.card.grade} | ${shop.card.name}]의 포토 카드 교환제안이 취소되었습니다.`,
       };
@@ -82,24 +83,24 @@ const switchingType = (type: number, exchange: ExchangeData) => {
 
 /* 상점 관련 알림 */
 const switchingTypeForShop = (type: number, shop: ShopData) => {
-  const { userId, card } = shop; // userId는 판매자 ID, card는 카드 정보
+  const { user, card } = shop; // userId는 판매자 ID, card는 카드 정보
 
   switch (type) {
     case 4: // 포토카드 판매 등록시, 사용자에게
       return {
-        userId,
+        userId: user.id,
         type: "등록완료",
         content: `[${card.grade} | ${card.name}]이 성공적으로 등록되었습니다.`,
       };
     case 5: // 포토카드 판매 취소시, 사용자에게
       return {
-        userId,
+        userId: user.id,
         type: "판매취소",
         content: `[${card.grade} | ${card.name}]의 판매가 취소되었습니다.`,
       };
     case 6: // 판매중인 포토카드 수정, 사용자에게
       return {
-        userId,
+        userId: user.id,
         type: "카드수정",
         content: `[${card.grade} | ${card.name}]이 수정되었습니다.`,
       };
@@ -159,7 +160,10 @@ const createNotificationFromType = async (
         const { userId, nickname, point } = data as unknown as NotificationUser; //고민이 좀 필요함 맞지않는 타입을 형 변환 하고 있음
         notificationData = createPointNotification(userId, nickname, point);
       } else {
-        notificationData = switchingTypeForPurchase(type, data.purchase);
+        notificationData = switchingTypeForPurchase(
+          type,
+          data.purchase as PurchaseData
+        );
       }
     const notification = await notificationRepository.createNotification(
       notificationData as NotificationData

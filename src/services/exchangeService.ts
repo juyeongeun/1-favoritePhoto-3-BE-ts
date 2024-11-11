@@ -1,10 +1,19 @@
-import exchangeRepository from "../repositorys/exchangeRepository.js";
-import shopRepository from "../repositorys/shopRepository.js";
-import getShopItem from "../repositorys/shopRepository.js";
-import createNotificationFromType from "../utils/notification/createByType.js";
+import exchangeRepository from "../repositorys/exchangeRepository";
+import shopRepository from "../repositorys/shopRepository";
+import { CustomError } from "../utils/interface/customError";
+import { QueryString, WhereConditions } from "../utils/interface/queryString";
+import createNotificationFromType from "../utils/notification/createByType";
 
-const whereConditions = (userId, keyword) => {
-  const where = { userId };
+interface ExchangeData {
+  userId: number;
+  cardId: number;
+  shopId: number;
+  count: number;
+  description: string;
+}
+
+const whereConditions = (userId: number, keyword: string) => {
+  const where: WhereConditions = { userId };
   if (keyword) {
     where.OR = [
       {
@@ -24,21 +33,22 @@ const whereConditions = (userId, keyword) => {
   return where;
 };
 
-const createExchange = async (data) => {
+const createExchange = async (data: ExchangeData) => {
   try {
     //판매의 남아있는 카드 수량을 검사하는 로직 필요
     const checkShop = await shopRepository.getShopItem(data.shopId);
-    if (checkShop.remainingCount <= 0) {
-      const error = new Error("Unprocessable Entity");
-      error.status = 422;
-      error.data = {
-        message: "거래가능한 수량이 없습니다.",
-      };
-      throw error;
-    }
+    if (checkShop)
+      if (checkShop.remainingCount <= 0) {
+        const error: CustomError = new Error("Unprocessable Entity");
+        error.status = 422;
+        error.data = {
+          message: "거래가능한 수량이 없습니다.",
+        };
+        throw error;
+      }
     const exchange = await exchangeRepository.create(data);
     //판매자에게 교환제안 알림생성
-    createNotificationFromType(1, { exchange });
+    createNotificationFromType(1, exchange);
     return exchange;
   } catch (error) {
     throw error;
@@ -46,17 +56,17 @@ const createExchange = async (data) => {
 };
 
 //요구사항에 없음 일단 제작
-const updateExchange = async ({ exchangeId, data }) => {
-  const exchange = await exchangeRepository.update({ exchangeId, data });
+const updateExchange = async (exchangeId: number, data: ExchangeData) => {
+  const exchange = await exchangeRepository.update(exchangeId, data);
 
   return exchange;
 };
 
-const deleteExchange = async (exchangeId, userId) => {
+const deleteExchange = async (exchangeId: number, userId: number) => {
   try {
     const exchange = await exchangeRepository.getById(exchangeId);
     if (!exchange) {
-      const error = new Error("Not Found");
+      const error: CustomError = new Error("Not Found");
       error.status = 404;
       error.data = {
         message: "교환신청 내역을 찾을수 없습니다.",
@@ -65,7 +75,7 @@ const deleteExchange = async (exchangeId, userId) => {
     }
 
     if (exchange.userId !== userId) {
-      const error = new Error("Unauthorized");
+      const error: CustomError = new Error("Unauthorized");
       error.status = 401;
       error.data = {
         message: "본인의 교환제안만 취소 할 수 있습니다.",
@@ -73,7 +83,7 @@ const deleteExchange = async (exchangeId, userId) => {
       throw error;
     }
     //판매자에게 교환제안취소 알림생성
-    createNotificationFromType(5, { exchange });
+    createNotificationFromType(5, exchange);
     const deleteExchange = await exchangeRepository.deleteExchange(exchangeId);
     return deleteExchange;
   } catch (error) {
@@ -81,11 +91,11 @@ const deleteExchange = async (exchangeId, userId) => {
   }
 };
 
-const acceptExchange = async (exchangeId) => {
+const acceptExchange = async (exchangeId: number) => {
   try {
     const exchange = await exchangeRepository.getById(exchangeId);
     if (!exchange) {
-      const error = new Error("Not Found");
+      const error: CustomError = new Error("Not Found");
       error.status = 404;
       error.data = {
         message: "교환내역을 찾지 못했습니다.",
@@ -94,7 +104,7 @@ const acceptExchange = async (exchangeId) => {
     }
 
     if (exchange.shop.remainingCount <= 0) {
-      const error = new Error("Unprocessable Entity");
+      const error: CustomError = new Error("Unprocessable Entity");
       error.status = 422;
       error.data = {
         message: "거래가능한 수량이 없습니다.",
@@ -117,11 +127,11 @@ const acceptExchange = async (exchangeId) => {
         );
         //성사된 제안자를 제외한 리스트의 모든 유저에게 알림생성
         notificationUsers.map((exchange) =>
-          createNotificationFromType(4, { exchange })
+          createNotificationFromType(4, exchange)
         );
       }
       //승인된 싱청자에게 성사 알림생성
-      createNotificationFromType(2, { exchange });
+      createNotificationFromType(2, exchange);
       //해당 상품의 모든 교환제안을 삭제해야 하는지 의문...
       await exchangeRepository.deleteExchange(exchangeId);
     }
@@ -131,11 +141,11 @@ const acceptExchange = async (exchangeId) => {
   }
 };
 
-const refuseExchange = async (exchangeId, userId) => {
+const refuseExchange = async (exchangeId: number, userId: number) => {
   try {
     const exchange = await exchangeRepository.getById(exchangeId);
     if (!exchange) {
-      const error = new Error("Not Found");
+      const error: CustomError = new Error("Not Found");
       error.status = 404;
       error.data = {
         message: "교환내역을 찾지 못했습니다.",
@@ -143,7 +153,7 @@ const refuseExchange = async (exchangeId, userId) => {
       throw error;
     }
     if (exchange.shop.userId !== userId) {
-      const error = new Error("Unauthorized");
+      const error: CustomError = new Error("Unauthorized");
       error.status = 401;
       error.data = {
         message: "판매자만 교환거절을 할 수 있습니다.",
@@ -151,7 +161,7 @@ const refuseExchange = async (exchangeId, userId) => {
       throw error;
     }
     //신청자에게 교환거절 알림생성
-    createNotificationFromType(3, { exchange });
+    createNotificationFromType(3, exchange);
     await exchangeRepository.deleteExchange(exchangeId);
     return true;
   } catch (error) {
@@ -159,17 +169,13 @@ const refuseExchange = async (exchangeId, userId) => {
   }
 };
 
-const getByUserId = async (userId, data) => {
+const getByUserId = async (userId: number, data: QueryString) => {
   const { limit, cursor, keyword } = data;
   const where = whereConditions(userId, keyword);
-  const exchanges = await exchangeRepository.getByUserId({
-    where,
-    limit,
-    cursor,
-  });
+  const exchanges = await exchangeRepository.getByUserId(cursor, limit, where);
 
   if (!exchanges) {
-    const error = new Error("Not Found");
+    const error: CustomError = new Error("Not Found");
     error.status = 404;
     error.message = "신청내역을 찾을 수 없습니다.";
     throw error;
@@ -185,11 +191,11 @@ const getByUserId = async (userId, data) => {
   };
 };
 
-const getByShopId = async (shopId) => {
+const getByShopId = async (shopId: number) => {
   const exchanges = await exchangeRepository.getByShopId(shopId);
 
   if (!exchanges) {
-    const error = new Error("Not Found");
+    const error: CustomError = new Error("Not Found");
     error.status = 404;
     error.message = "신청내역을 찾을 수 없습니다.";
     throw error;

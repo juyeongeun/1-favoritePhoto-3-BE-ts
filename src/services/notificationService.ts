@@ -1,5 +1,7 @@
 import { NumericalBotVersion } from "aws-sdk/clients/lexmodelsv2.js";
 import notificationRepository from "../repositorys/notificationRepository.js";
+import { CustomError } from "../utils/interface/customError.js";
+import { Notification } from "@prisma/client";
 
 interface NotificationData {
   userId: number;
@@ -47,13 +49,14 @@ const getAllNotifications = async (userId: number) => {
 };
 
 /* 특정 알림 조회 */
-const getNotificationById = async (id) => {
-  const notification = await notificationRepository.getNotificationById(
-    parseInt(id, 10)
-  );
+const getNotificationById = async (id: number) => {
+  const notification = await notificationRepository.getNotificationById(id);
   if (!notification) {
-    const error = new Error("알림을 찾을 수 없습니다.");
+    const error: CustomError = new Error("Not Found");
     error.status = 404;
+    error.data = {
+      message: "알림을 찾을 수 없습니다.",
+    };
     throw error;
   }
 
@@ -65,43 +68,30 @@ const getNotificationById = async (id) => {
 };
 
 /* 알림 업데이트 */
-const updateNotification = async (id, data) => {
-  const notification = await notificationRepository.getNotificationById(
-    parseInt(id, 10)
-  );
+const updateNotification = async (id: number) => {
+  const notification = await notificationRepository.getNotificationById(id);
 
   if (!notification) {
-    const error = new Error("알림을 찾을 수 없습니다.");
-    error.status = 404; // 404 상태 코드 설정
+    const error: CustomError = new Error("Not Found");
+    error.status = 404;
     error.data = {
-      notificationId: id, // 알림 ID 포함
+      message: "알림을 찾을 수 없습니다.",
     };
     throw error;
   }
 
-  // 'read' 필드만 업데이트하도록 필터링
-  const updateData = {};
-  if (data.read !== undefined) {
-    updateData.read = data.read;
-  }
-
-  return await notificationRepository.updateNotification({
-    id: parseInt(id, 10), // id 객체로 전달
-    data: updateData,
-  });
+  return await notificationRepository.updateNotification(id);
 };
 
 /* 알림 삭제 */
-const deleteNotification = async (id) => {
-  const notification = await notificationRepository.getNotificationById(
-    parseInt(id, 10)
-  );
+const deleteNotification = async (id: number) => {
+  const notification = await notificationRepository.getNotificationById(id);
 
   if (!notification) {
-    const error = new Error("알림을 찾을 수 없습니다.");
-    error.status = 404; // 404 상태 코드 설정
+    const error: CustomError = new Error("Not Found");
+    error.status = 404;
     error.data = {
-      notificationId: id, // 알림 ID 포함
+      message: "알림을 찾을 수 없습니다.",
     };
     throw error;
   }

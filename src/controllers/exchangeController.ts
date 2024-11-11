@@ -12,7 +12,7 @@ router.post(
   passport.authenticate("access-token", { session: false }),
   asyncHandle(async (req, res, next) => {
     try {
-      const { id: userId } = req.user;
+      const { id: userId } = req.user as { id: number };
       const { id: shopId } = req.params;
       const { myCardId, description, count } = req.body;
 
@@ -36,12 +36,10 @@ router.post(
   passport.authenticate("access-token", { session: false }),
   asyncHandle(async (req, res, next) => {
     try {
-      const { id: userId } = req.user;
       const { id: exchangeId } = req.params;
 
       const response = await exchangeService.acceptExchange(
-        parseInt(exchangeId),
-        userId
+        parseInt(exchangeId)
       );
       //승인자의 id로 새로 생성된 card 객체 반환
       res.status(200).send(response);
@@ -56,7 +54,7 @@ router.post(
   passport.authenticate("access-token", { session: false }),
   asyncHandle(async (req, res, next) => {
     try {
-      const { id: userId } = req.user;
+      const { id: userId } = req.user as { id: number };
       const { id: exchangeId } = req.params;
 
       const response = await exchangeService.refuseExchange(
@@ -77,7 +75,7 @@ router.delete(
   passport.authenticate("access-token", { session: false }),
   asyncHandle(async (req, res, next) => {
     try {
-      const { id: userId } = req.user;
+      const { id: userId } = req.user as { id: number };
       const { id: exchangeId } = req.params;
 
       const response = await exchangeService.deleteExchange(

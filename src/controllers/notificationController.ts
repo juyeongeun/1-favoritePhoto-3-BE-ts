@@ -20,8 +20,9 @@ router.get(
   passport.authenticate("access-token", { session: false }),
   async (req, res, next) => {
     try {
+      const { id: userId } = req.user as { id: number };
       const notifications = await notificationService.getAllNotifications(
-        req.user.id // 로그인된 현재 사용자 ID
+        userId // 로그인된 현재 사용자 ID
       );
       res.status(200).send({ notifications });
     } catch (error) {
@@ -36,9 +37,8 @@ router.get(
   passport.authenticate("access-token", { session: false }),
   async (req, res, next) => {
     try {
-      const notification = await notificationService.getNotificationById(
-        req.params.id
-      );
+      const id = parseInt(req.params.id);
+      const notification = await notificationService.getNotificationById(id);
       res.status(200).send({ notification });
     } catch (error) {
       next(error);
@@ -52,9 +52,9 @@ router.patch(
   passport.authenticate("access-token", { session: false }),
   async (req, res, next) => {
     try {
+      const id = parseInt(req.params.id);
       const updatedNotification = await notificationService.updateNotification(
-        req.params.id,
-        req.body
+        id
       );
       res.status(200).send({ updatedNotification });
     } catch (error) {
@@ -69,7 +69,8 @@ router.delete(
   passport.authenticate("access-token", { session: false }),
   async (req, res, next) => {
     try {
-      await notificationService.deleteNotification(req.params.id);
+      const id = parseInt(req.params.id);
+      await notificationService.deleteNotification(id);
       res.status(200).send({ message: "알림이 성공적으로 삭제되었습니다." });
     } catch (error) {
       next(error);
