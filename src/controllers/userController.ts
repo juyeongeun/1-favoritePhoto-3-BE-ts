@@ -9,15 +9,33 @@ import cardService from "../services/cardService";
 import shopService from "../services/shopService";
 import { userSockets } from "../utils/socket/socket";
 import { io } from "../app.js";
+import { CustomError } from "../utils/interface/customError";
+import { User } from "@prisma/client";
 
 const router = express.Router();
+
+interface RequestBody {
+  email: string;
+  password: string;
+  nickname: string;
+}
+
+interface RequestQuery {
+  limit: string;
+  cursor: string;
+  keyword: string;
+  genre: string;
+  grade: string;
+  salesType: string;
+  isSoldOut: string;
+}
 
 router.post(
   "/signup",
   userValidation,
   asyncHandle(async (req, res, next) => {
     try {
-      const { email, password, nickname } = req.body;
+      const { email, password, nickname } = req.body as RequestBody;
 
       const user = await userService.create({
         email,
@@ -36,12 +54,15 @@ router.post(
   "/login",
   asyncHandle(async (req, res, next) => {
     try {
-      const { email, password } = req.body;
-      const user = await userService.getUser({ email, password });
+      const { email, password } = req.body as RequestBody;
+      const user = await userService.getUser(email, password);
 
       const accessToken = userService.createToken(user);
       const refreshToken = userService.createToken(user, "refresh");
-      const nextUser = await userService.updateUser(user.id, { refreshToken });
+      const nextUser = await userService.updateRefreshToken(
+        user.id,
+        refreshToken
+      );
 
       res.cookie("access-token", accessToken, cookiesConfig.accessTokenOption);
       res.cookie(
@@ -62,10 +83,8 @@ router.delete(
   passport.authenticate("access-token", { session: false }),
   asyncHandle(async (req, res, next) => {
     try {
-      const { id: userId } = req.user;
-      await userService.updateUser(userId, {
-        refreshToken: "",
-      });
+      const { id: userId } = req.user as { id: number };
+      await userService.updateRefreshToken(userId, "");
       res.cookie("access-token", null, cookiesConfig.clearAccessTokenOption);
       res.cookie("refresh-token", null, cookiesConfig.clearRefreshTokenOption);
       res.status(200).send({ message: "로그아웃 되었습니다" });
@@ -80,7 +99,7 @@ router.get(
   passport.authenticate("access-token", { session: false }),
   asyncHandle(async (req, res, next) => {
     try {
-      const { id: userId } = req.user;
+      const { id: userId } = req.user as { id: number };
       const user = await userService.getUserById(userId);
 
       res.status(200).send(user);
@@ -94,7 +113,7 @@ router.post(
   "/check-email",
   asyncHandle(async (req, res, next) => {
     try {
-      const { email } = req.body;
+      const { email } = req.body as RequestBody;
       const user = await userService.getUserByEmail(email);
       if (user) {
         res.status(400).send({
@@ -151,37 +170,44 @@ router.post(
 router.get(
   "/refresh-token",
   (req, res, next) => {
-    passport.authenticate("refresh-token", { session: false }, (err, user) => {
-      if (err || !user) {
-        return res.status(403).send({ message: "토근만료" });
+    passport.authenticate(
+      "refresh-token",
+      { session: false },
+      (err: CustomError, user: User) => {
+        if (err || !user) {
+          return res.status(403).send({ message: "토근만료" });
+        }
+        req.user = user;
+        next();
       }
-      req.user = user;
-      next();
-    })(req, res, next);
+    )(req, res, next);
   },
   asyncHandle(async (req, res, next) => {
     try {
-      const { id: userId } = req.user;
+      const { id: userId } = req.user as { id: number };
       const cookieString = req.headers.cookie;
 
-      const refreshToken = cookieString
-        .split("; ")
-        .find((cookie) => cookie.startsWith("refresh-token="))
-        .split("=")[1];
+      const refreshToken: string = "";
+      if (cookieString) {
+        const cookie = cookieString
+          .split("; ")
+          .find((cookie) => cookie.startsWith("refresh-token="));
+        if (cookie) {
+          cookie.split("=")[1];
+        }
+      }
 
       if (!refreshToken) {
         return res.status(403).send({ message: "리프레쉬 토큰이 없습니다." });
       }
-      const validationToken = await userService.refreshToken(
-        userId,
-        refreshToken
-      );
-      if (validationToken) {
-        const accessToken = userService.createToken(req.user);
-        const newRefreshToken = userService.createToken(req.user, "refresh");
-        const nextUser = await userService.updateUser(req.user.id, {
-          refreshToken: newRefreshToken,
-        });
+      const user = await userService.refreshToken(userId, refreshToken);
+      if (user) {
+        const accessToken = userService.createToken(user);
+        const newRefreshToken = userService.createToken(user, "refresh");
+        const nextUser = await userService.updateRefreshToken(
+          userId,
+          newRefreshToken
+        );
 
         res.cookie(
           "access-token",
@@ -207,11 +233,16 @@ router.get(
   passport.authenticate("access-token", { session: false }),
   asyncHandle(async (req, res, next) => {
     try {
-      const { id: userId } = req.user;
+      const { id: userId } = req.user as { id: number };
       //페이지네이션
-      const { keyword = "", limit = 10, cursor = "" } = req.query;
+      const {
+        keyword = "",
+        limit = "10",
+        cursor = "",
+        genre = "",
+        grade = "",
+      } = req.query as unknown as RequestQuery;
       //정렬기준
-      const { genre = "", grade = "" } = req.query;
 
       const cards = await cardService.getByUserId(userId, {
         keyword,
@@ -233,7 +264,7 @@ router.get(
   passport.authenticate("access-token", { session: false }),
   asyncHandle(async (req, res, next) => {
     try {
-      const { id: userId } = req.user;
+      const { id: userId } = req.user as { id: number };
 
       const counts = await userService.getByUserCardsCount(userId);
 
@@ -249,8 +280,12 @@ router.get(
   passport.authenticate("access-token", { session: false }),
   asyncHandle(async (req, res, next) => {
     try {
-      const { id: userId } = req.user;
-      const { keyword = "", limit = 10, cursor = "" } = req.query;
+      const { id: userId } = req.user as { id: number };
+      const {
+        keyword = "",
+        limit = "10",
+        cursor = "",
+      } = req.query as unknown as RequestQuery;
 
       const exchanges = await exchangeService.getByUserId(userId, {
         keyword,
@@ -271,16 +306,17 @@ router.get(
   passport.authenticate("access-token", { session: false }),
   asyncHandle(async (req, res, next) => {
     try {
-      const { id: userId } = req.user;
+      const { id: userId } = req.user as { id: number };
 
-      const { limit = 10, cursor = "" } = req.query;
       const {
+        limit = "10",
+        cursor = "",
         grade = "",
         genre = "",
         salesType = "",
         isSoldOut = "false",
         keyword = "",
-      } = req.query;
+      } = req.query as unknown as RequestQuery;
 
       const sales = await userService.getMySales(userId, {
         limit: parseInt(limit),
@@ -305,7 +341,7 @@ router.get(
   passport.authenticate("access-token", { session: false }),
   asyncHandle(async (req, res, next) => {
     try {
-      const { id: userId } = req.user;
+      const { id: userId } = req.user as { id: number };
 
       const counts = await userService.getMySalesCount(userId);
 
@@ -322,10 +358,10 @@ router.get(
   passport.authenticate("access-token", { session: false }),
   asyncHandle(async (req, res) => {
     const { shopId } = req.params;
-    const { id: userId } = req.user;
+    const { id: userId } = req.user as { id: number };
     const cardDetailsExchanges = await shopService.getExchangeByUserId(
       parseInt(shopId),
-      parseInt(userId)
+      userId
     );
     return res.status(200).json(cardDetailsExchanges);
   })

@@ -1,4 +1,10 @@
-const userValidation = (req, res, next) => {
+import { Request, Response, NextFunction } from "express";
+
+const userValidation = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const emailPattern = /^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-za-z0-9\-]+/;
   const passwordPattern =
     /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,15}$/;
@@ -6,7 +12,7 @@ const userValidation = (req, res, next) => {
   const { email, nickname, password } = req.body;
 
   if (!email || !nickname || !password) {
-    return res.status(400).send({
+    res.status(400).send({
       message: "이메일, 닉네임, 비밀번호는 필수 값입니다.",
       data: {
         email,
@@ -17,7 +23,7 @@ const userValidation = (req, res, next) => {
   }
 
   if (!emailPattern.test(email)) {
-    return res.status(400).send({
+    res.status(400).send({
       message: "이메일 형식을 확인해 주세요",
       data: {
         email,
@@ -39,7 +45,7 @@ const userValidation = (req, res, next) => {
     nickname.length < 1 ||
     nickname.length > 10
   ) {
-    return res.status(400).send({
+    res.status(400).send({
       message: "닉네임은 1자 이상 10자 미만 입니다.",
       data: {
         nickname,
