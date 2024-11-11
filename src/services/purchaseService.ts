@@ -1,7 +1,20 @@
 import purchaseRepository from "../repositorys/purchaseRepository";
 import createNotificationFromType from "../utils/notification/createByType";
 import prismaClient from "../utils/prismaClient";
-import { Shop } from "@prisma/client";
+import { Card, Shop } from "@prisma/client";
+
+// 알림 인터페이스 정의
+interface PurchaseNotificationData {
+  userId: number;
+  card: Card;
+  count?: number;
+  consumer?: string;
+  id: number;
+  createAt: Date;
+  updateAt: Date;
+  cardId: number;
+  shopId: number;
+}
 
 // 구매 생성 함수
 const createPurchase = async (
@@ -21,8 +34,14 @@ const createPurchase = async (
   }
 
   // 구매 성공 알림을 생성하는 함수
-  const sendNotification = async (type: number, payload: any) => {
-    await createNotificationFromType(type, { purchase: payload });
+  const sendNotification = async (
+    type: number,
+    data: PurchaseNotificationData
+  ) => {
+    await createNotificationFromType(type, {
+      userId: data.userId,
+      purchase: data,
+    });
   };
 
   const notificationPromises: Promise<void>[] = [];
@@ -33,6 +52,11 @@ const createPurchase = async (
       userId: buyerId,
       card: purchase.card,
       count: count,
+      id: purchase.id,
+      createAt: purchase.createAt,
+      updateAt: purchase.updateAt,
+      cardId: purchase.cardId,
+      shopId: purchase.id,
     })
   );
 
@@ -52,6 +76,11 @@ const createPurchase = async (
       userId: purchase.userId,
       card: purchase.card,
       count: count,
+      id: purchase.id,
+      createAt: purchase.createAt,
+      updateAt: purchase.updateAt,
+      cardId: purchase.cardId,
+      shopId: purchase.id,
     })
   );
 
@@ -62,6 +91,11 @@ const createPurchase = async (
       sendNotification(9, {
         userId: purchase.userId,
         card: purchase.card,
+        id: purchase.id,
+        createAt: purchase.createAt,
+        updateAt: purchase.updateAt,
+        cardId: purchase.cardId,
+        shopId: purchase.id,
       })
     );
 
@@ -81,6 +115,11 @@ const createPurchase = async (
         sendNotification(9, {
           userId: exchange.userId,
           card: purchase.card,
+          id: purchase.id,
+          createAt: purchase.createAt,
+          updateAt: purchase.updateAt,
+          cardId: purchase.cardId,
+          shopId: purchase.id,
         })
       );
     });

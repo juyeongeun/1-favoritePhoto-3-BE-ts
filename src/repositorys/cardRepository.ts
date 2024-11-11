@@ -2,7 +2,7 @@ import prismaClient from "../utils/prismaClient.js";
 import {
   CreateCardData,
   GetByUserIdParamsWith,
-} from "../interfaces/card/cardInterfaces.js";
+} from "../utils/interface/card/cardInterfaces.js";
 
 const createCard = (data: CreateCardData) => {
   return prismaClient.card.create({

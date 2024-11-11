@@ -18,7 +18,7 @@ export interface WhereConditionsParams {
 
 export interface GetByUserIdParams {
   limit: number;
-  cursor?: string;
+  cursor?: number;
   keyword?: string;
   genre?: string;
   grade?: string;
@@ -27,5 +27,5 @@ export interface GetByUserIdParams {
 export interface GetByUserIdParamsWith {
   where: Record<string, any>;
   limit: number;
-  cursor?: string;
+  cursor?: number;
 }

@@ -3,7 +3,7 @@ import {
   CreateCardData,
   WhereConditionsParams,
   GetByUserIdParams,
-} from "../interfaces/card/cardInterfaces";
+} from "../utils/interface/card/cardInterfaces.js";
 
 const whereConditions = (
   userId: number,
