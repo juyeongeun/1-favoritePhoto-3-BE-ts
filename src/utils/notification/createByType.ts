@@ -1,5 +1,6 @@
 import notificationRepository from "../../repositorys/notificationRepository";
 import { Exchange, Shop, Purchase, User, Card } from "@prisma/client";
+import { CustomError } from "../interface/customError";
 
 interface ShopData extends Shop {
   user: User;
@@ -19,9 +20,22 @@ interface PurchaseData extends Purchase {
 }
 
 interface NotificationType {
+  userId: number;
   exchange?: ExchangeData;
   shop?: ShopData;
   purchase: PurchaseData;
+}
+
+interface NotificationUser {
+  userId: number;
+  nickname: string;
+  point: number;
+}
+
+interface NotificationData {
+  userId:number;
+  content:string;
+  type:string
 }
 
 const switchingType = (type: number, exchange: ExchangeData) => {
@@ -125,28 +139,25 @@ const createPointNotification = (
 
 const createNotificationFromType = async (
   type: number,
-  data: NotificationType
+  data: NotificationType | NotificationUser
 ) => {
   try {
-    var notificationData;
-    if (data.exchange) {
-      // 교환 관련 알림 처리
-      notificationData = switchingType(type, data.exchange);
-    } else if (data.shop) {
-      // 상점 관련 알림 처리
-      notificationData = switchingTypeForShop(type, data.shop);
-    } else if (type === 10) {
-      const { userId, nickname, point } = data as unknown as {
-        userId: number;
-        nickname: string;
-        point: number;
-      }; //고민이 좀 필요함 맞지않는 타입을 형 변환 하고 있음
-      notificationData = createPointNotification(userId, nickname, point);
-    } else {
-      notificationData = switchingTypeForPurchase(type, data.purchase);
-    }
+    let notificationData: NotificationData | undefined;
+    if ("exchange" in data)
+      if (data.exchange) {
+        // 교환 관련 알림 처리
+        notificationData = switchingType(type, data.exchange);
+      } else if (data.shop) {
+        // 상점 관련 알림 처리
+        notificationData = switchingTypeForShop(type, data.shop);
+      } else if (type === 10) {
+        const { userId, nickname, point } = data as unknown as NotificationUser; //고민이 좀 필요함 맞지않는 타입을 형 변환 하고 있음
+        notificationData = createPointNotification(userId, nickname, point);
+      } else {
+        notificationData = switchingTypeForPurchase(type, data.purchase);
+      }
     const notification = await notificationRepository.createNotification(
-      notificationData
+      notificationData as NotificationData
     );
 
     return notification;

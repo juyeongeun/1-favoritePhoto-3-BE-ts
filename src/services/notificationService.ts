@@ -1,10 +1,16 @@
+import { NumericalBotVersion } from "aws-sdk/clients/lexmodelsv2.js";
 import notificationRepository from "../repositorys/notificationRepository.js";
 
+interface NotificationData {
+  userId: number;
+  content: string;
+}
+
 /* 알림 경과시간 계산 */
-const calculateTime = (createAt) => {
+const calculateTime = (createAt: Date) => {
   const now = new Date();
   const createdTime = new Date(createAt);
-  const timeDiff = now - createdTime; // 밀리초 단위 차이
+  const timeDiff = now.getDate() - createdTime.getDate(); // 밀리초 단위 차이
 
   const seconds = Math.floor(timeDiff / 1000);
   const minutes = Math.floor(seconds / 60);
@@ -24,12 +30,12 @@ const calculateTime = (createAt) => {
 };
 
 /* 알림 생성 */
-const createNotification = async (data) => {
+const createNotification = async (data: NotificationData) => {
   return await notificationRepository.createNotification(data);
 };
 
 /* 현재까지 온 (전체) 알림 조회 */
-const getAllNotifications = async (userId) => {
+const getAllNotifications = async (userId: number) => {
   const notifications = await notificationRepository.getAllNotifications(
     userId
   );

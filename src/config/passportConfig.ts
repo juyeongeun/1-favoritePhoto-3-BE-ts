@@ -1,7 +1,7 @@
 import {
   accessTokenStrategy,
   refreshTokenStrategy,
-} from "../middlewares/passport/jwtToken.js";
+} from "../middlewares/passport/jwtToken";
 import passport from "passport";
 
 passport.use("access-token", accessTokenStrategy);

@@ -4,7 +4,7 @@ import cors, { CorsOptions } from "cors";
 import { Server } from "socket.io";
 import http from "http";
 import errorHandler from "./middlewares/error/errorHandler";
-import userRouter from "./controllers/userController"
+import userRouter from "./controllers/userController";
 import shopRouter from "./controllers/shopController";
 import cardRouter from "./controllers/cardController";
 import purchaseRouter from "./controllers/purchaseController";
@@ -16,7 +16,7 @@ import { setupSocket } from "./utils/socket/socket";
 const app = express();
 app.use(express.json());
 
-const allowedOrigins:  string[] = [
+const allowedOrigins: string[] = [
   "http://localhost:3000",
   "https://localhost:3000",
   "https://willowy-gingersnap-13564c.netlify.app",
@@ -25,7 +25,10 @@ const allowedOrigins:  string[] = [
 // CORS 설정
 const corsOptions: CorsOptions = {
   credentials: true,
-  origin: function (origin: string | undefined, callback:(err: Error | null, origin?:string) => void) {
+  origin: function (
+    origin: string | undefined,
+    callback: (err: Error | null, origin?: string) => void
+  ) {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, origin); // 허용
     } else {

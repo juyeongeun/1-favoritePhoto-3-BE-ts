@@ -1,7 +1,20 @@
 import prismaClient from "../utils/prismaClient.js";
 
-const getMySales = (data) => {
-  const { where, limit, cursor } = data;
+interface SearchData {
+  where: Object;
+  limit?: number;
+  cursor?: number;
+  userId?: number;
+}
+
+interface UserData {
+  email: string;
+  password: string;
+  nickname: string;
+}
+
+const getMySales = (data: SearchData) => {
+  const { where, limit = 5, cursor } = data;
   return prismaClient.card.findMany({
     where,
     take: limit + 1, //추가적인 데이터가 있는지 확인을 위함
@@ -32,7 +45,7 @@ const getMySales = (data) => {
   });
 };
 
-const getMySalesCount = async (data) => {
+const getMySalesCount = async (data: SearchData) => {
   const { where, userId } = data;
   //각 등급의 수를 그룹화
   const gradeCountsPromise = await prismaClient.card.groupBy({
@@ -82,16 +95,22 @@ const getMySalesCount = async (data) => {
     ]);
 
   // 그룹화한 등금을 원하는 JSON 형태로 변환
-  const formattedGradeCounts = gradeCounts.reduce((acc, curr) => {
-    acc[curr.grade] = curr._count.id;
-    return acc;
-  }, {});
+  const formattedGradeCounts = gradeCounts.reduce(
+    (acc: { [key: string]: number }, curr) => {
+      acc[curr.grade] = curr._count.id;
+      return acc;
+    },
+    {}
+  );
 
   // 그룹화한 장르을 원하는 JSON 형태로 변환
-  const formattedGenreCounts = genreCounts.reduce((acc, curr) => {
-    acc[curr.genre] = curr._count.id;
-    return acc;
-  }, {});
+  const formattedGenreCounts = genreCounts.reduce(
+    (acc: { [key: string]: number }, curr) => {
+      acc[curr.genre] = curr._count.id;
+      return acc;
+    },
+    {}
+  );
 
   return {
     totalCount: shopCounts + exchangeCounts,
@@ -107,7 +126,7 @@ const getMySalesCount = async (data) => {
   };
 };
 
-const getMyCardCount = async (userId) => {
+const getMyCardCount = async (userId: number) => {
   //사용자의 id로 등록된 총 카드의 수
   const totalCount = await prismaClient.card.count({
     where: {
@@ -125,10 +144,13 @@ const getMyCardCount = async (userId) => {
     },
   });
   // 그룹화한 등금을 원하는 JSON 형태로 변환
-  const formattedGradeCounts = gradeCounts.reduce((acc, curr) => {
-    acc[curr.grade] = curr._count.id;
-    return acc;
-  }, {});
+  const formattedGradeCounts = gradeCounts.reduce(
+    (acc: { [key: string]: number }, curr) => {
+      acc[curr.grade] = curr._count.id;
+      return acc;
+    },
+    {}
+  );
 
   //각 장르의 수를 그룹화
   const genreCounts = await prismaClient.card.groupBy({
@@ -141,10 +163,13 @@ const getMyCardCount = async (userId) => {
     },
   });
   // 그룹화한 장르을 원하는 JSON 형태로 변환
-  const formattedGenreCounts = genreCounts.reduce((acc, curr) => {
-    acc[curr.genre] = curr._count.id;
-    return acc;
-  }, {});
+  const formattedGenreCounts = genreCounts.reduce(
+    (acc: { [key: string]: number }, curr) => {
+      acc[curr.genre] = curr._count.id;
+      return acc;
+    },
+    {}
+  );
 
   return {
     totalCount,
@@ -153,7 +178,7 @@ const getMyCardCount = async (userId) => {
   };
 };
 
-const getByEmail = (email) => {
+const getByEmail = (email: string) => {
   return prismaClient.user.findUnique({
     where: {
       email,
@@ -161,7 +186,7 @@ const getByEmail = (email) => {
   });
 };
 
-const getByNickname = (nickname) => {
+const getByNickname = (nickname: string) => {
   return prismaClient.user.findFirst({
     where: {
       nickname,
@@ -169,7 +194,7 @@ const getByNickname = (nickname) => {
   });
 };
 
-const getById = (id) => {
+const getById = (id: number) => {
   return prismaClient.user.findUnique({
     where: {
       id,
@@ -177,13 +202,13 @@ const getById = (id) => {
   });
 };
 
-const create = (data) => {
+const create = (data: UserData) => {
   return prismaClient.user.create({
     data,
   });
 };
 
-const update = (id, data) => {
+const update = (id: number, data: UserData) => {
   return prismaClient.user.update({
     where: {
       id,
@@ -192,7 +217,18 @@ const update = (id, data) => {
   });
 };
 
-const deleteUser = (id) => {
+const updateToken = (id: number, refreshToken: string) => {
+  return prismaClient.user.update({
+    where: {
+      id,
+    },
+    data: {
+      refreshToken,
+    },
+  });
+};
+
+const deleteUser = (id: number) => {
   return prismaClient.user.update({
     where: {
       id,
@@ -212,5 +248,6 @@ export default {
   getById,
   create,
   update,
+  updateToken,
   deleteUser,
 };

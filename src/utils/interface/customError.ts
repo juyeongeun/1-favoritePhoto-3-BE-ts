@@ -1,4 +1,4 @@
-interface CustomError extends Error {
-    data?: Object;
-    status? : number;
+export interface CustomError extends Error {
+  data?: Object;
+  status?: number;
 }
