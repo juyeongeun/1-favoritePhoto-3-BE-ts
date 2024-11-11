@@ -1,6 +1,10 @@
 import prismaClient from "../utils/prismaClient.js";
+import {
+  CreateCardData,
+  GetByUserIdParamsWith,
+} from "../interfaces/card/cardInterfaces.js";
 
-const createCard = (data) => {
+const createCard = (data: CreateCardData) => {
   return prismaClient.card.create({
     data,
     include: {
@@ -16,13 +20,13 @@ const createCard = (data) => {
   });
 };
 
-const getByUserId = (data) => {
+const getByUserId = (data: GetByUserIdParamsWith) => {
   const { where, limit, cursor } = data;
   return prismaClient.card.findMany({
     where,
     take: limit + 1, //추가적인 데이터가 있는지 확인을 위함
     skip: cursor ? 1 : undefined,
-    cursor: cursor ? { id: cursor } : undefined,
+    cursor: cursor ? { id: Number(cursor) } : undefined,
     include: {
       user: {
         select: {

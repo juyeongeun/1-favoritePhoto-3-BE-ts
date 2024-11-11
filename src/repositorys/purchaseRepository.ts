@@ -1,7 +1,11 @@
-import prismaClient from "../utils/prismaClient.js";
+import prismaClient from "../utils/prismaClient";
 
 // 사용자 구매
-const createPurchase = async (buyerId, count, shopId) => {
+const createPurchase = async (
+  buyerId: number,
+  count: number,
+  shopId: number
+) => {
   // 상점 정보 및 재고 확인
   const shopInfo = await prismaClient.shop.findUnique({
     where: {
