@@ -7,19 +7,24 @@ import {
   AWS_BUCKET_NAME,
   AWS_REGION,
   AWS_SECRET_ACCESS_KEY,
-} from "../../env.js";
+} from "../../env";
+import { Request, Response, NextFunction } from "express";
 
 // AWS S3 클라이언트 설정 (v3)
 const s3 = new S3Client({
-  region: AWS_REGION,
+  region: AWS_REGION!,
   credentials: {
-    accessKeyId: AWS_ACCESS_KEY_ID,
-    secretAccessKey: AWS_SECRET_ACCESS_KEY,
+    accessKeyId: AWS_ACCESS_KEY_ID!,
+    secretAccessKey: AWS_SECRET_ACCESS_KEY!,
   },
 });
 
 // 파일 필터 설정 (이미지 파일 형식만 허용)
-const fileFilter = (req, file, cb) => {
+const fileFilter = (
+  req: Request,
+  file: Express.Multer.File,
+  cb: multer.FileFilterCallback
+) => {
   const allowedExtensions = /jpeg|jpg|png/;
   const ext = path.extname(file.originalname).toLowerCase();
   if (allowedExtensions.test(ext)) {
@@ -39,7 +44,13 @@ const imageUpload = multer({
 });
 
 // 이미지 업로드 핸들러 미들웨어 설정
-const uploadToS3 = async (req, res, next) => {
+const uploadToS3 = async (
+  req: Request & {
+    file?: Express.Multer.File & { location?: string };
+  },
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.file) {
     return next(new Error("파일이 업로드되지 않았습니다."));
   }
@@ -57,10 +68,10 @@ const uploadToS3 = async (req, res, next) => {
     // 압축된 이미지를 S3로 업로드
     await s3.send(
       new PutObjectCommand({
-        Bucket: AWS_BUCKET_NAME,
-        Key: key,
-        Body: compressedImageBuffer,
-        ContentType: req.file.mimetype,
+        Bucket: AWS_BUCKET_NAME!,
+        Key: key!,
+        Body: compressedImageBuffer!,
+        ContentType: req.file.mimetype!,
       })
     );
 

@@ -1,8 +1,14 @@
-import purchaseRepository from "../repositorys/purchaseRepository.js";
-import createNotificationFromType from "../../utils/notification/createByType.js";
-import prismaClient from "../../utils/prismaClient.js";
+import purchaseRepository from "../repositorys/purchaseRepository";
+import createNotificationFromType from "../utils/notification/createByType";
+import prismaClient from "../utils/prismaClient";
+import { Shop } from "@prisma/client";
 
-const createPurchase = async (buyerId, count, shopId) => {
+// 구매 생성 함수
+const createPurchase = async (
+  buyerId: number,
+  count: number,
+  shopId: number
+): Promise<{ purchase: Shop }> => {
   // 구매 및 상점 업데이트 처리
   const purchase = await purchaseRepository.createPurchase(
     buyerId,
@@ -15,11 +21,11 @@ const createPurchase = async (buyerId, count, shopId) => {
   }
 
   // 구매 성공 알림을 생성하는 함수
-  const sendNotification = async (type, payload) => {
+  const sendNotification = async (type: number, payload: any) => {
     await createNotificationFromType(type, { purchase: payload });
   };
 
-  const notificationPromises = [];
+  const notificationPromises: Promise<void>[] = [];
 
   // 구매자 알림 (구매 성공)
   notificationPromises.push(
@@ -70,7 +76,7 @@ const createPurchase = async (buyerId, count, shopId) => {
       },
     });
 
-    exchangeRequests.map((exchange) => {
+    exchangeRequests.forEach((exchange) => {
       notificationPromises.push(
         sendNotification(9, {
           userId: exchange.userId,
