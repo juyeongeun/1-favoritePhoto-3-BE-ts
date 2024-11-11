@@ -1,4 +1,4 @@
-import { Card, Exchange, User } from "@prisma/client";
+import { Exchange } from "@prisma/client";
 import { ShopData } from "../shop/shopData";
 
 export interface ResponseExchange extends Exchange {
