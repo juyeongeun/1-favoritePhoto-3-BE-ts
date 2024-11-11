@@ -1,7 +1,7 @@
 import prismaClient from "../utils/prismaClient.js";
 
 // 포인트 뽑기(랜덤으로 뽑은 포인트 추가)
-const drawPoints = async (userId, drawResult) => {
+const drawPoints = async (userId: number, drawResult: number) => {
   return await prismaClient.user.update({
     where: { id: userId },
     data: {
@@ -14,7 +14,7 @@ const drawPoints = async (userId, drawResult) => {
 };
 
 // 유저 정보 조회
-const getUserById = async (userId) => {
+const getUserById = async (userId: number) => {
   return await prismaClient.user.findUnique({
     where: { id: userId },
   });
