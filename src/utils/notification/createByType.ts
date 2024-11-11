@@ -14,9 +14,14 @@ interface ExchangeData extends Exchange {
 
 interface PurchaseData extends Purchase {
   userId: number;
-  card?: Card;
+  card: Card;
   count?: number;
   consumer?: string;
+  id: number; // 필수 속성
+  createAt: Date; // 필수 속성
+  updateAt: Date;
+  cardId: number;
+  shopId: number;
 }
 
 interface NotificationType {
@@ -33,9 +38,9 @@ interface NotificationUser {
 }
 
 interface NotificationData {
-  userId:number;
-  content:string;
-  type:string
+  userId: number;
+  content: string;
+  type: string;
 }
 
 const switchingType = (type: number, exchange: ExchangeData) => {

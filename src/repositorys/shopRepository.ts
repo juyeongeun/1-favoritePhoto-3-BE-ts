@@ -1,13 +1,11 @@
-import { PrismaClient, Shop, Card, User, Exchange } from "@prisma/client";
+import { Shop, Card, Exchange, Prisma } from "@prisma/client";
 import prismaClient from "../utils/prismaClient.js";
 import {
   CreateShopCardData,
   UpdateShopCardData,
   Filters,
   PaginationResult,
-} from "../interfaces/shop/shopInterfaces.js";
-
-const prisma = new PrismaClient();
+} from "../utils/interface/shop/shopInterfaces.js";
 
 // 사용자가 포토카드를 이미 상점에 등록했는지 확인
 const getCheckCardById = async (
@@ -132,7 +130,8 @@ const getAllShopCards = async (
 ): Promise<PaginationResult> => {
   const { search, grade, genre, isSoldOut } = filters;
 
-  const where: any = {
+  // where 조건에 Prisma의 타입 사용
+  const where: Prisma.ShopWhereInput = {
     AND: [
       ...(search ? [{ card: { name: { contains: search } } }] : []),
       ...(grade ? [{ card: { grade } }] : []),
@@ -147,16 +146,23 @@ const getAllShopCards = async (
     ],
   };
 
+  // 정렬 조건 설정 (Prisma.SortOrder 사용)
+  const orderBy: Prisma.ShopOrderByWithRelationInput[] = [];
+  if (sortOrder === "price_DESC") {
+    orderBy.push({ price: "desc" });
+  } else if (sortOrder === "price_ASC") {
+    orderBy.push({ price: "asc" });
+  } else if (sortOrder === "createAt_DESC") {
+    orderBy.push({ createAt: "desc" });
+  } else if (sortOrder === "createAt_ASC") {
+    orderBy.push({ createAt: "asc" });
+  }
+
   const totalCardsCount = await prismaClient.shop.count({ where });
 
   const shopCards = await prismaClient.shop.findMany({
     where,
-    orderBy: [
-      ...(sortOrder === "price_DESC" ? [{ price: "desc" }] : []),
-      ...(sortOrder === "price_ASC" ? [{ price: "asc" }] : []),
-      ...(sortOrder === "createAt_DESC" ? [{ createAt: "desc" }] : []),
-      ...(sortOrder === "createAt_ASC" ? [{ createAt: "asc" }] : []),
-    ],
+    orderBy,
     take: pageSize,
     skip: (page - 1) * pageSize,
     include: {
@@ -176,17 +182,15 @@ const getAllShopCards = async (
     },
   });
 
+  // 반환 타입 명시
   return {
     totalCards: totalCardsCount,
     currentPage: page,
     totalPages: Math.ceil(totalCardsCount / pageSize),
-    cards: shopCards.map(
-      (shopCard) =>
-        ({
-          ...shopCard,
-          isSoldOut: shopCard.remainingCount === 0,
-        } as any)
-    ),
+    cards: shopCards.map((shopCard) => ({
+      ...shopCard,
+      isSoldOut: shopCard.remainingCount === 0,
+    })),
   };
 };
 

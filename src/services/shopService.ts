@@ -1,26 +1,26 @@
-import shopRepository from "../repositorys/shopRepository.js";
-import exChangeRepository from "../repositorys/exchangeRepository.js";
-import prismaClient from "../utils/prismaClient.js";
-import createNotificationFromType from "../utils/notification/createByType.js"; // 알림 생성 유틸리티 임포트
+import shopRepository from "../repositorys/shopRepository";
+import exChangeRepository from "../repositorys/exchangeRepository";
+import prismaClient from "../utils/prismaClient";
+import createNotificationFromType from "../utils/notification/createByType";
 import {
-  WhereConditions,
+  // WhereConditions,
   CreateShopCardData,
   UpdateShopCardData,
-} from "../interfaces/shop/shopInterfaces.js";
+} from "../utils/interface/shop/shopInterfaces.js";
 
-const whereConditions = (userId: number, keyword?: string): WhereConditions => {
-  const where: WhereConditions = { userId };
-  if (keyword) {
-    where.OR = [
-      {
-        card: {
-          name: { contains: keyword, mode: "insensitive" },
-        },
-      },
-    ];
-  }
-  return where;
-};
+// const whereConditions = (userId: number, keyword?: string): WhereConditions => {
+//   const where: WhereConditions = { userId };
+//   if (keyword) {
+//     where.OR = [
+//       {
+//         card: {
+//           name: { contains: keyword, mode: "insensitive" },
+//         },
+//       },
+//     ];
+//   }
+//   return where;
+// };
 
 /* 카드 존재 여부 확인 */
 const checkCardExists = async (shopId: number) => {

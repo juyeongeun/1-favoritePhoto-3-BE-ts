@@ -1,10 +1,10 @@
 import express, { Request, Response, NextFunction } from "express";
-import shopService from "../services/shopService.js";
-import asyncHandle from "../utils/error/asyncHandle.js";
+import shopService from "../services/shopService";
+import asyncHandle from "../utils/error/asyncHandle";
 import {
   shopValidation,
   shopEditValidation,
-} from "../middlewares/shop/shopValidation.js";
+} from "../middlewares/shop/shopValidation";
 import passport from "../config/passportConfig";
 
 const router = express.Router();
