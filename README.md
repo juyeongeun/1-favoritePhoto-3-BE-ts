@@ -1,14 +1,10 @@
 # 📸💕 최애의 포토
 
----
-
-# **👥 스프린트 1기 3팀_BE**
-
 팀 협업 [노션 링크](https://bubble-city-3ac.notion.site/45d0984c93d146ebad41f9d4c835a0eb?v=d38586371d5d47e8bba3ee1ec029b278&pvs=4)
 
-[🎥 시연 영상](https://drive.google.com/file/d/1Tm46eMQ_Woq-zwY9syITu1ZSH-vohZyG/view?usp=drive_link)
+🎥 [시연 영상](https://drive.google.com/file/d/1Tm46eMQ_Woq-zwY9syITu1ZSH-vohZyG/view?usp=drive_link)
 
----
+<br>
 
 ## **👨‍👩‍👧 팀원 구성**
 <div align="center">
@@ -35,8 +31,7 @@
   </table>
 </div>
 
-
----
+<br>
 
 ## **📚 프로젝트 소개**
 
@@ -45,8 +40,8 @@
     > "최애의 포토"는 디지털 시대의 새로운 수집 문화를 선도하는 플랫폼입니다. 자신이 좋아하는 아이돌이나 스포츠 스타, 그림 등 디지털 포토카드를 손쉽게 사고팔 수 있는 공간으로, 특별한 커뮤니티를 제공합니다. 이제는 좋아하는 포토카드를 실제로 모으는 것뿐만 아니라, 디지털 자산으로 소장하며 나만의 컬렉션을 완성할 수 있습니다. 서로의 포토카드를 교환하고, 나만의 포토카드를 자랑하는 재미와 함께 상호 교류도 즐길 수 있는 플랫폼, "최애의 포토"에서 만나보세요!
     > 
 - 프로젝트 기간: 2024.10.08 ~ 2024.10.31
-
----
+  
+<br>
 
 ## **⚙ 기술 스택**
 
@@ -62,9 +57,9 @@
 
 <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white"> <img src="https://img.shields.io/badge/discord-5865F2?style=for-the-badge&logo=discord&logoColor=white"> <img src="https://img.shields.io/badge/Zoom-0B5CFF?style=for-the-badge&logo=zoom&logoColor=white"> <img src="https://img.shields.io/badge/notion-000000?style=for-the-badge&logo=notion&logoColor=white">
 
----
+<br>
 
-## **📌 백엔드 팀원별 구현 기능 상세**
+## **📌 구현 기능 상세**
 
 ### 주영은
 
@@ -119,7 +114,7 @@
                 2. 교환 신청자가 있을 경우 신청자 n명에 대해 해당 카드가 품절이 되었다는 알림(Notification) 레코드를 n개 생성합니다.
     - 응답: 구매 완료된 후의 해당 상점 레코드를 반환합니다.
 
----
+<br>
 
 ## 📁 파일 구조
 <details>
