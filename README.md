@@ -6,6 +6,8 @@
 
 팀 협업 [노션 링크](https://bubble-city-3ac.notion.site/45d0984c93d146ebad41f9d4c835a0eb?v=d38586371d5d47e8bba3ee1ec029b278&pvs=4)
 
+[🎥 시연 영상](https://drive.google.com/file/d/1Tm46eMQ_Woq-zwY9syITu1ZSH-vohZyG/view?usp=drive_link)
+
 ---
 
 ## **👨‍👩‍👧 팀원 구성**
